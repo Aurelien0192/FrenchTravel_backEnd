@@ -10,36 +10,40 @@ module.exports.PlaceService =  class PlaceService{
 
     static addOnePlace = async function (place, callback){
         try{
+            if(!place){
+                callback({msg:"body is missng", type_error:"no-valid"})
 
-            const new_place = new Place(place)
-            let errors = new_place.validateSync()
-            if(errors){
-
-                errors = errors['errors']
-                const text = Object.keys(errors).map((e) => {
-                    return !errors[e].stringValue? errors[e]['properties']['message'] : `type ${errors[e]['valueType']} is not allowed in path ${errors[e]['path']}`
-                }).join (' ')
-
-                const fields = _.transform(Object.keys(errors), function (result, value) {
-                    errors[value].properties ? result[value] = errors[value]['properties']['message'] : result[value] = ""
-                },{})
-                
-                const err = {
-                    msg: text,
-                    fields_with_error: Object.keys(errors),
-                    fields: fields,
-                    type_error : "validator"
-                }
-                callback(err)
             }else{
-                new_place.notation = 0
-                new_place.phone = ""
-                new_place.typeOfPlace = []
-                new_place.email = ""
-                new_place.bookingLink = ""
+                const new_place = new Place(place)
+                let errors = new_place.validateSync()
+                if(errors){
 
-                await new_place.save()
-                callback(null, new_place.toObject())
+                    errors = errors['errors']
+                    const text = Object.keys(errors).map((e) => {
+                        return !errors[e].stringValue? errors[e]['properties']['message'] : `type ${errors[e]['valueType']} is not allowed in path ${errors[e]['path']}`
+                    }).join (' ')
+
+                    const fields = _.transform(Object.keys(errors), function (result, value) {
+                        errors[value].properties ? result[value] = errors[value]['properties']['message'] : result[value] = ""
+                    },{})
+                    
+                    const err = {
+                        msg: text,
+                        fields_with_error: Object.keys(errors),
+                        fields: fields,
+                        type_error : "validator"
+                    }
+                    callback(err)
+                }else{
+                    new_place.notation = 0
+                    new_place.phone = ""
+                    new_place.typeOfPlace = []
+                    new_place.email = ""
+                    new_place.bookingLink = ""
+
+                    await new_place.save()
+                    callback(null, new_place.toObject())
+                }
             }
         }catch(error){
             console.log(error)

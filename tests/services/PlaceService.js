@@ -238,4 +238,14 @@ describe("addOnePlace", () => {
             done()
         })
     })
+    it("Place without object - E",(done) => {
+        PlaceService.addOnePlace(null,function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-valid')
+            expect(value).to.be.undefined
+            done()
+        })
+    })
+    
 })
