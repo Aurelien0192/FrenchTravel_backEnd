@@ -5,6 +5,9 @@ module.exports.PlaceSchema = mongoose.Schema({
         type : String,
         required : true,
     },
+    owner : {
+        type: mongoose.Schema.Types.ObjectId
+    },
     categorie : {
         type: String,
         enum : ["hotel","restaurant","activity"],

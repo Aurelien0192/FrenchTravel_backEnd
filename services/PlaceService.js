@@ -14,14 +14,14 @@ module.exports.PlaceService =  class PlaceService{
             const new_place = new Place(place)
             let errors = new_place.validateSync()
             if(errors){
-                
+
                 errors = errors['errors']
                 const text = Object.keys(errors).map((e) => {
-                    return errors[e]['properties']['message']
+                    return !errors[e].stringValue? errors[e]['properties']['message'] : `type ${errors[e]['valueType']} is not allowed in path ${errors[e]['path']}`
                 }).join (' ')
 
                 const fields = _.transform(Object.keys(errors), function (result, value) {
-                    result[value] = errors[value]['properties']['message']
+                    errors[value].properties ? result[value] = errors[value]['properties']['message'] : result[value] = ""
                 },{})
                 
                 const err = {
@@ -42,6 +42,7 @@ module.exports.PlaceService =  class PlaceService{
                 callback(null, new_place.toObject())
             }
         }catch(error){
+            console.log(error)
             if(error.code = 11000){
                 const field= Object.keys(error.keyValue)[0]
                 const err = {
