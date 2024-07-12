@@ -11,7 +11,7 @@ module.exports.PlaceService =  class PlaceService{
     static addOnePlace = async function (place, callback){
         try{
             if(!place){
-                callback({msg:"body is missng", type_error:"no-valid"})
+                callback({msg:"body is missing", type_error:"no-valid"})
 
             }else{
                 const new_place = new Place(place)
