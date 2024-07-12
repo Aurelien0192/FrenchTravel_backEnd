@@ -4,7 +4,8 @@ const bodyParser = require("body-parser")
 const Logger = require('./utils/logger').logger.pino
 const database = require('./middlewares/database')
 const loggerHttp = require('./middlewares/loggerHttp')
-const multer = require('./middlewares/multer.config')
+const multerOneImage = require('./middlewares/multer.config').oneImage
+const multerManyImage = require('./middlewares/multer.config').manyImage
 const path = require('path')
 
 
@@ -33,7 +34,8 @@ app.get('/getlocation',ApiLocationControllers.getDataGeocode)
 
 //routes images
 
-app.post('/image',multer,ImageController.addOneImage)
+app.post('/image',multerOneImage,ImageController.addOneImage)
+app.post('/images',multerManyImage,ImageController.addManyImages)
 
 
 app.listen(Config.port, () => {

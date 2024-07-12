@@ -24,4 +24,6 @@ const storage = multer.diskStorage({
 
 
 
-module.exports = multer({storage}).single('image')
+module.exports.oneImage = multer({storage}).single('image')
+
+module.exports.manyImage = multer({storage}).array('images')
