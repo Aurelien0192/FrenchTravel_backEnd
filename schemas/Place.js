@@ -102,7 +102,10 @@ module.exports.PlaceSchema = mongoose.Schema({
         required: true
     },
     phone : String,
-    typeOfPlace : [String],
+    typeOfPlace : {
+        type :[String],
+        default:undefined
+    },
     email : String,
     bookingLink : String,
 })

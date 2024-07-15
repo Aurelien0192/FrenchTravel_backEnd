@@ -26,13 +26,13 @@ const wrongParamsProperty = {
 
 describe("GET - /Getlocation", () => {
     it("get location with empty query - S", (done) => {
-        chai.request(server).get('/getlocation').query({}).end((err,res) => {
+        chai.request(server).get('/getlocation').send({}).end((err,res) => {
             res.should.has.status(200)
             done()
         })
     })
     it("get locations with correct query - S", (done) => {
-        chai.request(server).get('/getlocation').query(goodParams).end((err, res) => {
+        chai.request(server).get('/getlocation').send(goodParams).end((err, res) => {
             expect(res.body).to.be.a('array')
             expect(res.body[0]).to.be.haveOwnProperty('display_name')
             expect(res.body[0]['display_name']).include('Exincourt')
@@ -42,13 +42,13 @@ describe("GET - /Getlocation", () => {
         })
     })
     it("get location with wrong query - E", (done) => {
-        chai.request(server).get('/getlocation').query(wrongParams).end((err,res) => {
+        chai.request(server).get('/getlocation').send(wrongParams).end((err,res) => {
             res.should.has.status(404)
             done()
         })
     })
     it("get location with wrong query properties - S", (done) => {
-        chai.request(server).get('/getlocation').query(wrongParamsProperty).end((err,res) => {
+        chai.request(server).get('/getlocation').send(wrongParamsProperty).end((err,res) => {
             res.should.has.status(200)
             expect(res.body).to.be.a('array')
             expect(res.body[0]).to.haveOwnProperty('place_id')

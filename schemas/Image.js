@@ -7,7 +7,6 @@ module.exports.ImageSchema = mongoose.Schema({
     },
     place:{
         type: mongoose.Types.ObjectId,
-        required: true
     },
     path:{
         type: String,

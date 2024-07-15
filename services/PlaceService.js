@@ -1,4 +1,5 @@
 const PlaceSchema = require ("../schemas/Place").PlaceSchema;
+const ApiLocationService = require("../services/ApiLocationService").ApiLocationServices
 const _ = require('lodash')
 const mongoose = require('mongoose');
 
@@ -35,11 +36,13 @@ module.exports.PlaceService =  class PlaceService{
                     }
                     callback(err)
                 }else{
+
                     new_place.notation = 0
                     new_place.phone = ""
                     new_place.typeOfPlace = []
                     new_place.email = ""
                     new_place.bookingLink = ""
+                    
 
                     await new_place.save()
                     callback(null, new_place.toObject())

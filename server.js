@@ -20,11 +20,18 @@ require("./utils/database")
 
 app.use(bodyParser.json(), loggerHttp.addLogger)
 
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  next();
+});
+
 app.use('/data/images',express.static(path.join(__dirname, '/data/images')))
 
 //routes for Place
 
-app.post('/place',database.controlsBDD,PlaceControllers.addOnePlace)
+app.post('/place',database.controlsBDD,ApiLocationControllers.getDataGeocode,PlaceControllers.addOnePlace)
 
 
 //routes for api call

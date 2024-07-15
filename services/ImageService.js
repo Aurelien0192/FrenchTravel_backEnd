@@ -61,7 +61,6 @@ module.exports.ImageService = class ImageService{
                 image.name = imageInfo.filename
                 image.place = place_id
                 image.path = path
-                console.log(image)
                 imageTab.push(image)
             });
             for(let i =0; i < imagesInfo.length; i++ ){
@@ -69,11 +68,9 @@ module.exports.ImageService = class ImageService{
                 if(error){
                     error = error['errors']
                     const text = Object.keys(error).map((e) => {
-                        console.log(error[e].properties)
                         error[e].properties.message
                     }).join (' ')
                     const fields = _.transform(Object.keys(error), function (result, value) {
-                        console.log(value, result)
                         result[value] = error[value].properties.message
                     },{})
                     

@@ -68,7 +68,6 @@ describe("POST - /place", () => {
     it("Add one place with missing property - E", (done) => {
         chai.request(server).post('/place').send(PlaceWithoutname).end((err, res) => {
             res.should.has.status(405)
-            console.log(res.body)
             done()
         })
     })
