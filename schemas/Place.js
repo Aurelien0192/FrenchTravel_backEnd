@@ -21,7 +21,7 @@ module.exports.PlaceSchema = mongoose.Schema({
     },
     moreInfo : {
         schedules : {
-            type : [String],
+            type : [Object],
             default:undefined,
             validate : [function validator(){
                 return this.categorie === "activity"
@@ -29,7 +29,7 @@ module.exports.PlaceSchema = mongoose.Schema({
             
         },
         duration : {
-            type : Number,
+            type : String,
             validate : [function validator(){
                 return this.categorie === "activity"
             },{message : `duration is not allowed in categorie hotel or restaurant`}]

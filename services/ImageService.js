@@ -8,7 +8,6 @@ const Image = mongoose.model('Image',ImageSchema)
 module.exports.ImageService = class ImageService{
     static async addOneImage(imageInfo, place_id, callback){
         try{
-
             if(!imageInfo){
                 callback({msg: "no image get for upload", type_error: "no-valid"})
             }else{

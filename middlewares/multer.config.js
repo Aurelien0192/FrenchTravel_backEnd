@@ -1,4 +1,3 @@
-const { create } = require('lodash')
 const multer = require('multer')
 
 const MIME_TYPES = {

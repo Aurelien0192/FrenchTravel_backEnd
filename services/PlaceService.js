@@ -38,18 +38,12 @@ module.exports.PlaceService =  class PlaceService{
                 }else{
 
                     new_place.notation = 0
-                    new_place.phone = ""
-                    new_place.typeOfPlace = []
-                    new_place.email = ""
-                    new_place.bookingLink = ""
-                    
-
+                
                     await new_place.save()
                     callback(null, new_place.toObject())
                 }
             }
         }catch(error){
-            console.log(error)
             if(error.code = 11000){
                 const field= Object.keys(error.keyValue)[0]
                 const err = {
