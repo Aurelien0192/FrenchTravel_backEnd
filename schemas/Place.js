@@ -65,6 +65,12 @@ module.exports.PlaceSchema = mongoose.Schema({
                 return this.categorie === "hotel"
             },{message : `services is not allowed in categorie activity or restaurant`}]
         },
+        hotelCategorie:{
+            type:Number,
+            validate : [function validator(){
+                return this.categorie==="hotel"
+            },{message : `duration is not allowed in categorie activity or restaurant`}]
+        },
         accessibility :{
             type : [String],
             default:undefined,
