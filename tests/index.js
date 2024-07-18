@@ -4,9 +4,9 @@ require("../utils/database")
 //    require('./services/PlaceService.test')
 // })
 
-// describe("PlaceControllers", () => {
-//    require('./controllers/PlaceController.test')
-// })
+describe("PlaceControllers", () => {
+   require('./controllers/PlaceController.test')
+})
 
 // describe("ApiLocationService", () => [
 //    require('./services/ApiLocationService.test')

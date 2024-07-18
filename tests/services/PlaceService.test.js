@@ -172,7 +172,7 @@ const placeNothingGood = {
 describe("addOnePlace", () => {
     it("Correct Place. - S" ,(done) => {
 
-        PlaceService.addOnePlace(placeGood, function (err, value) {
+        PlaceService.addOnePlace(placeGood, null, function (err, value) {
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('name')
             expect(value['name']).to.be.equal("Château du Doubs")
@@ -181,7 +181,7 @@ describe("addOnePlace", () => {
         })
     })
     it("Place without Name - E", (done) => {
-        PlaceService.addOnePlace(PlaceWithoutname, function(err, value){
+        PlaceService.addOnePlace(PlaceWithoutname, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('fields')
             expect(err['fields']).to.haveOwnProperty('name')
@@ -192,7 +192,7 @@ describe("addOnePlace", () => {
         })
     })
     it("Place missing Name - E", (done) => {
-        PlaceService.addOnePlace(PlaceMissingname, function(err, value){
+        PlaceService.addOnePlace(PlaceMissingname, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('fields')
             expect(err['fields']).to.haveOwnProperty('name')
@@ -203,7 +203,7 @@ describe("addOnePlace", () => {
         })
     })
     it("place with wrong info sup - E", (done) => {
-        PlaceService.addOnePlace(placeWithWrongInfoSup, function(err, value){
+        PlaceService.addOnePlace(placeWithWrongInfoSup, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('validator')
@@ -212,7 +212,7 @@ describe("addOnePlace", () => {
         })
     })
     it("place with unwanted property - S",(done) => {
-        PlaceService.addOnePlace(placeWithUnwantedProperty, function(err, value){
+        PlaceService.addOnePlace(placeWithUnwantedProperty, null, function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('name')
             expect(value).to.not.have.property("ElleEstOuLaPoulette")
@@ -221,7 +221,7 @@ describe("addOnePlace", () => {
         })
     })
     it("Place with uncorrect type - E",(done) => {
-        PlaceService.addOnePlace(placeWithUncorrectType, function(err, value){
+        PlaceService.addOnePlace(placeWithUncorrectType, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('validator')
@@ -230,7 +230,7 @@ describe("addOnePlace", () => {
         })
     })
     it("Place with many error - E",(done) => {
-        PlaceService.addOnePlace(placeNothingGood,function(err, value){
+        PlaceService.addOnePlace(placeNothingGood, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('validator')
@@ -239,7 +239,7 @@ describe("addOnePlace", () => {
         })
     })
     it("Place without object - E",(done) => {
-        PlaceService.addOnePlace(null,function(err, value){
+        PlaceService.addOnePlace(null, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('no-valid')

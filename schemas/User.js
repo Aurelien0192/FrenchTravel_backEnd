@@ -2,10 +2,16 @@ const mongoose = require('mongoose')
 
 module.exports.UserSchema = mongoose.Schema({
     firstName : {
-        type : String
+        type : String,
+        validate : [function validator(){
+                return this.userType === "professionnal" && this.firstName !==""
+            },{msg : `Le prénom est requis pour un compte professionnel`, type_error:"no-valid"}]
     },
     lastName : {
-        type : String
+        type : String,
+        validate : [function validator(){
+                return this.userType === "professionnal" && this.firstName !==""
+            },{msg : `Le prénom est requis pour un compte professionnel`, type_error:"no-valid"}]
     },
     userType:{
         type: String,
@@ -14,7 +20,9 @@ module.exports.UserSchema = mongoose.Schema({
     },
     username:{
         type:String,
-        required: true
+        required: true,
+        index:true,
+        unique:true
     },
     password:{
         type: String,
@@ -22,7 +30,9 @@ module.exports.UserSchema = mongoose.Schema({
     },
     email:{
         type:mongoose.Types.email,
-        required : true
+        required : true,
+        index:true,
+        unique:true
     },
     about: String,
 })
