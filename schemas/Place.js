@@ -114,5 +114,10 @@ module.exports.PlaceSchema = mongoose.Schema({
     },
     email : String,
     bookingLink : String,
+    create_at:{
+        type:Date,
+        default: new Date()
+    },
+    udpate_at: Date
 })
 

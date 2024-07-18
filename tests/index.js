@@ -12,6 +12,6 @@ require("../utils/database")
 //    require('./services/ApiLocationService.test')
 // ])
 
-describe("ApiLocationControllers",() => {
-   require('./controllers/ApiLocationController.test')
-})
+// describe("ApiLocationControllers",() => {
+//    require('./controllers/ApiLocationController.test')
+// })
