@@ -1,9 +1,7 @@
-const PlaceSchema = require ("../schemas/Place").PlaceSchema;
+const PlaceSchema = require ("../schemas/Place").PlaceSchema
 const ApiLocationService = require("../services/ApiLocationService").ApiLocationServices
 const _ = require('lodash')
 const mongoose = require('mongoose');
-
-const ObjectId = mongoose.Types.ObjectId
 
 const Place = mongoose.model('Place', PlaceSchema)
 

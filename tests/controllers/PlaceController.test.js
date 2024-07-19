@@ -26,9 +26,7 @@ const placeGood = {
     city: "Pontarlier",
     codePostal : "25300",
     country: "France",
-    county: "Doubs",
-    latCoordinate: "46.907258",
-    lonCoordinate:"6.3537263"
+    county: "Doubs"
 }
 
 const PlaceWithoutname = {
@@ -50,9 +48,7 @@ const PlaceWithoutname = {
     city: "Pontarlier",
     codePostal : "25300",
     country: "France",
-    county: "Doubs",
-    latCoordinate: "46.907258",
-    lonCoordinate:"6.3537263"
+    county: "Doubs"
 }
 
 describe("POST - /place", () => {

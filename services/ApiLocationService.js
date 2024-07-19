@@ -24,13 +24,13 @@ module.exports.ApiLocationServices =  class ApiLocationServices {
             const data = await http_geocode.get(`search?`,{params})
             setTimeout(() => {   
                 if(data.data.length !==0){
-                    callback(null,data.data)
+                    return callback(null,data.data)
                 }else{
                     const error = {
                         msg: "adress not found",
                         type_error:"no-found"
                     }
-                    callback(error)
+                    return callback(error)
                 }
             },1000)
         }catch (e){
