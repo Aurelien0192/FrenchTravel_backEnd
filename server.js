@@ -32,9 +32,9 @@ app.use('/data/images',express.static(path.join(__dirname, '/data/images')))
 //routes for User
 
 app.post('/user', database.controlsBDD, UserControllers.addOneUser)
-app.get('user/:id', database.controlsBDD, UserControllers.findOneUser)
-app.put('user/:id', database.controlsBDD, UserControllers.updateOneUser)
-app.delete('user/:id', database.controlsBDD, UserControllers.deleteOneUser)
+app.get('/user/:id', database.controlsBDD, UserControllers.findOneUserById)
+app.put('/user/:id', database.controlsBDD, UserControllers.updateOneUser)
+app.delete('/user/:id', database.controlsBDD, UserControllers.deleteOneUser)
 
 //routes for Place
 
