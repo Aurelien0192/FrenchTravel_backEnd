@@ -45,9 +45,10 @@ module.exports.PlaceService =  class PlaceService{
             if(error.code = 11000){
                 const field= Object.keys(error.keyValue)[0]
                 const err = {
-                    msg: `Duplicate key error : ${field} must be unique`,
+                    msg: `Duplicate key error: ${field} must be unique.`,
                     fields_with_error: [field],
-                    type_error:"duplicate"
+                    fields: { [field]: `The ${field} is already taken.` },
+                    type_error: "duplicate"
                 }
                 callback(err)
             }

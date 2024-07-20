@@ -15,6 +15,8 @@ module.exports.ApiLocationServices =  class ApiLocationServices {
             notAllowedProperties = _.join(notAllowedProperties,' ')
             const error ={
                 msg : `property ${notAllowedProperties} is not allowed`,
+                fields_with_error: notAllowedProperties,
+                fields: { [notAllowedProperties]: `The ${notAllowedProperties} is not allowed.` },
                 type_error : "no-valid"
             }
             callback(error) 
@@ -28,6 +30,8 @@ module.exports.ApiLocationServices =  class ApiLocationServices {
                 }else{
                     const error = {
                         msg: "adress not found",
+                        fields_with_error: [],
+                        fields: { [notAllowedProperties]: `The ${notAllowedProperties} is not allowed.` },
                         type_error:"no-found"
                     }
                     return callback(error)

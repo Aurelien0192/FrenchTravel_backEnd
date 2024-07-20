@@ -44,7 +44,7 @@ module.exports.UserService = class UserService{
                 };
                 callback(err);
             } else {
-                callback({msg: "Erreur avec la base de donnée", type_error:"error-mongo"})
+                callback({msg: "Erreur avec la base de donnée", fields_with_error: [], fields:"", type_error:"error-mongo"})
             }
         }
     }
@@ -56,17 +56,17 @@ module.exports.UserService = class UserService{
                     if (value){
                         callback(null, value.toObject())
                     }else{
-                        callback({msg:"Aucun utilisateur trouvé", type_error: "no-found"})
+                        callback({msg:"Aucun utilisateur trouvé", fields_with_error: [], fields:"", type_error: "no-found"})
                     }
                 }catch(e){
                     console.log(e)
-                    callback({msg: "Erreur avec la base de donnée", type_error:"error-mongo"})
+                    callback({msg: "Erreur avec la base de donnée", fields_with_error: [], fields:"", type_error:"error-mongo"})
                 }
             }).catch((err) => {
                 callback(err)
             })
         }else{
-            callback({msg: "Id non conforme", type_error: "no-valid"})
+            callback({msg: "Id non conforme", fields_with_error: [], fields:"", type_error: "no-valid"})
         }
     }
 
@@ -76,13 +76,13 @@ module.exports.UserService = class UserService{
                 const user = await User.findById(user_id)
                 try{
                     if(!user){
-                        return callback({msg:"Utilisateur non trouvé", type_error:"no-found"})
+                        return callback({msg:"Utilisateur non trouvé",  fields_with_error: [], fields:"", type_error:"no-found"})
                     }
                     if(user.userType === "professional"){
                         return callback({msg:`Un utilisateur ne peut pas avoir les champs nom ou prénom vides`,type_error:"no-valid"})
                     }
                 }catch(e){
-                    return callback({msg: "Erreur avec la base de données", type_error:"error-mongo"})
+                    return callback({msg: "Erreur avec la base de données", fields_with_error: [], fields:"", type_error:"error-mongo"})
                 }
             }
             User.findByIdAndUpdate(new ObjectId(user_id), update, {returnDocument: 'after', runValidators: true}).then((value)=>{
@@ -90,10 +90,10 @@ module.exports.UserService = class UserService{
                     if(value){
                         callback(null, value.toObject())
                     }else{
-                        callback({msg: "Utilisateur non trouvé", type_error:"no-found"})
+                        callback({msg: "Utilisateur non trouvé", fields_with_error: [], fields:"", type_error:"no-found"})
                     }
                 }catch(e){
-                    callback({msg: "Erreur avec la base de données", type_error:"error-mongo"})
+                    callback({msg: "Erreur avec la base de données", fields_with_error: [], fields:"", type_error:"error-mongo"})
                 }
             }).catch((errors) =>{
                 if (errors.code === 11000) { // Erreur de duplicité
@@ -123,7 +123,7 @@ module.exports.UserService = class UserService{
                 }
             })
         }else{
-            !update ? callback({msg: "propriété udpate inexistante", type_error: "no-valid"}) : callback({msg: "Id non conforme", type_error: "no-valid"})
+            !update ? callback({msg: "propriété udpate inexistante", fields_with_error: [], fields:"", type_error: "no-valid"}) : callback({msg: "Id non conforme", type_error: "no-valid"})
         }
     }
 
@@ -135,17 +135,17 @@ module.exports.UserService = class UserService{
                 if (value)
                     callback(null, value.toObject())
                 else
-                callback({ msg: "Utilisateur non trouvé.", type_error: "no-found" });
+                callback({ msg: "Utilisateur non trouvé.", fields_with_error: [], fields:"", type_error: "no-found" });
             }
             catch (e) {  
                 callback(e)
             }
         }).catch((e) => {
-            callback({ msg: "Impossible de chercher l'élément.", type_error: "error-mongo" });
+            callback({ msg: "Impossible de chercher l'élément.", fields_with_error: [], fields:"", type_error: "error-mongo" });
         })
     }
     else {
-        callback({ msg: "Id invalide.", type_error: 'no-valid' })
+        callback({ msg: "Id invalide.", fields_with_error: [], fields:"", type_error: 'no-valid' })
     }
 }
 }
