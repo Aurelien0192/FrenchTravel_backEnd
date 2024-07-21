@@ -1,6 +1,34 @@
+const passport = require('passport')
+
 const UserService = require('../services/UserService').UserService
 
 module.exports.UserControllers = class UserControllers{
+    static loginUser = function(req, res, next){
+        passport.authenticate('login', {badRequestMessage : "Les champs sont manquants"}, async function (err, user){
+            if(err){
+                res.statusCode = 401
+                return res.send({
+                    msg: "Le nom d'utilisateur ou mot de passe n'est pas correct", 
+                    fields_with_error: ['userName','password'],
+                    fields:"",
+                    error_type:"no-valid"
+                })
+            }else{
+                if (err) {
+                    res.statusCode = 500
+                    return res.send({
+                        msg:"Problème d'authentification sur le serveur",
+                        fields_with_error: [''],
+                        fields:"",
+                        error_type:"internal"
+                    })
+                }else{
+                    return res.send(user)
+                }
+            }
+        })(req, res, next)
+    }
+
     static addOneUser(req, res){
         const opts = null
         req.log.info("Ajout d'un utilisateur")
