@@ -9,6 +9,21 @@ const User = mongoose.model('User',UserSchema)
 User.createIndexes()
 
 module.exports.UserService = class UserService{
+    static loginUser = async function(username, password, options, callback){
+        UserService.findOneUser(['username','email'], username, null, async (err, value) => {
+        if(err){
+            callback(err)
+        }else{
+            if(bcrypt.compareSync(password, value.password)){ //comparaison hash password et password fourni lors de la co
+                let token = TokenUtils.createToken({_id : value._id}, null) //création du token via jsonwebtoken en fournissant l'id utilisateur
+                callback(null, {...value, token:token}) //return l'utilisateur avec le token
+            }else{
+                callback({msg: "La comparaison des mots de passe sont fausse",type_error:"no-comparaison"})
+            }
+        }
+    })
+}
+
     static async addOneUser(user, options, callback){
         try{
             const newUser = new User(user)
@@ -67,6 +82,47 @@ module.exports.UserService = class UserService{
             })
         }else{
             callback({msg: "Id non conforme", fields_with_error: [], fields:"", type_error: "no-valid"})
+        }
+    }
+
+    static async findOneUser(tab_field, value, options, callback){
+        const field_unique = ["userName","email"]
+        
+        if (tab_field && Array.isArray(tab_field) && value && _.filter(tab_field, (e) => {return field_unique.indexOf(e) === -1}).length ===0){
+            let obj_find= []
+
+            _.forEach(tab_field, (e) => {
+                obj_find.push({ [e]: value})
+            })
+
+            User.findOne({ $or: obj_find}).then((value) => {
+                if (value){
+                    callback(null, value)
+                }else{
+                    callback({
+                        msg:"utilisateur non trouvé",
+                        type_error: "no-found"
+                    })
+                }
+            }).catch((err) => {
+                callback({msg:"Erreur interne mongo", type_error:"error-mongo"})
+            })
+        }else{
+            let msg = ""
+            if(!tab_field || !Array.isArray(tab_field)){
+                msg += "Les champs de recherche sont incorrecte"
+            }
+            if(!value){
+                msg +=msg ?" et la valeur de recherche est vide":"La valeur de recherche est vide"
+            }
+            if (_.filter(tab_field, (e) => {return field_unique.indexOf(e) === -1}).length>0){
+                const field_not_authorized = _.filter(tab_field, (e) => {return field_unique.indexOf(e) === -1})
+                msg += msg ? `Et (${field_not_authorized.join (',')}) ne sont pas des champs autorisés.`:
+                `Les champs (${field_not_authorized.join(',')}) ne sont pas des champs de recherche autorisé`
+                callback({msg : msg, type_error: "no-valid", field_not_authorized : field_not_authorized})
+            }else{
+                callback({msg: msg, type_error:"no-valid"})
+            }
         }
     }
 
