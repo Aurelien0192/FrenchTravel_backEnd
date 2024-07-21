@@ -16,7 +16,6 @@ module.exports.PlaceService =  class PlaceService{
                 const new_place = new Place(place)
                 let errors = new_place.validateSync()
                 if(errors){
-
                     errors = errors['errors']
                     const text = Object.keys(errors).map((e) => {
                         return !errors[e].stringValue? errors[e]['properties']['message'] : `type ${errors[e]['valueType']} is not allowed in path ${errors[e]['path']}`
@@ -25,10 +24,15 @@ module.exports.PlaceService =  class PlaceService{
                     const fields = _.transform(Object.keys(errors), function (result, value) {
                         errors[value].properties ? result[value] = errors[value]['properties']['message'] : result[value] = ""
                     },{})
+                    let fields_with_error = Object.keys(errors)
+                    if(fields_with_error.includes("moreInfo.price")){
+                        fields_with_error[_.findIndex(fields_with_error,(e)=>{return e ==="moreInfo.price"})] = ["price1","price2"]
+                        fields_with_error= _.flatten(fields_with_error)
+                    }
                     
                     const err = {
                         msg: text,
-                        fields_with_error: Object.keys(errors),
+                        fields_with_error: fields_with_error,
                         fields: fields,
                         type_error : "validator"
                     }

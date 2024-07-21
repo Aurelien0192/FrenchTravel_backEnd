@@ -30,8 +30,7 @@ module.exports.ApiLocationServices =  class ApiLocationServices {
                 }else{
                     const error = {
                         msg: "adress not found",
-                        fields_with_error: [],
-                        fields: { [notAllowedProperties]: `The ${notAllowedProperties} is not allowed.` },
+                        fields_with_error: ["street","codePostal","city","county"],
                         type_error:"no-found"
                     }
                     return callback(error)

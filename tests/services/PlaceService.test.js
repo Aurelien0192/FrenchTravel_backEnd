@@ -76,6 +76,60 @@ const PlaceMissingname = {
     lonCoordinate:"6.3537263"
 }
 
+const PlaceWithstringPrice = {
+    name:"les Capucines",
+    describe : "Super chateau dans le centre du Doubs",
+    categorie : "restaurant",
+    moreInfo:{
+        cook : "miam",
+        sevices: "vraiment bon",
+        price:["null", "null"]
+    },
+    street: "2 rue du Moulin Parnet",
+    city: "Pontarlier",
+    codePostal : "25300",
+    country: "France",
+    county: "Doubs",
+    latCoordinate: "46.907258",
+    lonCoordinate:"6.3537263"
+}
+
+const PlaceWithNullPrice = {
+    name:"les Capucines",
+    describe : "Super chateau dans le centre du Doubs",
+    categorie : "restaurant",
+    moreInfo:{
+        cook : "miam",
+        sevices: "vraiment bon",
+        price:[null, null]
+    },
+    street: "2 rue du Moulin Parnet",
+    city: "Pontarlier",
+    codePostal : "25300",
+    country: "France",
+    county: "Doubs",
+    latCoordinate: "46.907258",
+    lonCoordinate:"6.3537263"
+}
+
+const PlaceWithThreePrices = {
+    name:"les Capucines",
+    describe : "Super chateau dans le centre du Doubs",
+    categorie : "restaurant",
+    moreInfo:{
+        cook : "miam",
+        sevices: "vraiment bon",
+        price:[1, 2, 3]
+    },
+    street: "2 rue du Moulin Parnet",
+    city: "Pontarlier",
+    codePostal : "25300",
+    country: "France",
+    county: "Doubs",
+    latCoordinate: "46.907258",
+    lonCoordinate:"6.3537263"
+}
+
 const placeWithWrongInfoSup = {
     name: "Château du Doubs",
     describe : "Super chateau dans le centre du Doubs",
@@ -217,6 +271,39 @@ describe("addOnePlace", () => {
             expect(value).to.haveOwnProperty('name')
             expect(value).to.not.have.property("ElleEstOuLaPoulette")
             expect(err).to.be.null
+            done()
+        })
+    })
+    it("Restaurant with string price - E",(done) => {
+        PlaceService.addOnePlace(PlaceWithstringPrice, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('validator')
+            expect(value).to.be.undefined
+            done()
+        })
+    })
+    it("Restaurant with null price - E",(done) => {
+        PlaceService.addOnePlace(PlaceWithNullPrice, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('validator')
+            expect(err).to.haveOwnProperty('fields_with_error')
+            expect(err['fields_with_error']).to.be.includes('price1')
+            expect(err['fields_with_error']).to.be.includes('price2')
+            expect(value).to.be.undefined
+            done()
+        })
+    })
+    it("Restaurant with three price - E",(done) => {
+        PlaceService.addOnePlace(PlaceWithThreePrices, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('validator')
+            expect(err).to.haveOwnProperty('fields_with_error')
+            expect(err['fields_with_error']).to.be.includes('price1')
+            expect(err['fields_with_error']).to.be.includes('price2')
+            expect(value).to.be.undefined
             done()
         })
     })

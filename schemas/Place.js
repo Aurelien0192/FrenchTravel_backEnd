@@ -37,9 +37,17 @@ module.exports.PlaceSchema = mongoose.Schema({
         price : {
             type : [Number],
             default:undefined,
-            validate : [function validator(){
-                return this.categorie === "restaurant"
-            },{message : `price is not allowed in categorie hotel or activity`}]
+            validate : [
+                {validator : function validator(){
+                    return this.categorie === "restaurant"
+                },message : `price is not allowed in categorie hotel or activity`},
+                {validator : function lengh(price){
+                    return (price.length === 2 || price.lengh===0);
+                },message: "price cannot take more than two values"},
+                {validator : function lengh(price){
+                    return (price[0] !== null && price[1]!== null);
+                },message: "Les prix renseignées doivent être un nombre"}
+                ]
         },
         diner : {
             type : String,
