@@ -7,6 +7,7 @@ const loggerHttp = require('./middlewares/loggerHttp')
 const multerOneImage = require('./middlewares/multer.config').oneImage
 const multerManyImage = require('./middlewares/multer.config').manyImage
 const path = require('path')
+const session = require('express-session')
 
 const UserControllers = require('./controllers/UserController').UserControllers
 const PlaceControllers = require("./controllers/PlaceController").PlaceControllers
@@ -17,6 +18,18 @@ const ImageController = require('./controllers/ImageController').ImageController
 const app = express()
 
 require("./utils/database")
+
+const passport = require("./utils/passport")
+
+app.use(session({
+  secret : Config.passportConfig.getSecretCookie(),
+  resave: false,
+  saveUninitialized : true,
+  cookie : {secure: true}
+}))
+
+app.use(passport.initialize())
+app.use(passport.session())
 
 app.use(bodyParser.json(), loggerHttp.addLogger)
 
@@ -31,6 +44,7 @@ app.use('/data/images',express.static(path.join(__dirname, '/data/images')))
 
 //routes for User
 
+app.post('/login',database.controlsBDD, UserControllers.loginUser)
 app.post('/user', database.controlsBDD, UserControllers.addOneUser)
 app.get('/user/:id', database.controlsBDD, UserControllers.findOneUserById)
 app.put('/user/:id', database.controlsBDD, UserControllers.updateOneUser)
