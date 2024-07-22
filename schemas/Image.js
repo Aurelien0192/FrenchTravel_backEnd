@@ -9,7 +9,7 @@ module.exports.ImageSchema = mongoose.Schema({
         type: mongoose.Types.ObjectId,
         required : true
     },
-    user_owner:{
+    user_id:{
         type: mongoose.Types.ObjectId,
         required : true
     },

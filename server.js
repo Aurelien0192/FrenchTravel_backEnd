@@ -34,7 +34,7 @@ const UserControllers = require('./controllers/UserController').UserControllers
 const PlaceControllers = require("./controllers/PlaceController").PlaceControllers
 const ApiLocationControllers = require("./controllers/ApiLocationController").ApiLocationControllers
 const ImageController = require('./controllers/ImageController').ImageController
-const controleRoleUser = require('./middlewares/controleRoleUser')
+
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -65,8 +65,8 @@ app.get('/getlocation',ApiLocationControllers.getDataGeocode)
 
 //routes images
 
-app.post('/image',multerOneImage,ImageController.addOneImage)
-app.post('/images',multerManyImage,ImageController.addManyImages)
+app.post('/image',database.controlsBDD,passport.authenticate('jwt',{session:false}),multerOneImage,ImageController.addOneImage)
+app.post('/images',database.controlsBDD,passport.authenticate('jwt',{session:false}),multerManyImage,ImageController.addManyImages)
 
 
 app.listen(Config.port, () => {

@@ -6,7 +6,7 @@ const ImageSchema = require('../schemas/Image').ImageSchema
 const Image = mongoose.model('Image',ImageSchema)
 
 module.exports.ImageService = class ImageService{
-    static async addOneImage(imageInfo, place_id, callback){
+    static async addOneImage(imageInfo, place_id, user_id, callback){
         try{
             if(!imageInfo){
                 callback({msg: "no image get for upload", type_error: "no-valid"})
@@ -16,7 +16,7 @@ module.exports.ImageService = class ImageService{
                 image.name = imageInfo.filename
                 image.place = place_id
                 image.path = path
-                
+                image.user_id = user_id
                 let errors = image.validateSync()
                 if(errors){
                     errors = errors['errors']
@@ -45,7 +45,7 @@ module.exports.ImageService = class ImageService{
         }
     }
 
-    static async addManyImages(imagesInfo, place_id, callback){
+    static async addManyImages(imagesInfo, place_id, user_id, callback){
         const errors = []
 
         if(!imagesInfo){
@@ -59,6 +59,7 @@ module.exports.ImageService = class ImageService{
                 const image = new Image()
                 image.name = imageInfo.filename
                 image.place = place_id
+                image.user_id = user_id
                 image.path = path
                 imageTab.push(image)
             });
