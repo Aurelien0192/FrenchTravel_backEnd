@@ -25,7 +25,8 @@ passport.use(new JWTStrategy({
     UserService.findOneUserById(jwt_payload._id, null, function (err, value){
         if(err){
             done(err)
-        }else{
+        }else{ 
+            req._id=jwt_payload._id
             done(null, value)
         }
     })

@@ -37,6 +37,10 @@ module.exports.UserSchema = mongoose.Schema({
     },
     about: String,
     token: String,
+    profilePhoto :{
+        type: String,
+        default:"data/systemImages/noPhoto.png"
+    },
     create_at:{
         type:Date,
         default:new Date()

@@ -34,7 +34,7 @@ const UserControllers = require('./controllers/UserController').UserControllers
 const PlaceControllers = require("./controllers/PlaceController").PlaceControllers
 const ApiLocationControllers = require("./controllers/ApiLocationController").ApiLocationControllers
 const ImageController = require('./controllers/ImageController').ImageController
-
+const controleRoleUser = require('./middlewares/controleRoleUser')
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -55,7 +55,7 @@ app.delete('/user/:id', database.controlsBDD, UserControllers.deleteOneUser)
 
 //routes for Place
 
-app.post('/place',database.controlsBDD,ApiLocationControllers.getDataGeocode,PlaceControllers.addOnePlace)
+app.post('/place',database.controlsBDD, passport.authenticate('jwt',{session:false}),ApiLocationControllers.getDataGeocode,PlaceControllers.addOnePlace)
 
 
 //routes for api call

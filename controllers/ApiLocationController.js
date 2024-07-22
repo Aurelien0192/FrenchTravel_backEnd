@@ -10,6 +10,7 @@ module.exports.ApiLocationControllers = class ApiLocationControllers{
             postalCode : req.body.codePostal
         }
         ApiLocationService.getDataGeocode(params, function(err, value){
+            console.log(err)
             if(err && err.type_error === "no-valid"){
                 res.statusCode = 405
                 res.send(err)
@@ -23,6 +24,7 @@ module.exports.ApiLocationControllers = class ApiLocationControllers{
                 res.statusCode = 200
                 req.body.latCoordinate = value[0].lat
                 req.body.lonCoordinate = value[0].lon
+                console.log(req)
                 req.route.path === "/getlocation" ? res.send(value): next()
             }
         }

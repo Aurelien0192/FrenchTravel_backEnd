@@ -10,7 +10,8 @@ module.exports.ImageSchema = mongoose.Schema({
         required : true
     },
     user_owner:{
-        type: mongoose.Types.ObjectId
+        type: mongoose.Types.ObjectId,
+        required : true
     },
     path:{
         type: String,
