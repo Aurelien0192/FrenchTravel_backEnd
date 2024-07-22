@@ -1,6 +1,9 @@
 const mongoose = require('mongoose')
 const UserSchema = require('../schemas/User').UserSchema
 const _ = require('lodash')
+const bcrypt = require("bcryptjs")
+const TokenUtils = require('./../utils/token')
+const SALT_WORK_FACTOR = 10
 
 const ObjectId = mongoose.Types.ObjectId
 
@@ -10,10 +13,12 @@ User.createIndexes()
 
 module.exports.UserService = class UserService{
     static loginUser = async function(username, password, options, callback){
+        console.log("ok2")
         UserService.findOneUser(['username','email'], username, null, async (err, value) => {
         if(err){
             callback(err)
         }else{
+            console.log(value)
             if(bcrypt.compareSync(password, value.password)){ //comparaison hash password et password fourni lors de la co
                 let token = TokenUtils.createToken({_id : value._id}, null) //création du token via jsonwebtoken en fournissant l'id utilisateur
                 callback(null, {...value, token:token}) //return l'utilisateur avec le token
@@ -26,6 +31,10 @@ module.exports.UserService = class UserService{
 
     static async addOneUser(user, options, callback){
         try{
+            const salt = await bcrypt.genSalt(SALT_WORK_FACTOR)
+            if (user && user.password){
+                user.password = await bcrypt.hash(user.password, salt)
+            }
             const newUser = new User(user)
             let errors = newUser.validateSync()
             if(errors){
@@ -86,7 +95,7 @@ module.exports.UserService = class UserService{
     }
 
     static async findOneUser(tab_field, value, options, callback){
-        const field_unique = ["userName","email"]
+        const field_unique = ["username","email"]
         
         if (tab_field && Array.isArray(tab_field) && value && _.filter(tab_field, (e) => {return field_unique.indexOf(e) === -1}).length ===0){
             let obj_find= []

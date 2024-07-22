@@ -3,6 +3,7 @@ const chaiHttp = require('chai-http')
 const should = chai.should()
 const expect = chai.expect
 const server = require('./../../server')
+const passport = require('passport')
 
 chai.use(chaiHttp)
 
@@ -14,7 +15,7 @@ describe("POST - /User",()=>{
             firstName : "Eric",
             lastName : "Dupond",
             userType:"user",
-            userName:"EricLaDébrouille",
+            username:"EricLaDébrouille",
             password:"coucou",
             email:"eric.dupond@gmail.com"
         }).end((err, res)=>{
@@ -23,15 +24,25 @@ describe("POST - /User",()=>{
             done()
         })
     })
+    it("authentifiate this user -S",(done) => {
+        chai.request(server).post('/login').send({
+            username:"EricLaDébrouille",
+            password:"coucou"
+        }).end((err, res) => {
+            console.log(res.body)
+            done()
+        })
+    })
     it("add correct users with minimal property - S",(done) => {
         chai.request(server).post('/user').send({
             firstName : "",
             lastName : "",
             userType:"user",
-            userName:"Jojo",
+            username:"Jojo",
             password:"coucou",
             email:"jojodu25@gmail.com"
         }).end((err, res)=>{
+            console.log(res.body, err)
             res.should.has.status(201)
             users.push(res.body)
             done()
@@ -42,7 +53,7 @@ describe("POST - /User",()=>{
             firstName : "Nelson",
             lastName : "Mosini",
             userType:"professional",
-            userName:"Titi",
+            username:"Titi",
             password:"coucou",
             email:"titiLeMurgule@gmail.com",
             bibiPower:"tripleDose"
@@ -57,7 +68,7 @@ describe("POST - /User",()=>{
             firstName : "Nelson",
             lastName : "Mosini",
             userType:"user",
-            userName:"Titi",
+            username:"Titi",
             password:"coucou",
             email:"Nelson@gmail.com",
         }).end((err, res)=>{
@@ -70,7 +81,7 @@ describe("POST - /User",()=>{
             firstName : "",
             lastName : "",
             userType:"professional",
-            userName:"La Gazette du Dimanche",
+            username:"La Gazette du Dimanche",
             password:"coucou",
             email:"GazetteDuDimanche@gmail.com",
         }).end((err, res)=>{
@@ -83,7 +94,7 @@ describe("POST - /User",()=>{
             firstName : "Gizmo",
             lastName : "Zeus",
             userType:"yo",
-            userName:"La Gazette du Dimanche",
+            username:"La Gazette du Dimanche",
             password:"coucou",
             email:"GazetteDuDimanche@gmail.com",
         }).end((err, res)=>{

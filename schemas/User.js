@@ -19,7 +19,7 @@ module.exports.UserSchema = mongoose.Schema({
         required:true,
         immutable: true
     },
-    userName:{
+    username:{
         type: String,
         required: true,
         index:true,
@@ -36,6 +36,7 @@ module.exports.UserSchema = mongoose.Schema({
         unique:true
     },
     about: String,
+    token: String,
     create_at:{
         type:Date,
         default:new Date()

@@ -11,9 +11,12 @@ const ExtractJWT = passportJWT.ExtractJwt
 passport.serializeUser((user, done) => done(null, user))
 passport.deserializeUser((user, done) => done(null, user))
 
-passport.use('login', new LocalStrategy({passReqToCallback : true}, function (req, username, password, done){
-    UserService.loginUser(username, password, null, done)
+passport.use('login', new LocalStrategy({passReqToCallback: true}, function(req, username, password, done){
+    //création du systeme de login avec comparaison des mots de passe
+    console.log("ok")
+    UserService.loginUser(username,password,null, done)
 }))
+
 
 passport.use(new JWTStrategy({
     jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),

@@ -11,14 +11,14 @@ describe("AddOneUser",()=> {
         firstName : "Eric",
         lastName : "Dupond",
         userType:"user",
-        userName:"EricLaDébrouille",
+        username:"EricLaDébrouille",
         password:"coucou",
         email:"eric.dupond@gmail.com"
     }
         UserService.addOneUser(goodUserUser, null, function(err, value){
             expect(value).to.be.a('object')
-            expect(value).to.haveOwnProperty('userName')
-            expect(value['userName']).to.equal(goodUserUser.userName)
+            expect(value).to.haveOwnProperty('username')
+            expect(value['username']).to.equal(goodUserUser.username)
             expect(err).to.be.null
             users.push(value)
             done()
@@ -29,7 +29,7 @@ describe("AddOneUser",()=> {
         firstName : "Eric",
         lastName : "Dupond",
         userType:"user",
-        userName:"LaFéeDuLogie",
+        username:"LaFéeDuLogie",
         password:"coucou",
         email:"peter.pan@gmail.com",
         batiment:"Rondoudou"
@@ -37,8 +37,8 @@ describe("AddOneUser",()=> {
     }
         UserService.addOneUser(goodUserWithSuppProperty, null, function(err, value){
             expect(value).to.be.a('object')
-            expect(value).to.haveOwnProperty('userName')
-            expect(value['userName']).to.equal(goodUserWithSuppProperty.userName)
+            expect(value).to.haveOwnProperty('username')
+            expect(value['username']).to.equal(goodUserWithSuppProperty.username)
             expect(value).to.not.have.property('batiment')
             expect(err).to.be.null
             users.push(value)
@@ -50,25 +50,25 @@ describe("AddOneUser",()=> {
             firstName : "",
             lastName : "",
             userType:"user",
-            userName:"Jojo",
+            username:"Jojo",
             password:"coucou",
             email:"jojodu25@gmail.com"
         }
         UserService.addOneUser(goodUserUserWithMinimalProperty, null, function(err, value){
             expect(value).to.be.a('object')
-            expect(value).to.haveOwnProperty('userName')
-            expect(value['userName']).to.equal(goodUserUserWithMinimalProperty.userName)
+            expect(value).to.haveOwnProperty('username')
+            expect(value['username']).to.equal(goodUserUserWithMinimalProperty.username)
             expect(err).to.be.null
             users.push(value)
             done()
         })
     })
-    it("Add user with duplicate userName - E",(done)=>{
+    it("Add user with duplicate username - E",(done)=>{
         const userWithDuplicateUserName ={
         firstName : "Eric",
         lastName : "Dupond",
         userType:"user",
-        userName:"EricLaDébrouille",
+        username:"EricLaDébrouille",
         password:"coucou",
         email:"eric.dupond3@gmail.com"
     }
@@ -77,7 +77,7 @@ describe("AddOneUser",()=> {
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('duplicate')
             expect(err).to.haveOwnProperty('fields_with_error')
-            expect(err['fields_with_error'][0]).to.be.equal('userName')
+            expect(err['fields_with_error'][0]).to.be.equal('username')
             expect(value).to.be.undefined
             done()
         })
@@ -87,7 +87,7 @@ describe("AddOneUser",()=> {
         firstName : "Eric",
         lastName : "Dupond",
         userType:"user",
-        userName:"EricLaDébrouille2",
+        username:"EricLaDébrouille2",
         password:"coucou",
         email:"eric.dupond@gmail.com"
     }
@@ -101,20 +101,20 @@ describe("AddOneUser",()=> {
             done()
         })
     })
-    it("Add user with missing userName - E",(done)=>{
-        const badUserWithMissinguserName ={
+    it("Add user with missing username - E",(done)=>{
+        const badUserWithMissingusername ={
             firstName : "Eric",
             lastName : "Dupond",
             userType:"user",
             password:"coucou",
             email:"eric.dupond@gmail.com"
         }
-        UserService.addOneUser(badUserWithMissinguserName, null, function(err, value){
+        UserService.addOneUser(badUserWithMissingusername, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('validator')
             expect(err).to.haveOwnProperty('fields_with_error')
-            expect(err['fields_with_error'][0]).to.be.equal('userName')
+            expect(err['fields_with_error'][0]).to.be.equal('username')
             expect(value).to.be.undefined
             done()
         })
@@ -124,7 +124,7 @@ describe("AddOneUser",()=> {
             firstName : "",
             lastName : "",
             userType:"professional",
-            userName:"Santafe",
+            username:"Santafe",
             password:"coucou",
             email:"SantaFe@gmail.com"
         }
@@ -144,14 +144,14 @@ describe("AddOneUser",()=> {
             firstName : "Picsou",
             lastName : "Donald",
             userType:"professional",
-            userName:"LaGaffe",
+            username:"LaGaffe",
             password:"coucou",
             email:"SantaFe@gmail.com"
         }
         UserService.addOneUser(goodUserProfessional, null, function(err, value){
             expect(value).to.be.a('object')
-            expect(value).to.haveOwnProperty('userName')
-            expect(value['userName']).to.equal(goodUserProfessional.userName)
+            expect(value).to.haveOwnProperty('username')
+            expect(value['username']).to.equal(goodUserProfessional.username)
             expect(err).to.be.null
             users.push(value)
             done()
@@ -163,8 +163,8 @@ describe("findOneUserById", () => {
     it("find user with good id",(done)=>{
         UserService.findOneUserById(users[0]._id, null, function(err, value){
             expect(value).to.be.a('object')
-            expect(value).to.haveOwnProperty('userName')
-            expect(value['userName']).to.equal(users[0].userName)
+            expect(value).to.haveOwnProperty('username')
+            expect(value['username']).to.equal(users[0].username)
             expect(err).to.be.null
             done()
         })
@@ -220,7 +220,7 @@ describe("UpdateOneUser",() => {
         })
     })
     it("modify user with unexisting id - E",(done)=> {
-        UserService.updateOneUser('66999181b8ed19f77af1660b', {userName:"lala"}, null, function(err, value){
+        UserService.updateOneUser('66999181b8ed19f77af1660b', {username:"lala"}, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('no-found')
@@ -229,7 +229,7 @@ describe("UpdateOneUser",() => {
         })
     })
     it("modify user with uncorrect id - E",(done)=> {
-        UserService.updateOneUser('itsme', {userName:"lala"}, null, function(err, value){
+        UserService.updateOneUser('itsme', {username:"lala"}, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('no-valid')

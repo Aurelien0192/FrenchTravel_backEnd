@@ -9,17 +9,12 @@ const multerManyImage = require('./middlewares/multer.config').manyImage
 const path = require('path')
 const session = require('express-session')
 
-const UserControllers = require('./controllers/UserController').UserControllers
-const PlaceControllers = require("./controllers/PlaceController").PlaceControllers
-const ApiLocationControllers = require("./controllers/ApiLocationController").ApiLocationControllers
-const ImageController = require('./controllers/ImageController').ImageController
 
 //Create express.js app
 const app = express()
 
 require("./utils/database")
 
-const passport = require("./utils/passport")
 
 app.use(session({
   secret : Config.passportConfig.getSecretCookie(),
@@ -28,10 +23,18 @@ app.use(session({
   cookie : {secure: true}
 }))
 
+app.use(bodyParser.json(), loggerHttp.addLogger)
+
+const passport = require("./utils/passport")
 app.use(passport.initialize())
 app.use(passport.session())
 
-app.use(bodyParser.json(), loggerHttp.addLogger)
+
+const UserControllers = require('./controllers/UserController').UserControllers
+const PlaceControllers = require("./controllers/PlaceController").PlaceControllers
+const ApiLocationControllers = require("./controllers/ApiLocationController").ApiLocationControllers
+const ImageController = require('./controllers/ImageController').ImageController
+
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -62,14 +65,12 @@ app.get('/getlocation',ApiLocationControllers.getDataGeocode)
 
 //routes images
 
-app.post('/image',multerOneImage,ImageController.addOneImage)
+app.post('/image',passport.authenticate('jwt',{session:false}),multerOneImage,ImageController.addOneImage)
 app.post('/images',multerManyImage,ImageController.addManyImages)
 
 
 app.listen(Config.port, () => {
     Logger.info(`Serveur démarré sur le port ${Config.port}.`)
 })
-
-
 
 module.exports = app
