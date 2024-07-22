@@ -4,7 +4,6 @@ const UserService = require('../services/UserService').UserService
 
 module.exports.UserControllers = class UserControllers{
     static loginUser = function(req, res, next){
-        console.log(req.body)
         passport.authenticate('login', {badRequestMessage: "Les champs sont manquants."}, async function (err, user){
             if(err){
                 res.statusCode = 401
@@ -16,7 +15,6 @@ module.exports.UserControllers = class UserControllers{
                 })
             }else{
                 req.logIn(user, async function(err){
-                    console.log(user)
                     if (err) {
                         res.statusCode = 500
                         return res.send({

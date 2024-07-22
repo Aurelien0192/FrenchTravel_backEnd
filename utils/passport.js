@@ -13,7 +13,6 @@ passport.deserializeUser((user, done) => done(null, user))
 
 passport.use('login', new LocalStrategy({passReqToCallback: true}, function(req, username, password, done){
     //création du systeme de login avec comparaison des mots de passe
-    console.log("ok")
     UserService.loginUser(username,password,null, done)
 }))
 

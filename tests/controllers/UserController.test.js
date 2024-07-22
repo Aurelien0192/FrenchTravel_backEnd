@@ -24,10 +24,19 @@ describe("POST - /User",()=>{
             done()
         })
     })
-    it("authentifiate this user -S",(done) => {
+    it("authentifiate correct user -S",(done) => {
         chai.request(server).post('/login').send({
             username:"EricLaDébrouille",
             password:"coucou"
+        }).end((err, res) => {
+            res.should.has.status(200)
+            done()
+        })
+    })
+    it("authentifiate with empty username and password -S",(done) => {
+        chai.request(server).post('/login').send({
+            username:"",
+            password:""
         }).end((err, res) => {
             console.log(res.body)
             done()
@@ -42,7 +51,6 @@ describe("POST - /User",()=>{
             password:"coucou",
             email:"jojodu25@gmail.com"
         }).end((err, res)=>{
-            console.log(res.body, err)
             res.should.has.status(201)
             users.push(res.body)
             done()

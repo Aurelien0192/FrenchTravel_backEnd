@@ -41,7 +41,6 @@ describe('get Geocode Response',() => {
     })
     it('with query wrong properties - E', (done) => {
         ApiLocationServices.getDataGeocode({dobby:"c'est le meilleur"}, function(err, value){
-            console.log(err)
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('no-valid')

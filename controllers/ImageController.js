@@ -15,11 +15,9 @@ module.exports.ImageController = class ImageController{
     }
 
     static async addManyImages(req, res){
-        console.log(req.files)
         ImageService.addManyImages(req.files,req.body.place_id,function(err,value){
             if(err && (err.type_error === "no-valid" || err[0].type_error === "validator")){
                 res.statusCode = 405
-                console.log(err)
                 res.send(err)
             }else{
                 res.statusCode = 201

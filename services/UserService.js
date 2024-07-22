@@ -13,12 +13,10 @@ User.createIndexes()
 
 module.exports.UserService = class UserService{
     static loginUser = async function(username, password, options, callback){
-        console.log("ok2")
         UserService.findOneUser(['username','email'], username, null, async (err, value) => {
         if(err){
             callback(err)
         }else{
-            console.log(value)
             if(bcrypt.compareSync(password, value.password)){ //comparaison hash password et password fourni lors de la co
                 let token = TokenUtils.createToken({_id : value._id}, null) //création du token via jsonwebtoken en fournissant l'id utilisateur
                 callback(null, {...value, token:token}) //return l'utilisateur avec le token

@@ -65,7 +65,7 @@ app.get('/getlocation',ApiLocationControllers.getDataGeocode)
 
 //routes images
 
-app.post('/image',passport.authenticate('jwt',{session:false}),multerOneImage,ImageController.addOneImage)
+app.post('/image',multerOneImage,ImageController.addOneImage)
 app.post('/images',multerManyImage,ImageController.addManyImages)
 
 

@@ -91,7 +91,6 @@ module.exports.ImageService = class ImageService{
                     callback(null, data) 
                 
                 }catch(err){
-                    //console.log(err)
                     callback(err)
                 }
             }
