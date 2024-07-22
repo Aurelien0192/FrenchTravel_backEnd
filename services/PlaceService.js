@@ -8,7 +8,6 @@ const Place = mongoose.model('Place', PlaceSchema)
 module.exports.PlaceService =  class PlaceService{
 
     static addOnePlace = async function (place, user_id, options, callback){
-        console.log(place)
         try{
             if(!place){
                 callback({msg:"body is missing", type_error:"no-valid"})
@@ -38,7 +37,6 @@ module.exports.PlaceService =  class PlaceService{
                         fields: fields,
                         type_error : "validator"
                     }
-                    console.log(err)
                     callback(err)
                 }else{
                     new_place.notation = 0
@@ -58,7 +56,6 @@ module.exports.PlaceService =  class PlaceService{
                 }
                 callback(err)
             }
-            console.log(error)
             callback(error)
         }
     }

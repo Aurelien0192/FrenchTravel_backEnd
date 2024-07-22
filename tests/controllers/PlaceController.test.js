@@ -206,9 +206,60 @@ const placeWithWrongAdresse = {
     county: "lalala"
 }
 
+const users = []
+const tokens =[]
+
 describe("POST - /place", () => {
+    it ("create professional user -S", (done) => {
+        chai.request(server).post('/user').send({
+            firstName : "Eric",
+            lastName : "Dupond",
+            userType:"professional",
+            username:"EricLaDébrouille",
+            password:"coucou",
+            email:"eric.dupond@gmail.com"
+        }).end((err, res) =>{
+            res.should.has.status(201)
+            users.push(res.body)
+            done()
+        })
+    })
+    it ("create normal user -S", (done) => {
+        chai.request(server).post('/user').send({
+            firstName : "Eric",
+            lastName : "Dupont",
+            userType:"user",
+            username:"EricLaFripouille",
+            password:"coucou",
+            email:"eric.dupont@gmail.com"
+        }).end((err, res) =>{
+            users.push(res.body)
+            res.should.has.status(201)
+            done()
+        })
+    })
+    it("connect the professional user - S",(done) => {
+        chai.request(server).post('/login').send({
+            username:"EricLaDébrouille",
+            password:"coucou"
+        }).end((err, res) => {
+            res.should.has.status(200)
+            tokens.push(res.body.token)
+            done()
+        })
+    })
+    it("connect the normal user - S",(done) => {
+        chai.request(server).post('/login').send({
+            username:"EricLaFripouille",
+            password:"coucou"
+        }).end((err, res) => {
+            res.should.has.status(200)
+            tokens.push(res.body.token)
+            done()
+        })
+    })
     it("Add one place good - S", (done) => {
-        chai.request(server).post('/place').send(placeGood).end((err, res) => {
+        chai.request(server).post('/place').send(placeGood).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
             expect(res.body).to.be.a('object')
             expect(res.body).to.be.haveOwnProperty('_id')
             res.should.has.status(201)
@@ -217,63 +268,88 @@ describe("POST - /place", () => {
         })
     })
     it("Add one place without property - E", (done) => {
-        chai.request(server).post('/place').send(PlaceWithoutname).end((err, res) => {
+        chai.request(server).post('/place').send(PlaceWithoutname).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
             res.should.has.status(405)
             done()
         })
     })
     it("Add one place with missing property - E", (done) => {
-        chai.request(server).post('/place').send(PlaceMissingname).end((err, res) => {
+        chai.request(server).post('/place').send(PlaceMissingname).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
             res.should.has.status(405)
             done()
         })
     })
     it("Add one restaurant with string prices - E", (done) => {
-        chai.request(server).post('/place').send(PlaceWithstringPrice).end((err, res) => {
+        chai.request(server).post('/place').send(PlaceWithstringPrice).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
             res.should.has.status(405)
             done()
         })
     })
     it("Add one restaurant with null prices - E", (done) => {
-        chai.request(server).post('/place').send(PlaceWithNullPrice).end((err, res) => {
+        chai.request(server).post('/place').send(PlaceWithNullPrice).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
             res.should.has.status(405)
             done()
         })
     })
     it("Add one restaurant with three prices - E", (done) => {
-        chai.request(server).post('/place').send(PlaceWithThreePrices).end((err, res) => {
+        chai.request(server).post('/place').send(PlaceWithThreePrices).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
             res.should.has.status(405)
             done()
         })
     })
     it("Add one restaurant with wrong info sup - E", (done) => {
-        chai.request(server).post('/place').send(placeWithWrongInfoSup).end((err, res) => {
+        chai.request(server).post('/place').send(placeWithWrongInfoSup).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
             res.should.has.status(405)
             done()
         })
     })
     it("Add one restaurant with unwanted property - S", (done) => {
-        chai.request(server).post('/place').send(placeWithUnwantedProperty).end((err, res) => {
+        chai.request(server).post('/place').send(placeWithUnwantedProperty).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
             res.should.has.status(201)
             done()
         })
     })
     it("Add one restaurant with unwanted property - S", (done) => {
-        chai.request(server).post('/place').send(placeWithUnwantedProperty).end((err, res) => {
+        chai.request(server).post('/place').send(placeWithUnwantedProperty).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
             res.should.has.status(201)
             done()
         })
     })
     it("Add one restaurant with wrong type in describe - E", (done) => {
-        chai.request(server).post('/place').send(placeWithUncorrectType).end((err, res) => {
+        chai.request(server).post('/place').send(placeWithUncorrectType).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
             res.should.has.status(405)
             done()
         })
     })
     it("Add one restaurant with wrong adress - E", (done) => {
-        chai.request(server).post('/place').send(placeWithWrongAdresse).end((err, res) => {
+        chai.request(server).post('/place').send(placeWithWrongAdresse).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
             res.should.has.status(404)
             done()
         })
+    })
+    it("Add good place with normal users - E", (done) => {
+        chai.request(server).post('/place').send(placeGood).auth(tokens[1],{type: 'bearer'}).end((err, res) => {
+            res.should.has.status(401)
+            done()
+        })
+    })
+    it("Add good place with wrong token - E", (done) => {
+        chai.request(server).post('/place').send(placeGood).auth("dsngblkqsd,bùdfh5fd6bhsh;fl,sh",{type: 'bearer'}).end((err, res) => {
+            res.should.has.status(401)
+            done()
+        })
+    })
+    it("Add good place without token - E", (done) => {
+        chai.request(server).post('/place').send(placeGood).end((err, res) => {
+            res.should.has.status(401)
+            done()
+        })
+    })
+    it('purge database - S',(done)=>{
+        users.forEach((user) => {
+                chai.request(server).delete(`/user/${user._id}`).end((err,res)=>{
+            })
+        })
+    done()
     })
 })

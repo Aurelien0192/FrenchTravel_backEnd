@@ -38,7 +38,6 @@ describe("POST - /User",()=>{
             username:"",
             password:""
         }).end((err, res) => {
-            console.log(res.body)
             done()
         })
     })

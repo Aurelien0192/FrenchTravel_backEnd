@@ -81,7 +81,6 @@ module.exports.UserService = class UserService{
                         callback({msg:"Aucun utilisateur trouvé", fields_with_error: [], fields:"", type_error: "no-found"})
                     }
                 }catch(e){
-                    console.log(e)
                     callback({msg: "Erreur avec la base de donnée", fields_with_error: [], fields:"", type_error:"error-mongo"})
                 }
             }).catch((err) => {

@@ -3,7 +3,7 @@ const PlaceService = require('../services/PlaceService').PlaceService
 module.exports.PlaceControllers = class PlaceControllers {
     static addOnePlace(req, res){
         req.log.info("One place creation")
-        console.log(req.user)
+
         if(req.user.userType ==='professional'){
 
             PlaceService.addOnePlace(req.body, req._id, null, function(err, value) {

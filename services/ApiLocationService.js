@@ -37,12 +37,11 @@ module.exports.ApiLocationServices =  class ApiLocationServices {
                 }
             },1000)
         }catch (e){
-            console.log(e)
             const error = {
                 msg: "error with api geocode",
                 type_error: "error-api"
             }
-            callback(e)
+            callback(error)
         }
     }
 }

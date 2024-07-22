@@ -44,6 +44,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/data/images',express.static(path.join(__dirname, '/data/images')))
+app.use('/data/systemImages',express.static(path.join(__dirname, '/data/systemImages')))
 
 //routes for User
 

@@ -40,7 +40,6 @@ module.exports.ImageService = class ImageService{
                 }
             }
         }catch(err){
-            console.log(err)
             callback(err)
         }
     }
