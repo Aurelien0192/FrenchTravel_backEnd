@@ -57,7 +57,7 @@ app.delete('/user/:id', database.controlsBDD, UserControllers.deleteOneUser)
 //routes for Place
 
 app.post('/place',database.controlsBDD, passport.authenticate('jwt',{session:false}),ApiLocationControllers.getDataGeocode,PlaceControllers.addOnePlace)
-
+app.get('/place/:id',database.controlsBDD,PlaceControllers.FindOnePlaceById)
 
 //routes for api call
     //routes for geocodes
