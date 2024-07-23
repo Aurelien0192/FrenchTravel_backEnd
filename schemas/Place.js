@@ -130,3 +130,9 @@ module.exports.PlaceSchema = mongoose.Schema({
     udpate_at: Date
 })
 
+UserSchema.virtual('images',{
+    ref:'Image',
+    localField : '_id',
+    foreignField:'user_id'
+})
+

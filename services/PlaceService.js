@@ -59,4 +59,25 @@ module.exports.PlaceService =  class PlaceService{
             callback(error)
         }
     }
+
+    static findOnePlaceById = function (place_id, options, callback){
+        const opts = {populate : options && options.populate ? ["images"]:[], lean:true}
+        if(place_id && mongoose.isValidObjectId(place_id)){
+            Place.findById(place_id, null, opts).then((value) => {
+                try{
+                    if (value){
+                        callback(null, value)
+                    }else{
+                        callback({msg: "Aucun article trouvé", type_error: "no-found"})
+                    }
+                }catch(e){
+                    callback({msg: "Erreur avec la base de donnée", fields_with_error: [], fields:"", type_error:"error-mongo"})
+                }
+            }).catch((err) => {
+                callback(err)
+            })
+        }else{
+            callback({ msg: "ObjectId non conforme.", type_error: 'no-valid' });
+        }
+    }
 }

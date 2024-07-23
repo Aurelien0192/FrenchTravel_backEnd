@@ -71,7 +71,7 @@ module.exports.UserService = class UserService{
         }
     }
 
-    static async findOneUserById(user_id, option, callback) {
+    static async findOneUserById(user_id, options, callback) {
         if(user_id && mongoose.isValidObjectId(user_id)){
             User.findById(user_id).then((value) => {
                 try{
