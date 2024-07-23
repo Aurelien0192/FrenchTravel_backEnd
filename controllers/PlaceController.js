@@ -43,4 +43,16 @@ module.exports.PlaceControllers = class PlaceControllers {
             }
         } )
     }
+
+    static FindManyPlaceRandom(req, res){
+        PlaceService.findManyPlaceRandom(function(err, value){
+            if(err && err.type_error === "error-mongo"){
+                res.statusCode = 500
+                res.send(err)
+            }else{
+                res.statusCode = 200
+                res.send(value)
+            }
+        })
+    }
 }

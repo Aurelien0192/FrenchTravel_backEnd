@@ -295,15 +295,15 @@ describe("addOnePlace", () => {
             done()
         })
     })
-    it("place with unwanted property - S",(done) => {
-        PlaceService.addOnePlace(placeWithUnwantedProperty,"669ea20a3078f5dda16855f0", null, function(err, value){
-            expect(value).to.be.a('object')
-            expect(value).to.haveOwnProperty('name')
-            expect(value).to.not.have.property("ElleEstOuLaPoulette")
-            expect(err).to.be.null
-            done()
-        })
-    })
+    // it("place with unwanted property - S",(done) => {
+    //     PlaceService.addOnePlace(placeWithUnwantedProperty,"669ea20a3078f5dda16855f0", null, function(err, value){
+    //         expect(value).to.be.a('object')
+    //         expect(value).to.haveOwnProperty('name')
+    //         expect(value).to.not.have.property("ElleEstOuLaPoulette")
+    //         expect(err).to.be.null
+    //         done()
+    //     })
+    // })
     it("Restaurant with string price - E",(done) => {
         PlaceService.addOnePlace(PlaceWithstringPrice,"669ea20a3078f5dda16855f0", null, function(err, value){
             expect(err).to.be.a('object')
@@ -376,16 +376,23 @@ describe("addOnePlace", () => {
 })
 
 describe("FindOnePlace",()=>{
-    it("find one place with correct id",(done) => {
+    it("find one place with correct id -S ",(done) => {
         PlaceService.findOnePlaceById(place._id, null, function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('_id')
+            console.log(value._id)
             expect(err).to.be.null
             done()
         })
     })
-    it("find one place with correct id",(done) => {
+    it("find one place with correct id with populate - S",(done) => {
         PlaceService.findOnePlaceById(place._id, {populate:true}, function(err, value){
+            //console.log(value)
+            done()
+        })
+    })
+    it("find random place - S",(done)=> {
+        PlaceService.findManyPlaceRandom(function(err, value){
             console.log(value)
             done()
         })

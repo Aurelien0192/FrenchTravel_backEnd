@@ -83,4 +83,36 @@ module.exports.PlaceService =  class PlaceService{
             callback({ msg: "ObjectId non conforme.", type_error: 'no-valid' });
         }
     }
+
+    static findManyPlaceRandom = async function (callback){
+        const queryMongo = {categorie:"activity"}
+        const indexChoice =[]
+        const nbActivity = await Place.countDocuments(queryMongo)
+
+        if (nbActivity===0){
+            callback({
+                msg: "Un problème c'est produit avec la base de données",
+                type_error: "error-mongo"
+            })
+        }else{
+            for (let i = 0; i< (nbActivity<3? nbActivity : 3); i++){
+                const indexRandom = _.random(0, nbActivity-1, false)
+                if(_.indexOf(indexChoice,indexRandom) === -1){
+                    indexChoice.push(indexRandom)
+                }else{
+                    i--
+                }
+            }
+            Place.find(queryMongo, null, {populate: {path:'images',perDocumentLimit:1},lean:true}).then((results) => {
+                const placesToSend = indexChoice.map((e) => {
+                    return results[e]
+                })
+                callback(null, placesToSend)
+
+            }).catch((err) =>{
+                console.log(err)
+                callback(err)
+            })
+        }
+    }
 }
