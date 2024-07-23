@@ -7,6 +7,12 @@ const Image = mongoose.model('Image',ImageSchema)
 
 module.exports.ImageService = class ImageService{
     static async addOneImage(imageInfo, place_id, user_id, callback){
+        if(!mongoose.isValidObjectId(user_id)){
+            return callback({msg:"place_id is uncorrect", type_error:"no-valid"})
+        }
+        if(!mongoose.isValidObjectId(user_id)){
+            return callback({msg:"user_id is uncorrect", type_error:"no-valid"})
+        }
         try{
             if(!imageInfo){
                 callback({msg: "no image get for upload", type_error: "no-valid"})
@@ -46,7 +52,12 @@ module.exports.ImageService = class ImageService{
 
     static async addManyImages(imagesInfo, place_id, user_id, callback){
         const errors = []
-
+        if(!mongoose.isValidObjectId(user_id)){
+            return callback({msg:"place_id is uncorrect", type_error:"no-valid"})
+        }
+        if(!mongoose.isValidObjectId(user_id)){
+            return callback({msg:"user_id is uncorrect", type_error:"no-valid"})
+        }
         if(!imagesInfo){
             callback({msg: "no image get for upload", type_error: "no-valid"})
 
@@ -59,6 +70,7 @@ module.exports.ImageService = class ImageService{
                 image.name = imageInfo.filename
                 image.place = place_id
                 image.user_id = user_id
+                console.log(image)
                 image.path = path
                 imageTab.push(image)
             });

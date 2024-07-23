@@ -3,8 +3,11 @@ const ApiLocationService = require("../services/ApiLocationService").ApiLocation
 const _ = require('lodash')
 const mongoose = require('mongoose');
 
-const Place = mongoose.model('Place', PlaceSchema)
 
+PlaceSchema.set('toJSON',{virtuals:true})
+PlaceSchema.set('toObject',{virtuals:true})
+
+const Place = mongoose.model('Place', PlaceSchema)
 module.exports.PlaceService =  class PlaceService{
 
     static addOnePlace = async function (place, user_id, options, callback){
@@ -61,7 +64,7 @@ module.exports.PlaceService =  class PlaceService{
     }
 
     static findOnePlaceById = function (place_id, options, callback){
-        const opts = {populate : options && options.populate ? ["images"]:[], lean:true}
+        const opts = {populate : options && options.populate ? {path:'images',perDocumentLimit:1}:[], lean:true}
         if(place_id && mongoose.isValidObjectId(place_id)){
             Place.findById(place_id, null, opts).then((value) => {
                 try{

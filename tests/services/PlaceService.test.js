@@ -1,6 +1,9 @@
 const chai = require('chai') 
 const PlaceService = require("../../services/PlaceService").PlaceService;
+const ImageService = require("../../services/ImageService").ImageService;
+const { destination } = require('pino');
 let expect = chai.expect
+
 
 const placeGood = {
     name: "Château du Doubs",
@@ -222,18 +225,45 @@ const placeNothingGood = {
     lonCoordinate:"6.3537263",
 }
 
+let place = {}
 
 describe("addOnePlace", () => {
     it("Correct Place. - S" ,(done) => {
-
         PlaceService.addOnePlace(placeGood,"669ea20a3078f5dda16855f0", null, function (err, value) {
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('name')
             expect(value['name']).to.be.equal("Château du Doubs")
             expect(err).to.be.null
+            place = {...value}
             done()
         })
     })
+    it("add image to correct place - S", (done) => {
+        const images=[{
+            fieldname: 'images',
+            originalname: 'leCanyon.jpg',
+            encoding:'7bit',
+            mimetype:'image/jpeg',
+            destination:'data/images',
+            filename:'leCanyontadaaa.jpeg',
+            path:"data\\images\\leCanyontadaaa.jpeg",
+            size:716175
+        },{
+            fieldname: 'images',
+            originalname: 'leCanyon2.jpg',
+            encoding:'7bit',
+            mimetype:'image/jpeg',
+            destination:'data/images',
+            filename:'leCanyontadaaa2.jpeg',
+            path:"data\\images\\leCanyontadaaa2.jpeg",
+            size:716175
+        }]
+        ImageService.addManyImages(images, place._id,"669ea20a3078f5dda16855f0", function(err, value){
+            console.log(value)
+            done()
+        })
+    })
+
     it("Place without Name - E", (done) => {
         PlaceService.addOnePlace(PlaceWithoutname,"669ea20a3078f5dda16855f0", null, function(err, value){
             expect(err).to.be.a('object')
@@ -343,5 +373,21 @@ describe("addOnePlace", () => {
             done()
         })
     })
-    
+})
+
+describe("FindOnePlace",()=>{
+    it("find one place with correct id",(done) => {
+        PlaceService.findOnePlaceById(place._id, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('_id')
+            expect(err).to.be.null
+            done()
+        })
+    })
+    it("find one place with correct id",(done) => {
+        PlaceService.findOnePlaceById(place._id, {populate:true}, function(err, value){
+            console.log(value)
+            done()
+        })
+    })
 })

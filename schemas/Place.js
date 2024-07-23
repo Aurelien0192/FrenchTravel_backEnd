@@ -1,12 +1,13 @@
 const mongoose = require('mongoose')
 
-module.exports.PlaceSchema = mongoose.Schema({
+const PlaceSchema = mongoose.Schema({
     name : {
         type : String,
         required : true,
     },
     owner : {
         type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
         required : true
     },
     categorie : {
@@ -130,9 +131,10 @@ module.exports.PlaceSchema = mongoose.Schema({
     udpate_at: Date
 })
 
-UserSchema.virtual('images',{
+PlaceSchema.virtual('images',{
     ref:'Image',
     localField : '_id',
-    foreignField:'user_id'
+    foreignField:'place'
 })
 
+module.exports.PlaceSchema = PlaceSchema
