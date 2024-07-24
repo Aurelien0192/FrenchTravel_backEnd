@@ -85,7 +85,7 @@ module.exports.PlaceService =  class PlaceService{
     }
 
     static findManyPlaceRandom = async function (callback){
-        const categories = ["activity","restaurant"]
+        const categories = ["activity","restaurant","hotel"]
         let placesToSend = []
         try{
             for (let y =0; y<categories.length;y++){
