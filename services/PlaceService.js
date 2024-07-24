@@ -69,7 +69,7 @@ module.exports.PlaceService =  class PlaceService{
             Place.findById(place_id, null, opts).then((value) => {
                 try{
                     if (value){
-                        callback(null, value)
+                        callback(null, value.toObject())
                     }else{
                         callback({msg: "Aucun article trouvé", type_error: "no-found"})
                     }
@@ -85,34 +85,42 @@ module.exports.PlaceService =  class PlaceService{
     }
 
     static findManyPlaceRandom = async function (callback){
-        const queryMongo = {categorie:"activity"}
-        const indexChoice =[]
-        const nbActivity = await Place.countDocuments(queryMongo)
-
-        if (nbActivity===0){
-            callback({
-                msg: "Un problème c'est produit avec la base de données",
-                type_error: "error-mongo"
-            })
-        }else{
-            for (let i = 0; i< (nbActivity<3? nbActivity : 3); i++){
-                const indexRandom = _.random(0, nbActivity-1, false)
-                if(_.indexOf(indexChoice,indexRandom) === -1){
-                    indexChoice.push(indexRandom)
+        const categories = ["activity","restaurant"]
+        let placesToSend = []
+        try{
+            for (let y =0; y<categories.length;y++){
+                const queryMongo = {categorie:categories[y]}
+                const indexChoice =[]
+                const nbOfPlace = await Place.countDocuments(queryMongo)
+                if (nbOfPlace===0){
+                    console.log(queryMongo)
+                    return callback({
+                        msg: "Un problème c'est produit avec la base de données",
+                        type_error: "error-mongo"
+                    })
                 }else{
-                    i--
+                    for (let i = 0; i< (nbOfPlace<3? nbOfPlace : 3); i++){
+                        const indexRandom = _.random(0, nbOfPlace-1, false)
+                        if(_.indexOf(indexChoice,indexRandom) === -1){
+                            indexChoice.push(indexRandom)
+                        }else{
+                            i--
+                        }
+                    }
+                
+                    const results = await Place.find(queryMongo, null, {populate: {path:'images',perDocumentLimit:1},lean:true})
+                    const placesToSendInt = indexChoice.map((e) => {
+                        return results[e]
+                    })
+                    
+                    placesToSend = [...placesToSend, ...placesToSendInt]
                 }
+                    
             }
-            Place.find(queryMongo, null, {populate: {path:'images',perDocumentLimit:1},lean:true}).then((results) => {
-                const placesToSend = indexChoice.map((e) => {
-                    return results[e]
-                })
-                callback(null, placesToSend)
-
-            }).catch((err) =>{
-                console.log(err)
-                callback(err)
-            })
+            callback(null, placesToSend)
+        }catch(e){
+            console.log(e)
+            callback(e)
         }
     }
 }
