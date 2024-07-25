@@ -42,6 +42,15 @@ module.exports.PlaceService =  class PlaceService{
                     }
                     callback(err)
                 }else{
+
+                    if(new_place.price[1]< new_place.price[0]){
+                        return({
+                            msg: "le deuxième prix ne peux être inférieur au premier prix",
+                            fields_with_error: ["price1","price2"],
+                            fieds : "",
+                            type_error : "no-valid"
+                        })
+                    }
                     new_place.notation = 0
                 
                     await new_place.save()
