@@ -42,19 +42,21 @@ module.exports.PlaceService =  class PlaceService{
                     }
                     callback(err)
                 }else{
-
-                    if(new_place.price[1]< new_place.price[0]){
-                        return({
-                            msg: "le deuxième prix ne peux être inférieur au premier prix",
+                    console.log(new_place)
+                    if(new_place.categorie=== "restaurant" && new_place.moreInfo.price && new_place.moreInfo.price[1] < new_place.moreInfo.price[0]){
+                        callback({
+                            msg: "le deuxième prix ne peut être inférieur au premier prix",
                             fields_with_error: ["price1","price2"],
                             fieds : "",
                             type_error : "no-valid"
                         })
+                    }else{
+                        console.log("ok")
+                        new_place.notation = 0
+                        await new_place.save()
+                        callback(null, new_place.toObject())
                     }
-                    new_place.notation = 0
                 
-                    await new_place.save()
-                    callback(null, new_place.toObject())
                 }
             }
         }catch(error){

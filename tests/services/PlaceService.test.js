@@ -155,6 +155,25 @@ const placeWithUnwantedProperty = {
     describe : "Super chateau dans le centre du Doubs",
     categorie : "restaurant",
     moreInfo:{
+        cook: "lundi : 9h - 18h",
+        price:[10,25]
+    },
+    street: "2 rue du Moulin Parnet",
+    city: "Pontarlier",
+    codePostal : "25300",
+    country: "France",
+    county: "Doubs",
+    latCoordinate: "46.907258",
+    lonCoordinate:"6.3537263",
+    ElleEstOuLaPoulette: "Kammelot"
+}
+
+const restaurantWithWrongPrices = {
+    name: "Château du Doubs",
+    describe : "Super chateau dans le centre du Doubs",
+    categorie : "restaurant",
+    moreInfo:{
+        price :[25,10],
         cook: "lundi : 9h - 18h"
     },
     street: "2 rue du Moulin Parnet",
@@ -292,6 +311,15 @@ describe("addOnePlace", () => {
             expect(value).to.haveOwnProperty('name')
             expect(value).to.not.have.property("ElleEstOuLaPoulette")
             expect(err).to.be.null
+            done()
+        })
+    })
+    it("place with wrong price - E",(done) => {
+        PlaceService.addOnePlace(restaurantWithWrongPrices,"669ea20a3078f5dda16855f0", null, function(err, value){
+            expect(err).to.be.an("object")
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err["type_error"]).to.be.equal('no-valid')
+            expect(value).to.be.undefined
             done()
         })
     })
