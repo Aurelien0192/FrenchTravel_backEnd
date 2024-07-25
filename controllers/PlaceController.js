@@ -55,4 +55,19 @@ module.exports.PlaceControllers = class PlaceControllers {
             }
         })
     }
+    
+    static findPlacesNear(req, res){
+        PlaceService.findPlacesNear(req.body.latCoordinate, req.body.lonCoordinate, function(err, value){
+            if(err && err.type_error === "error-mongo"){
+                res.statusCode = 500
+                res.send(err)
+            }else if(err && err.type_error === "no-valid"){
+                res.statusCode = 405
+                res.send(err)
+            }else{
+                res.statusCode = 200
+                res.send(value)
+            }
+        })
+    }
 }

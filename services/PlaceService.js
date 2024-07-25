@@ -134,4 +134,68 @@ module.exports.PlaceService =  class PlaceService{
             callback(e)
         }
     }
+
+    static findPlacesNear = async function(latCoordinate, lonCoordinate, callback){
+        const categories = ["activity","restaurant","hotel"]
+        let placesToSend = []
+        if(Number(latCoordinate) === null || Number(lonCoordinate === null)){
+            return ({
+                msg:"Coordinates of the place not good",
+                type_error:"no-valid"
+            })
+        }else{
+            try{
+                for (let y =0; y<categories.length;y++){
+                    
+                    const queryMongo = {
+                        categorie:categories[y],
+                        $expr: {
+                            $lte: [
+                                {
+                                    $multiply: [
+                                        6372.795477598,
+                                        {
+                                            $acos: {
+                                                $add: [
+                                                    {
+                                                        $multiply: [
+                                                            { $sin: { $divide: [{ $multiply: [Number(latCoordinate), Math.PI] }, 180] } },
+                                                            { $sin: { $divide: [{ $multiply: [Number("$latCoordinateB"), Math.PI] }, 180] } }
+                                                        ]
+                                                    },
+                                                    {
+                                                        $multiply: [
+                                                            { $cos: { $divide: [{ $multiply: [Number(latCoordinate), Math.PI] }, 180] } },
+                                                            { $cos: { $divide: [{ $multiply: [Number("$latCoordinateB"), Math.PI] }, 180] } },
+                                                            { $cos: { $subtract: [
+                                                                { $divide: [{ $multiply: [Number(lonCoordinate), Math.PI] }, 180] },
+                                                                { $divide: [{ $multiply: [Number("$lonCoordinateB"), Math.PI] }, 180] }
+                                                            ]}}
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                ]
+                                },
+                                10
+                            ]
+                        }
+                    }    
+                }
+                    const results = await Place.find(queryMongo, null, {populate: {path:'images',perDocumentLimit:1},lean:true,limit:10})
+            
+                    placesToSend = [...placesToSend, ...results]
+
+                callback(null, placesToSend)
+            }catch(e){
+                console.log(e)
+                callback({
+                    msg: "erreur interne au serveur",
+                    type_error:"error-mongo"
+                })
+            }
+        
+        }
+    }
 }

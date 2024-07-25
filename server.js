@@ -59,6 +59,7 @@ app.delete('/user/:id', database.controlsBDD, UserControllers.deleteOneUser)
 app.post('/place',database.controlsBDD, passport.authenticate('jwt',{session:false}),ApiLocationControllers.getDataGeocode,PlaceControllers.addOnePlace)
 app.get('/place/:id',database.controlsBDD,PlaceControllers.FindOnePlaceById)
 app.get('/places/random',database.controlsBDD,PlaceControllers.FindManyPlaceRandom)
+app.get('/places/suggestions',database.controlsBDD,PlaceControllers.findPlacesNear)
 
 //routes for api call
     //routes for geocodes

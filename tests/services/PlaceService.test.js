@@ -158,13 +158,13 @@ const placeWithUnwantedProperty = {
         cook: "lundi : 9h - 18h",
         price:[10,25]
     },
-    street: "2 rue du Moulin Parnet",
-    city: "Pontarlier",
-    codePostal : "25300",
+    street: "2 Pont de la République",
+    city: "Besançon",
+    codePostal : "25000",
     country: "France",
     county: "Doubs",
-    latCoordinate: "46.907258",
-    lonCoordinate:"6.3537263",
+    latCoordinate: "47.2407913",
+    lonCoordinate:"6.0280113",
     ElleEstOuLaPoulette: "Kammelot"
 }
 
@@ -411,7 +411,12 @@ describe("FindOnePlace",()=>{
     })
     it("find random place - S",(done)=> {
         PlaceService.findManyPlaceRandom(function(err, value){
-            console.log(value)
+
+            done()
+        })
+    })
+    it("return near places - S",(done) => {
+        PlaceService.findPlacesNear(place.latCoordinate, place.lonCoordinate,function(err, value){
             done()
         })
     })
