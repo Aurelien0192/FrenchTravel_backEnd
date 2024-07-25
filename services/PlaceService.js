@@ -182,10 +182,10 @@ module.exports.PlaceService =  class PlaceService{
                             ]
                         }
                     }    
-                }
                     const results = await Place.find(queryMongo, null, {populate: {path:'images',perDocumentLimit:1},lean:true,limit:10})
-            
                     placesToSend = [...placesToSend, ...results]
+                }
+            
 
                 callback(null, placesToSend)
             }catch(e){
