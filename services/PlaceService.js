@@ -64,12 +64,12 @@ module.exports.PlaceService =  class PlaceService{
     }
 
     static findOnePlaceById = function (place_id, options, callback){
-        const opts = {populate : options && options.populate ? {path:'images',perDocumentLimit:1}:[], lean:true}
+        const opts = {populate : options && options.populate ? ['images']:[], lean:true}
         if(place_id && mongoose.isValidObjectId(place_id)){
             Place.findById(place_id, null, opts).then((value) => {
                 try{
                     if (value){
-                        callback(null, value.toObject())
+                        callback(null, value)
                     }else{
                         callback({msg: "Aucun article trouvé", type_error: "no-found"})
                     }
