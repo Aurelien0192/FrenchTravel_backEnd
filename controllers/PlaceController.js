@@ -70,4 +70,31 @@ module.exports.PlaceControllers = class PlaceControllers {
             }
         })
     }
+
+    static findManyPlaces(req, res){
+        const q = {search : req.query.search}
+        if(req.query.notation){
+            q.notation = req.query.notation
+        }
+
+        if(req.query.hotelCategorie){
+            q.hotelCategorie = req.query.hotelCategorie
+        }
+
+        if(req.query.categorie){
+            q.categorie = req.query.categorie
+        }
+        PlaceService.findManyPlaces(req.query.page, req.query.limit, q, null, function(err, value){
+            if(err && err.type_error === "error-mongo"){
+                res.statusCode = 500
+                res.send(err)
+            }else if(err && err.type_error === "no-valid"){
+                res.statusCode = 405
+                res.send(err)
+            }else{
+                res.statusCode = 200
+                res.send(value)
+            }
+        })
+    }
 }

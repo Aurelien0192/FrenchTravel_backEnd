@@ -93,6 +93,50 @@ module.exports.PlaceService =  class PlaceService{
         }
     }
 
+    static findManyPlaces = async function (page, limit, q, options, callback){
+        const populate = options && options.populate? ["images"]:[]
+        page = !page ? 1 : page
+        limit = !limit ? 1 : limit
+        page = !Number.isNaN(page) ? Number(page): page
+        limit = !Number.isNaN(limit) ? Number(limit): limit
+        
+        const queryMongo = q.search ? 
+            {$or : _.map(["name","categorie","city","typeOfPlace","county"], (e) => {return{[e]:{$regex:`${q.search}`,$options: 'i'}}})}
+            : {}
+        
+        if(q.notation){
+            queryMongo.notation = q.notation
+        }
+
+        if(q.hotelCategorie){
+            queryMongo.hotelCategorie = q.hotelCategorie
+        }
+
+        if(q.categorie){
+            queryMongo.categorie = q.categorie
+        }
+
+        if (Number.isNaN(page) || Number.isNaN(limit)){
+            callback ({msg: `format de ${Number.isNaN(page) ? "page" : "limit"} est incorrect`, type_error:"no-valid"})
+        }else{
+            Place.countDocuments(queryMongo).then((value) => {
+                if (value > 0){
+                    const skip = ((page-1) * limit)
+                    Place.find(queryMongo, null, {populate: {path:'images',perDocumentLimit:1},lean:true}).then((results) => {
+                        callback(null, {
+                            count : value,
+                            results : results
+                        })
+                    })
+                }else{
+                    callback(null,{count : 0, results : []})
+                }
+            }).catch((e) => {
+                callback(e)
+            })
+        }
+    }
+
     static findManyPlaceRandom = async function (callback){
         const categories = ["activity","restaurant","hotel"]
         let placesToSend = []
