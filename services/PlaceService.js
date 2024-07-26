@@ -42,7 +42,6 @@ module.exports.PlaceService =  class PlaceService{
                     }
                     callback(err)
                 }else{
-                    console.log(new_place)
                     if(new_place.categorie=== "restaurant" && new_place.moreInfo.price && new_place.moreInfo.price[1] < new_place.moreInfo.price[0]){
                         callback({
                             msg: "le deuxième prix ne peut être inférieur au premier prix",
@@ -51,7 +50,6 @@ module.exports.PlaceService =  class PlaceService{
                             type_error : "no-valid"
                         })
                     }else{
-                        console.log("ok")
                         new_place.notation = 0
                         await new_place.save()
                         callback(null, new_place.toObject())
@@ -104,7 +102,6 @@ module.exports.PlaceService =  class PlaceService{
                 const indexChoice =[]
                 const nbOfPlace = await Place.countDocuments(queryMongo)
                 if (nbOfPlace===0){
-                    console.log(queryMongo)
                     return callback({
                         msg: "Un problème c'est produit avec la base de données",
                         type_error: "error-mongo"

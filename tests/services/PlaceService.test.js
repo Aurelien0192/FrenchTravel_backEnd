@@ -269,7 +269,7 @@ describe("addOnePlace", () => {
             size:716175
         }]
         ImageService.addManyImages(images, place._id,"669ea20a3078f5dda16855f0", function(err, value){
-            console.log(value)
+
             done()
         })
     })
@@ -397,21 +397,21 @@ describe("addOnePlace", () => {
 describe("FindOnePlace",()=>{
     it("find one place with correct id -S ",(done) => {
         PlaceService.findOnePlaceById(place._id, null, function(err, value){
-            // expect(value).to.be.a('object')
-            // expect(value).to.haveOwnProperty('_id')
-            // expect(err).to.be.null
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('_id')
+            console.log(value['_id'], place._id)
+            //expect(value['_id']).be.equal(place._id)
+            expect(err).to.be.null
             done()
         })
     })
     it("find one place with correct id with populate - S",(done) => {
         PlaceService.findOnePlaceById(place._id, {populate:true}, function(err, value){
-            //console.log(value)
             done()
         })
     })
     it("find random place - S",(done)=> {
         PlaceService.findManyPlaceRandom(function(err, value){
-
             done()
         })
     })

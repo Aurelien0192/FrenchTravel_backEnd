@@ -70,7 +70,6 @@ module.exports.ImageService = class ImageService{
                 image.name = imageInfo.filename
                 image.place = place_id
                 image.user_id = user_id
-                console.log(image)
                 image.path = path
                 imageTab.push(image)
             });
