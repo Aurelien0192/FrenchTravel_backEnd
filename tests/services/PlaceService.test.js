@@ -5,6 +5,22 @@ const { destination } = require('pino');
 let expect = chai.expect
 
 
+const goodHotel = {
+    name: "Château du Doubs",
+    describe : "Super chateau dans le centre du Doubs",
+    categorie : "hotel",
+    moreInfo:{
+        services:"ascensceur"
+    },
+    street: "2 rue du Moulin Parnet",
+    city: "Pontarlier",
+    codePostal : "25300",
+    country: "France",
+    county: "Doubs",
+    latCoordinate: 46.907258,
+    lonCoordinate:6.3537263
+}
+
 const placeGood = {
     name: "Château du Doubs",
     describe : "Super chateau dans le centre du Doubs",
@@ -26,8 +42,8 @@ const placeGood = {
     codePostal : "25300",
     country: "France",
     county: "Doubs",
-    latCoordinate: "46.907258",
-    lonCoordinate:"6.3537263"
+    latCoordinate: 46.907258,
+    lonCoordinate:6.3537263
 }
 
 const PlaceWithoutname = {
@@ -50,8 +66,8 @@ const PlaceWithoutname = {
     codePostal : "25300",
     country: "France",
     county: "Doubs",
-    latCoordinate: "46.907258",
-    lonCoordinate:"6.3537263"
+    latCoordinate: 46.907258,
+    lonCoordinate:6.3537263
 }
 
 const PlaceMissingname = {
@@ -75,8 +91,8 @@ const PlaceMissingname = {
     codePostal : "25300",
     country: "France",
     county: "Doubs",
-    latCoordinate: "46.907258",
-    lonCoordinate:"6.3537263"
+    latCoordinate: 46.907258,
+    lonCoordinate:6.3537263
 }
 
 const PlaceWithstringPrice = {
@@ -93,8 +109,8 @@ const PlaceWithstringPrice = {
     codePostal : "25300",
     country: "France",
     county: "Doubs",
-    latCoordinate: "46.907258",
-    lonCoordinate:"6.3537263"
+    latCoordinate: 46.907258,
+    lonCoordinate:6.3537263
 }
 
 const PlaceWithNullPrice = {
@@ -111,8 +127,8 @@ const PlaceWithNullPrice = {
     codePostal : "25300",
     country: "France",
     county: "Doubs",
-    latCoordinate: "46.907258",
-    lonCoordinate:"6.3537263"
+    latCoordinate: 46.907258,
+    lonCoordinate: 6.3537263
 }
 
 const PlaceWithThreePrices = {
@@ -129,8 +145,8 @@ const PlaceWithThreePrices = {
     codePostal : "25300",
     country: "France",
     county: "Doubs",
-    latCoordinate: "46.907258",
-    lonCoordinate:"6.3537263"
+    latCoordinate: 46.907258,
+    lonCoordinate: 6.3537263
 }
 
 const placeWithWrongInfoSup = {
@@ -146,12 +162,12 @@ const placeWithWrongInfoSup = {
     codePostal : "25300",
     country: "France",
     county: "Doubs",
-    latCoordinate: "46.907258",
-    lonCoordinate:"6.3537263"
+    latCoordinate: 46.907258,
+    lonCoordinate: 6.3537263
 }
 
 const placeWithUnwantedProperty = {
-    name: "Château du Doubs",
+    name: "les tortues",
     describe : "Super chateau dans le centre du Doubs",
     categorie : "restaurant",
     moreInfo:{
@@ -163,8 +179,8 @@ const placeWithUnwantedProperty = {
     codePostal : "25000",
     country: "France",
     county: "Doubs",
-    latCoordinate: "47.2407913",
-    lonCoordinate:"6.0280113",
+    latCoordinate: 47.2407913,
+    lonCoordinate: 6.0280113,
     ElleEstOuLaPoulette: "Kammelot"
 }
 
@@ -181,8 +197,8 @@ const restaurantWithWrongPrices = {
     codePostal : "25300",
     country: "France",
     county: "Doubs",
-    latCoordinate: "46.907258",
-    lonCoordinate:"6.3537263",
+    latCoordinate: 46.907258,
+    lonCoordinate: 6.3537263,
     ElleEstOuLaPoulette: "Kammelot"
 }
 
@@ -207,8 +223,8 @@ const placeWithUncorrectType = {
     codePostal : "25300",
     country: "France",
     county: "Doubs",
-    latCoordinate: "46.907258",
-    lonCoordinate:"6.3537263",
+    latCoordinate: 46.907258,
+    lonCoordinate: 6.3537263,
 }
 
 const placeNothingGood = {
@@ -231,8 +247,8 @@ const placeNothingGood = {
     codePostal :'',
     country: "France",
     county: "Doubs",
-    latCoordinate: "46.907258",
-    lonCoordinate:"6.3537263",
+    latCoordinate: 46.907258,
+    lonCoordinate: 6.3537263,
 }
 
 let place = {}
@@ -245,6 +261,15 @@ describe("addOnePlace", () => {
             expect(value['name']).to.be.equal("Château du Doubs")
             expect(err).to.be.null
             place = {...value}
+            done()
+        })
+    })
+    it("Correct hotel. - S" ,(done) => {
+        PlaceService.addOnePlace(goodHotel,"669ea20a3078f5dda16855f0", null, function (err, value) {
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('name')
+            expect(value['name']).to.be.equal("Château du Doubs")
+            expect(err).to.be.null
             done()
         })
     })
@@ -399,8 +424,7 @@ describe("FindOnePlace",()=>{
         PlaceService.findOnePlaceById(place._id, null, function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('_id')
-            console.log(value['_id'], place._id)
-            //expect(value['_id']).be.equal(place._id)
+            expect(String(value['_id'])).be.equal(String(place._id))
             expect(err).to.be.null
             done()
         })
@@ -412,11 +436,31 @@ describe("FindOnePlace",()=>{
     })
     it("find random place - S",(done)=> {
         PlaceService.findManyPlaceRandom(function(err, value){
+            expect(value).to.be.an('array')
+            expect(value[0]).to.be.a('object')
+            expect(value[0]).to.haveOwnProperty('images')
+            expect(value[0].images).to.be.an('array')
+            expect(value[0].images).to.have.lengthOf(1)
+            expect(err).to.be.null
             done()
         })
     })
     it("return near places - S",(done) => {
         PlaceService.findPlacesNear(place.latCoordinate, place.lonCoordinate,function(err, value){
+            expect(value).to.be.an('array')
+            expect(value).to.have.lengthOf.below(31)
+            value.forEach(place => {
+                expect(place).to.haveOwnProperty('city')
+                expect(place['city']).to.be.equal("Pontarlier")
+            });
+            done()
+        })
+    })
+    it("return near places - S",(done) => {
+        PlaceService.findPlacesNear("jsdvoiqjod", place.lonCoordinate,function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err["type_error"]).to.be.equal("no-valid")
             done()
         })
     })

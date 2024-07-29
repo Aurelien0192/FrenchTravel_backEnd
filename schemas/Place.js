@@ -110,11 +110,11 @@ const PlaceSchema = mongoose.Schema({
         required: true
     },
     latCoordinate : {
-        type : String,
+        type : Number,
         required: true
     },
     lonCoordinate : {
-        type : String,
+        type : Number,
         required: true
     },
     phone : String,

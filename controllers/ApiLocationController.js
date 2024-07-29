@@ -21,8 +21,8 @@ module.exports.ApiLocationControllers = class ApiLocationControllers{
                 res.send(err)
             }else{
                 res.statusCode = 200
-                req.body.latCoordinate = value[0].lat
-                req.body.lonCoordinate = value[0].lon
+                req.body.latCoordinate = Number(value[0].lat)
+                req.body.lonCoordinate = Number(value[0].lon)
                 req.route.path === "/getlocation" ? res.send(value): next()
             }
         }

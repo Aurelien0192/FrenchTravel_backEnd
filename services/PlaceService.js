@@ -177,10 +177,12 @@ module.exports.PlaceService =  class PlaceService{
     }
 
     static findPlacesNear = async function(latCoordinate, lonCoordinate, callback){
+        console.log(latCoordinate,lonCoordinate)
         const categories = ["activity","restaurant","hotel"]
         let placesToSend = []
-        if(Number(latCoordinate) === null || Number(lonCoordinate === null)){
-            return ({
+        console.log(isNaN(Number(latCoordinate)))
+        if(isNaN(Number(latCoordinate))|| isNaN(Number(lonCoordinate === null))){
+            callback({
                 msg:"Coordinates of the place not good",
                 type_error:"no-valid"
             })
@@ -200,17 +202,17 @@ module.exports.PlaceService =  class PlaceService{
                                                 $add: [
                                                     {
                                                         $multiply: [
-                                                            { $sin: { $divide: [{ $multiply: [Number(latCoordinate), Math.PI] }, 180] } },
-                                                            { $sin: { $divide: [{ $multiply: [Number("$latCoordinateB"), Math.PI] }, 180] } }
+                                                            { $sin: { $divide: [{ $multiply: [latCoordinate, Math.PI] }, 180] } },
+                                                            { $sin: { $divide: [{ $multiply: ["$latCoordinate", Math.PI] }, 180] } }
                                                         ]
                                                     },
                                                     {
                                                         $multiply: [
-                                                            { $cos: { $divide: [{ $multiply: [Number(latCoordinate), Math.PI] }, 180] } },
-                                                            { $cos: { $divide: [{ $multiply: [Number("$latCoordinateB"), Math.PI] }, 180] } },
+                                                            { $cos: { $divide: [{ $multiply: [latCoordinate, Math.PI] }, 180] } },
+                                                            { $cos: { $divide: [{ $multiply: ["$latCoordinate", Math.PI] }, 180] } },
                                                             { $cos: { $subtract: [
-                                                                { $divide: [{ $multiply: [Number(lonCoordinate), Math.PI] }, 180] },
-                                                                { $divide: [{ $multiply: [Number("$lonCoordinateB"), Math.PI] }, 180] }
+                                                                { $divide: [{ $multiply: [lonCoordinate, Math.PI] }, 180] },
+                                                                { $divide: [{ $multiply: ["$lonCoordinate", Math.PI] }, 180] }
                                                             ]}}
                                                         ]
                                                     }
@@ -223,11 +225,10 @@ module.exports.PlaceService =  class PlaceService{
                             ]
                         }
                     }    
+                    console.log(queryMongo)
                     const results = await Place.find(queryMongo, null, {populate: {path:'images',perDocumentLimit:1},lean:true,limit:10})
                     placesToSend = [...placesToSend, ...results]
                 }
-            
-
                 callback(null, placesToSend)
             }catch(e){
                 console.log(e)
