@@ -2,7 +2,42 @@ const passport = require('passport')
 
 const UserService = require('../services/UserService').UserService
 
+
+
+
 module.exports.UserControllers = class UserControllers{
+
+/**
+ * @swagger
+ * /login:
+ *  post:
+ *      summary: Login user
+ *      description: Login user with the provided details
+ *      tags:
+ *          - Login
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/Login'
+ *      responses:
+ *          200:
+ *              description: Login successfully.
+ *              content: 
+ *                  application/json:
+ *                      schema:
+ *                          $ref : '#/components/schemas/User'
+ *          401:
+ *              $ref: '#/components/responses/ErrorLogin'
+ *          404:
+ *              $ref: '#/components/responses/NotFound'
+ *          405:
+ *              $ref: '#/components/responses/ValidationError'
+ *          500:
+ *              description : Internal server error
+ */
+
     static loginUser = function(req, res, next){
         passport.authenticate('login', {badRequestMessage: "Les champs sont manquants."}, async function (err, user){
             if(err){
@@ -31,6 +66,35 @@ module.exports.UserControllers = class UserControllers{
         })(req, res, next)
     }
 
+/**
+ * @swagger
+ * /user:
+ *  post:
+ *      summary: Create a new user
+ *      description : Create a new user with the provided details
+ *      tags:
+ *          - User
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/User'
+ *      responses:
+ *          201:
+ *              description: User created successfully.
+ *              content: 
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/User'
+ *          404:
+ *              $ref: '#/components/responses/NotFound'
+ *          405:
+ *              $ref: '#/components/responses/ValidationError'
+ *          500:
+ *              description: Internal server error
+ */
+
     static addOneUser(req, res){
         const opts = null
         req.log.info("Ajout d'un utilisateur")
@@ -47,6 +111,38 @@ module.exports.UserControllers = class UserControllers{
             }
         })
     }
+
+/**
+ * @swagger
+ * /user/{id}:
+ *  get:
+ *      summary: find user by id
+ *      description : Create a new user with the provided details
+ *      parameters:
+ *          - in: path
+ *            name: id
+ *            schema:
+ *              type: string
+ *            required: true
+ *            description: Object ID of the user to get
+ *      tags:
+ *          - User
+ *      responses:
+ *          201:
+ *              description: User find successfully.
+ *              content: 
+ *                  application/json:
+ *                      schema:
+ *                          $ref : '#/components/schemas/User'
+ *          403: 
+ *              description: Not Authorized
+ *          404:
+ *              $ref: '#/components/responses/NotFound'
+ *          405:
+ *              $ref: '#/components/responses/ValidationError'
+ *          500:
+ *              description : Internal server error
+ */
     
     static findOneUserById(req, res){
         const opts = null
@@ -68,6 +164,44 @@ module.exports.UserControllers = class UserControllers{
         })
     }
 
+/**
+ * @swagger
+ * /user:
+ *  put:
+ *      summary: Update user
+ *      description : Update a user with provided
+ *      parameters:
+ *          - in: path
+ *            name: id
+ *            schema:
+ *              type: string
+ *            required: true
+ *            description: Object ID of the user to get
+ *      tags:
+ *          - User
+ *      requestBody:
+ *          required: false
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/User'
+ *      responses:
+ *          200:
+ *              description: User updated successfully.
+ *              content: 
+ *                  application/json:
+ *                      schema:
+ *                          $ref : '#/components/schemas/User'
+ *          403: 
+ *              description: Not Authorized
+ *          404:
+ *              $ref: '#/components/responses/NotFound'
+ *          405:
+ *              $ref: '#/components/responses/ValidationError'
+ *          500:
+ *              description : Internal server error
+ */
+
     static updateOneUser(req, res){
         const opts = null
         UserService.updateOneUser(req.params.id, req.body, opts, function(err, value){
@@ -87,6 +221,38 @@ module.exports.UserControllers = class UserControllers{
             }
         })
     }
+
+    /**
+ * @swagger
+ * /user:
+ *  delete:
+ *      summary: Delete one user
+ *      description : delete one user by using ID
+ *      parameters:
+ *          - in: path
+ *            name: id
+ *            schema:
+ *              type: string
+ *            required: true
+ *            description: Object ID of the user to get
+ *      tags:
+ *          - User
+ *      responses:
+ *          201:
+ *              description: User deleted successfully.
+ *              content: 
+ *                  application/json:
+ *                      schema:
+ *                          $ref : '#/components/schemas/User'
+ *          403: 
+ *              description: Not Authorized
+ *          404:
+ *              $ref: '#/components/responses/NotFound'
+ *          405:
+ *              $ref: '#/components/responses/ValidationError'
+ *          500:
+ *              description : Internal server error
+ */
 
     static deleteOneUser(req, res){
         const opts = null

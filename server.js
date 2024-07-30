@@ -9,12 +9,18 @@ const multerManyImage = require('./middlewares/multer.config').manyImage
 const path = require('path')
 const session = require('express-session')
 
+const swaggerJSDoc= require('swagger-jsdoc')
+const swaggerUi = require('swagger-ui-express')
 
 //Create express.js app
 const app = express()
 
 require("./utils/database")
 
+//configuration Swagger
+const swaggerOptions = require('./swagger.json')
+const swaggerDocs = swaggerJSDoc(swaggerOptions)
+app.use('/api-docs', swaggerUi.serve,swaggerUi.setup(swaggerDocs))
 
 app.use(session({
   secret : Config.passportConfig.getSecretCookie(),

@@ -1,0 +1,382 @@
+{
+    "swaggerDefinition": {
+        "openapi": "3.0.0",
+        "info": {
+            "title": "FrenchTravel_BackEnd",
+            "vesion": "1.0.0",
+            "description": "API documentation"
+        },
+        "servers": [
+            {
+                "url": "http://localhost:3001",
+                "description": "Development server"
+            }
+        ],
+        "components" : {
+            "securitySchemes": {
+                "bearerAuth": {
+                    "type": "http",
+                    "scheme": "bearer",
+                    "bearerFormat": "JWT"
+                }
+            },
+            "schemas": {
+                "User": {
+                    "type": "object",
+                    "required":["username","userType","password","email"],
+                    "properties":{
+                        "firstName":{
+                            "type": "string",
+                            "description": "The user's firstName, required if userType is professional",
+                            "exemple": "John"
+                        },
+                        "lastName":{
+                            "type": "string",
+                            "description": "The user's lastName, required if userType is professional",
+                            "exemple": "Doe"
+                        },
+                        "username": {
+                            "type": "string",
+                            "description" : "The user's username",
+                            "exemple": "johnDoe"
+                        },
+                        "userType": {
+                            "type": "string",
+                            "enum": ["professional","user","admin"],
+                            "description": "role of the user",
+                            "exemple": "professional"
+                        },
+                        "password": {
+                            "type": "string",
+                            "description" : "the user's password",
+                            "exemple": "coucou"
+                        },
+                        "email": {
+                            "type": "string",
+                            "description": "the user's email",
+                            "exemple" : "john.doe@gmail.com"
+                        },
+                        "about": {
+                            "type": "string",
+                            "description": "the user's description",
+                            "exemple": "Love travel around Paris"
+                        },
+                        "token": {
+                            "type" : "string",
+                            "description": "An optional token for the user",
+                            "exemple": "somerandomtoken" 
+                        },
+                        "profilePhoto": {
+                            "type": "string",
+                            "description": "path to fin profile photos of user, have default value"
+                        },
+                        "create_at":{
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "Date when the user was created",
+                            "exemple" :"2024-01-01T00:00:00Z"
+                        }
+                    }
+                },
+                "Place": {
+                    "type": "object",
+                    "required": ["name","owner","categorie","describe","street","city","codePostal","county","country","latCoordinate","lonCoordinate"],
+                    "properties": {
+                        "name" : {
+                            "type": "string",
+                            "description" : "name of the place",
+                            "exemple": "la Citadelle"
+                        },
+                        "owner": {
+                            "type":"string",
+                            "description": "user's objectID of owner place",
+                            "exemple": "66a75cbd8b18880971f52fe8"
+                        },
+                        "categorie": {
+                            "type": "string",
+                            "enum": ["hotel","restaurant","activity"],
+                            "description": "categorie of the place",
+                            "exemple": "activity"
+                        },"notation" :{
+                            "type": "number",
+                            "description" : "notation of the place by users",
+                            "exemple": 4
+                        }, "describe": {
+                            "type": "string",
+                            "description": "describe of the place by the owner",
+                            "exemple":"Beautiful place with somes animals"
+                        }, "moreInfo":{
+                            "type":"object",
+                            "properties":{
+                                "schedules":{
+                                    "type": "array",
+                                    "description": "schedules to know schedules of a place, only for category place activity",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "day":{
+                                                "type" : "string",
+                                                "description": "day in schedules",
+                                                "enum":["monday","tuesday","wednesday","thursday","friday","saturday","sunday"],
+                                                "exemple": "monday"                                               
+                                            }, 
+                                            "open":{
+                                                "type": "string",
+                                                "description": "time of opening",
+                                                "exemple": "8:00"   
+                                            },
+                                            "close":{
+                                                "type": "string",
+                                                "description": "time of closing",
+                                                "exemple": "18:00"
+                                            }
+                                        }
+                                    }
+                                },"duration":{
+                                    "type": "string",
+                                    "description": "duration needed to visited a place, only for category place activity",
+                                    "exemple": "360"
+                                },"price":{
+                                    "type": "array",
+                                    "description" : "price range of the place, only for category place restaurant, need 2 items",
+                                    "items":{
+                                        "type": "number",
+                                        "description": "price",
+                                        "exemple": 10
+                                    }
+                                },"diner":{
+                                    "type": "string",
+                                    "description": "not used right now",
+                                    "exemple":""
+                                },"cook":{
+                                    "type": "string",
+                                    "description": "type of cook in the place, only for category place restaurant",
+                                    "exemple": "steakhouse, française, belge"
+                                },"services":{
+                                    "type": "string",
+                                    "description": "services availables in the place, only for category place activity and hotel",
+                                    "exemple": "wifi"
+                                },"equipment":{
+                                    "type": "string",
+                                    "description": "equipments available in the place only for category place hotel",
+                                    "exemple":"télévision"
+                                },"hotelCategorie":{
+                                    "type": "number",
+                                    "description": "number of star of the hotel only for category place hotel",
+                                    "exemple": 3
+                                },"accessibility":{
+                                    "type":"string",
+                                    "description": "equipment and installation for disability's person",
+                                    "exemple": "assensceur"
+                                }
+                            }
+                        }, "street":{
+                            "type": "string",
+                            "description": "street and street number of the place",
+                            "exemple": "99 Rue des Fusillés de la Résistance"
+                        }, "city":{
+                            "type":"string",
+                            "description": "city of the place",
+                            "exemple": "Besançon"
+                        }, "county":{
+                            "type": "string",
+                            "description": "county of the place",
+                            "exemple": "doubs"
+                        },"country":{
+                            "type" : "string",
+                            "description": "country of the place",
+                            "exemple":"France"
+                        },"latCoordinate":{
+                            "type":"number",
+                            "description": "lattitude coordinate of the place",
+                            "exemple": 47.2326466
+                        },"lonCoordinate":{
+                            "type":"number",
+                            "description": "longitude coordinate of the place",
+                            "exemple": 6.0314766
+                        },"phone":{
+                            "type": "string",
+                            "description": "phone number of the place",
+                            "exemple": "03.81.33.44.10"
+                        },"typeOfPlace":{
+                            "type": "array",
+                            "description": "professional can give two more precision of the category",
+                            "items":{
+                                "type":"string",
+                                "exemple" : "zoo"
+                            }
+                        },"email":{
+                            "type": "string",
+                            "description": "email of the place",
+                            "exemple": "citadelle@gmail.com"
+                        },"bookingLink":{
+                            "type": "string",
+                            "description": "url to access on the website of the place",
+                            "exemple":"www.citadelle.com"
+                        },"create_at":{
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "Date when the place was created",
+                            "exemple" :"2024-01-01T00:00:00Z"
+                        },"update_at":{
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "Date when the place was update",
+                            "exemple" :"2024-01-01T00:00:00Z"
+                        }
+                    }
+                },
+                "Image": {
+                    "type": "object",
+                    "required":["name","place","user_id","path"],
+                    "properties":{
+                        "name":{
+                            "type": "string",
+                            "description": "name of the pictures",
+                            "exemple": "1200x680_index.jpg1721718943526.jpeg"
+                        },"place":{
+                            "type":"string",
+                            "description": "place's objectID of place link to the photo",
+                            "exemple": "66a75cbd8b18880971f52fe8"
+                        },"user_id":{
+                            "type":"string",
+                            "description": "user's objectID of user post the photo",
+                            "exemple": "66a75cbd8b18880971f52fe8"
+                        }, "path":{
+                            "type":"string",
+                            "description":"path to find photos in the server",
+                            "exemple": "data/images/1200x680_index.jpg1721718943526.jpeg"
+                        },"create_at":{
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "Date when the place was created",
+                            "exemple" :"2024-01-01T00:00:00Z"
+                        }
+                    }
+                },
+                "Login":{
+                    "type" : "object",
+                    "required" : ["username"],
+                    "properties": {
+                        "username": {
+                            "type": "string",
+                            "description": "The user's username",
+                            "exemple": "johnDoe"
+                        },
+                        "password": {
+                            "type": "string",
+                            "description": "the user's password",
+                            "exemple": "coucou"
+                        }
+                    }
+                 }
+            },"responses":{
+                "NotFound":{
+                    "description":"Resource not found",
+                    "content":{
+                        "application/json":{
+                            "schemas": {
+                                "type":"object",
+                                "properties":{
+                                    "type_error":{
+                                        "type":"string",
+                                        "exemple":"no-found"
+                                    },"msg":{
+                                        "type": "string",
+                                        "exemple":"Ressource not found"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },"ValidationError":{
+                    "description":"Validation error",
+                    "content":{
+                        "application/json":{
+                            "schemas": {
+                                "type":"object",
+                                "properties":{
+                                    "type_error":{
+                                        "type":"string",
+                                        "exemple":"validator"
+                                    },"msg":{
+                                        "type": "string",
+                                        "exemple":"Validation error"
+                                    }
+                                }
+                            }
+                        }
+                    }    
+                },"DuplicateError":{
+                    "description":"Duplicate entry",
+                    "content":{
+                        "application/json":{
+                            "schemas": {
+                                "type":"object",
+                                "properties":{
+                                    "type_error":{
+                                        "type":"string",
+                                        "exemple":"duplicate"
+                                    },"msg":{
+                                        "type": "string",
+                                        "exemple":"Duplicate entry"
+                                    }
+                                }
+                            }
+                        }
+                    }    
+                },"RequestNotValide":{
+                    "description":"request params no valid",
+                    "content":{
+                        "application/json":{
+                            "schemas": {
+                                "type":"object",
+                                "properties":{
+                                    "type_error":{
+                                        "type":"string",
+                                        "exemple":"no-valid"
+                                    },"msg":{
+                                        "type": "string",
+                                        "exemple":"request not valid"
+                                    }
+                                }
+                            }
+                        }
+                    }    
+                }
+                ,"ErrorLogin":{
+                    "description":"username or password are false",
+                    "content":{
+                        "application/json":{
+                            "schemas": {
+                                "type":"object",
+                                "properties":{
+                                    "type_error":{
+                                        "type":"string",
+                                        "exemple":"no-valid"
+                                    },"msg":{
+                                        "type": "string",
+                                        "exemple":"request not valid"
+                                    }
+                                }
+                            }
+                        }
+                    }    
+                }
+            }
+        },"tags": [
+            {
+                "name": "User",
+                "description": "Operation about User"
+            },{
+                "name": "Place",
+                "description": "Operation about Place"
+            },{
+                "name": "Image",
+                "description": "Operation about Image"
+            }
+        ]
+    },"apis": [
+        "./controllers/*.js"
+    ]
+}
