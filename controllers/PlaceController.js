@@ -57,7 +57,6 @@ module.exports.PlaceControllers = class PlaceControllers {
     }
     
     static findPlacesNear(req, res){
-        console.log(req.query)
         PlaceService.findPlacesNear(Number(req.query.latCoordinate), Number(req.query.lonCoordinate), function(err, value){
             if(err && err.type_error === "error-mongo"){
                 res.statusCode = 500

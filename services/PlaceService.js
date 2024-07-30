@@ -96,7 +96,7 @@ module.exports.PlaceService =  class PlaceService{
     static findManyPlaces = async function (page, limit, q, options, callback){
         const populate = options && options.populate? ["images"]:[]
         page = !page ? 1 : page
-        limit = !limit ? 1 : limit
+        limit = !limit ? 10 : limit
         page = !Number.isNaN(page) ? Number(page): page
         limit = !Number.isNaN(limit) ? Number(limit): limit
         
@@ -109,6 +109,7 @@ module.exports.PlaceService =  class PlaceService{
         }
 
         if(q.hotelCategorie){
+
             queryMongo.hotelCategorie = q.hotelCategorie
         }
 
@@ -122,7 +123,7 @@ module.exports.PlaceService =  class PlaceService{
             Place.countDocuments(queryMongo).then((value) => {
                 if (value > 0){
                     const skip = ((page-1) * limit)
-                    Place.find(queryMongo, null, {populate: {path:'images',perDocumentLimit:1},lean:true}).then((results) => {
+                    Place.find(queryMongo, null, {skip:skip, limit:limit, populate: {path:'images',perDocumentLimit:1},lean:true}).then((results) => {
                         callback(null, {
                             count : value,
                             results : results
@@ -177,11 +178,9 @@ module.exports.PlaceService =  class PlaceService{
     }
 
     static findPlacesNear = async function(latCoordinate, lonCoordinate, callback){
-        console.log(latCoordinate,lonCoordinate)
         const categories = ["activity","restaurant","hotel"]
         let placesToSend = []
-        console.log(isNaN(Number(latCoordinate)))
-        if(isNaN(Number(latCoordinate))|| isNaN(Number(lonCoordinate === null))){
+        if(isNaN(Number(latCoordinate))|| isNaN(Number(lonCoordinate === null))||!latCoordinate||!lonCoordinate){
             callback({
                 msg:"Coordinates of the place not good",
                 type_error:"no-valid"
@@ -225,7 +224,6 @@ module.exports.PlaceService =  class PlaceService{
                             ]
                         }
                     }    
-                    console.log(queryMongo)
                     const results = await Place.find(queryMongo, null, {populate: {path:'images',perDocumentLimit:1},lean:true,limit:10})
                     placesToSend = [...placesToSend, ...results]
                 }

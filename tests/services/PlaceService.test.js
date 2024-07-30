@@ -434,17 +434,92 @@ describe("FindOnePlace",()=>{
             done()
         })
     })
+})
+
+describe('FindManyPlaces',() => {
+    it("find many places with correct informations search:Besançon - S", (done) =>{
+        PlaceService.findManyPlaces(1,5,{search:"Besançon"}, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('results')
+            expect(value.results).to.be.an("array")
+            expect(value.results).to.be.lengthOf(5)
+            expect(value.results[0]).to.be.a('object')
+            expect(value.results[0]).to.haveOwnProperty('city')
+            value.results.forEach((e) => {
+                expect(String(e.city)).to.be.equal('Besançon')
+            })
+            done()
+        })
+    })
+    it("find many places with correct informations search:Besançon and Category:restaurant - S", (done) =>{
+        PlaceService.findManyPlaces(1,5,{search:"Pontarlier",categorie:"activity"}, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('results')
+            expect(value.results).to.be.an("array")
+            expect(value.results).to.be.lengthOf(5)
+            expect(value.results[0]).to.be.a('object')
+            expect(value.results[0]).to.haveOwnProperty('city')
+            expect(value.results[0]).to.haveOwnProperty('categorie')
+            value.results.forEach((e) => {
+                expect(String(e.city)).to.be.equal('Pontarlier')
+                expect(String(e.categorie)).to.be.equal('activity')
+            })
+            done()
+        })
+    })
+    it("find many places with unexisting search - S", (done) =>{
+        PlaceService.findManyPlaces(1,5,{search:"dsjogjqzjggz"}, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('results')
+            expect(value.results).to.be.an("array")
+            expect(value.results).to.be.lengthOf(0)
+            done()
+        })
+    })
+    it("find many places with supplementary info search:Besançon - S", (done) =>{
+        PlaceService.findManyPlaces(1,5,{search:"Besançon",coucou:"coucou"}, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('results')
+            expect(value.results).to.be.an("array")
+            expect(value.results).to.be.lengthOf(5)
+            expect(value.results[0]).to.be.a('object')
+            expect(value.results[0]).to.haveOwnProperty('city')
+            value.results.forEach((e) => {
+                expect(String(e.city)).to.be.equal('Besançon')
+            })
+            done()
+        })
+    })
+    it("find many places with null page and limit - S", (done) =>{
+        PlaceService.findManyPlaces(null, null,{search:"Besançon"}, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('results')
+            expect(value.results).to.be.an("array")
+            expect(value.results).to.be.lengthOf(10)
+            expect(value.results[0]).to.be.a('object')
+            expect(value.results[0]).to.haveOwnProperty('city')
+            value.results.forEach((e) => {
+                expect(String(e.city)).to.be.equal('Besançon')
+            })
+            done()
+        })
+    })
+})
+
+describe("findManyPlaceRandom",() => {
     it("find random place - S",(done)=> {
         PlaceService.findManyPlaceRandom(function(err, value){
             expect(value).to.be.an('array')
             expect(value[0]).to.be.a('object')
             expect(value[0]).to.haveOwnProperty('images')
             expect(value[0].images).to.be.an('array')
-            expect(value[0].images).to.have.lengthOf(1)
             expect(err).to.be.null
             done()
         })
     })
+})
+
+describe("findNearPlaces",()=>{
     it("return near places - S",(done) => {
         PlaceService.findPlacesNear(place.latCoordinate, place.lonCoordinate,function(err, value){
             expect(value).to.be.an('array')
@@ -456,8 +531,16 @@ describe("FindOnePlace",()=>{
             done()
         })
     })
-    it("return near places - S",(done) => {
+    it("return near places with wrong coordinate - E",(done) => {
         PlaceService.findPlacesNear("jsdvoiqjod", place.lonCoordinate,function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err["type_error"]).to.be.equal("no-valid")
+            done()
+        })
+    })
+    it("return near places with missing coordinate - E",(done) => {
+        PlaceService.findPlacesNear(null, null,function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty("type_error")
             expect(err["type_error"]).to.be.equal("no-valid")

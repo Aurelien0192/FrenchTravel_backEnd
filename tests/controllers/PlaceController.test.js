@@ -6,6 +6,22 @@ const server = require('./../../server')
 
 chai.use(chaiHttp)
 
+const goodHotel = {
+    name: "Château du Doubs",
+    describe : "Super chateau dans le centre du Doubs",
+    categorie : "hotel",
+    moreInfo:{
+        services:"ascensceur"
+    },
+    street: "2 rue du Moulin Parnet",
+    city: "Pontarlier",
+    codePostal : "25300",
+    country: "France",
+    county: "Doubs",
+    latCoordinate: 46.907258,
+    lonCoordinate:6.3537263
+}
+
 const placeGood = {
     name: "Château du Doubs",
     describe : "Super chateau dans le centre du Doubs",
@@ -26,7 +42,9 @@ const placeGood = {
     city: "Pontarlier",
     codePostal : "25300",
     country: "France",
-    county: "Doubs"
+    county: "Doubs",
+    latCoordinate: 46.907258,
+    lonCoordinate:6.3537263
 }
 
 const PlaceWithoutname = {
@@ -48,7 +66,9 @@ const PlaceWithoutname = {
     city: "Pontarlier",
     codePostal : "25300",
     country: "France",
-    county: "Doubs"
+    county: "Doubs",
+    latCoordinate: 46.907258,
+    lonCoordinate:6.3537263
 }
 
 const PlaceMissingname = {
@@ -71,12 +91,14 @@ const PlaceMissingname = {
     city: "Pontarlier",
     codePostal : "25300",
     country: "France",
-    county: "Doubs"
+    county: "Doubs",
+    latCoordinate: 46.907258,
+    lonCoordinate:6.3537263
 }
 
 const PlaceWithstringPrice = {
     name:"les Capucines",
-    describe : "Super chateau dans le centre du Doubs",
+    describe : "Super chateau dans le centre du Doubs",    
     categorie : "restaurant",
     moreInfo:{
         cook : "miam",
@@ -87,7 +109,9 @@ const PlaceWithstringPrice = {
     city: "Pontarlier",
     codePostal : "25300",
     country: "France",
-    county: "Doubs"
+    county: "Doubs",
+    latCoordinate: 46.907258,
+    lonCoordinate:6.3537263
 }
 
 const PlaceWithNullPrice = {
@@ -103,7 +127,9 @@ const PlaceWithNullPrice = {
     city: "Pontarlier",
     codePostal : "25300",
     country: "France",
-    county: "Doubs"
+    county: "Doubs",
+    latCoordinate: 46.907258,
+    lonCoordinate: 6.3537263
 }
 
 const PlaceWithThreePrices = {
@@ -119,7 +145,9 @@ const PlaceWithThreePrices = {
     city: "Pontarlier",
     codePostal : "25300",
     country: "France",
-    county: "Doubs"
+    county: "Doubs",
+    latCoordinate: 46.907258,
+    lonCoordinate: 6.3537263
 }
 
 const placeWithWrongInfoSup = {
@@ -134,10 +162,48 @@ const placeWithWrongInfoSup = {
     city: "Pontarlier",
     codePostal : "25300",
     country: "France",
-    county: "Doubs"
+    county: "Doubs",
+    latCoordinate: 46.907258,
+    lonCoordinate: 6.3537263
 }
 
 const placeWithUnwantedProperty = {
+    name: "les tortues",
+    describe : "Super chateau dans le centre du Doubs",
+    categorie : "restaurant",
+    moreInfo:{
+        cook: "lundi : 9h - 18h",
+        price:[10,25]
+    },
+    street: "2 Pont de la République",
+    city: "Besançon",
+    codePostal : "25000",
+    country: "France",
+    county: "Doubs",
+    latCoordinate: 47.2407913,
+    lonCoordinate: 6.0280113,
+    ElleEstOuLaPoulette: "Kammelot"
+}
+
+const restaurantWithWrongPrices = {
+    name: "Château du Doubs",
+    describe : "Super chateau dans le centre du Doubs",
+    categorie : "restaurant",
+    moreInfo:{
+        price :[25,10],
+        cook: "lundi : 9h - 18h"
+    },
+    street: "2 rue du Moulin Parnet",
+    city: "Pontarlier",
+    codePostal : "25300",
+    country: "France",
+    county: "Doubs",
+    latCoordinate: 46.907258,
+    lonCoordinate: 6.3537263,
+    ElleEstOuLaPoulette: "Kammelot"
+}
+
+const placeWithUncorrectType = {
     name: "Château du Doubs",
     describe : "Super chateau dans le centre du Doubs",
     categorie : "activity",
@@ -154,37 +220,15 @@ const placeWithUnwantedProperty = {
         duration : 6,
     },
     street: "2 rue du Moulin Parnet",
-    city: "Pontarlier",
+    city: {coucou:"c'est moi", test: ()=> {console.log("ok")}},
     codePostal : "25300",
     country: "France",
     county: "Doubs",
-    ElleEstOuLaPoulette: "Kammelot"
+    latCoordinate: 46.907258,
+    lonCoordinate: 6.3537263,
 }
 
-const placeWithUncorrectType = {
-    name: "Château du Doubs",
-    describe : {coucou:"c'est moi", test: ()=> {console.log("ok")}},
-    categorie : "activity",
-    moreInfo:{
-        schedules: [
-            "lundi : 9h - 18h",
-            "mardi : 9h - 18h",
-            "mercredi : 9h - 18h",
-            "jeudi : 9h - 18h",
-            "vendredi : 9h - 18h",
-            "samedi : 9h - 18h",
-            "dimanche : fermé"
-        ],
-        duration : 6,
-    },
-    street: "2 rue du Moulin Parnet",
-    city: "Pontarlier",
-    codePostal : "25300",
-    country: "France",
-    county: "Doubs"
-}
-
-const placeWithWrongAdresse = {
+const placeNothingGood = {
     name: ["Château du Doubs"],
     categorie : "hello",
     moreInfo:{
@@ -199,12 +243,16 @@ const placeWithWrongAdresse = {
         ],
         duration : 6,
     },
-    street: "lalala",
-    city: "lalala",
+    street: "2 rue du Moulin Parnet",
+    city: {coucou:"c'est moi", test: ()=> {console.log("ok")}},
     codePostal :'',
     country: "France",
-    county: "lalala"
+    county: "Doubs",
+    latCoordinate: 46.907258,
+    lonCoordinate: 6.3537263,
 }
+
+let place = {}
 
 const users = []
 const tokens =[]
@@ -263,6 +311,7 @@ describe("POST - /place", () => {
             expect(res.body).to.be.a('object')
             expect(res.body).to.be.haveOwnProperty('_id')
             res.should.has.status(201)
+            place = {...res.body}
             expect(err).to.be.null
             done()
         })
@@ -322,7 +371,7 @@ describe("POST - /place", () => {
         })
     })
     it("Add one restaurant with wrong adress - E", (done) => {
-        chai.request(server).post('/place').send(placeWithWrongAdresse).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
+        chai.request(server).post('/place').send(restaurantWithWrongPrices).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
             res.should.has.status(404)
             done()
         })
@@ -351,5 +400,93 @@ describe("POST - /place", () => {
             })
         })
     done()
+    })
+})
+describe("GET - /place/:id",() =>{
+    it('find place with correct ID - S', (done) => {
+        chai.request(server).get(`/place/${place._id}`).end((err, res) =>{
+            res.should.has.status(200)
+            done()
+        })
+    })
+    it('find place with uncorrect ID - E', (done) => {
+        chai.request(server).get(`/place/${users[0]._id}`).end((err, res) =>{
+            res.should.has.status(404)
+            done()
+        })
+    })
+    it('find place with wrong format ID - E', (done) => {
+        chai.request(server).get(`/place/erghr`).end((err, res) =>{
+            res.should.has.status(405)
+            done()
+        })
+    })
+    it('find place with missing ID - E', (done) => {
+        chai.request(server).get(`/place/${null}`).end((err, res) =>{
+            res.should.has.status(405)
+            done()
+        })
+    })
+})
+describe('GET - /places/random', () =>{
+    it('get random place',(done) => {
+        chai.request(server).get(`/places/random`).end((err, res) => {
+            res.should.has.status(200)
+            done()
+        })
+    })
+})
+
+describe('GET - /places', () => {
+    it('get places with correct query - S',(done) => {
+        chai.request(server).get('/places').query({search:"Besançon", page:1, limit:5}).end((err, res) => {
+            res.should.has.status(200)
+            done()
+        })
+    })
+    it('get places with correct query with categorie - S',(done) => {
+        chai.request(server).get('/places').query({search:"Pontarlier", categorie:"", page:1, limit:5}).end((err, res) => {
+            res.should.has.status(200)
+            done()
+        })
+    })
+    it('get places with uncorrect search - S',(done) => {
+        chai.request(server).get('/places').query({search:"zedzedzef", categorie:"", page:1, limit:5}).end((err, res) => {
+            res.should.has.status(200)
+            done()
+        })
+    })
+    it('get places with missing query - S',(done) => {
+        chai.request(server).get('/places').end((err, res) => {
+            res.should.has.status(200)
+            done()
+        })
+    })
+})
+
+describe('GET - /places/suggestions', () => {
+    it('get random place with correct coordinates - S',(done) => {
+        chai.request(server).get('/places/suggestions').query({
+            latCoordinate:place.latCoordinate,
+            lonCoordinate : place.lonCoordinate
+        }).end((err, res) =>{
+            res.should.has.status(200)
+            done()
+        })
+    })
+    it('get random place with uncorrect coordinates - E',(done) => {
+        chai.request(server).get('/places/suggestions').query({
+            latCoordinate:place.latCoordinate,
+            lonCoordinate : "gzagrezg"
+        }).end((err, res) =>{
+            res.should.has.status(405)
+            done()
+        })
+    })
+    it('get random place with missing query - E',(done) => {
+        chai.request(server).get('/places/suggestions').end((err, res) =>{
+            res.should.has.status(405)
+            done()
+        })
     })
 })
