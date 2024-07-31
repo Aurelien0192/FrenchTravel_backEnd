@@ -43,16 +43,23 @@ module.exports.ImageController = class ImageController{
  *              description : Internal server error
  */
 
-    static async addOneImage(req, res){
+    static async addOneImage(req, res, next){
         req.log.info("Add one image in Database")
-        ImageService.addOneImage(req.file,req.body.place_id, req.user._id,function(err,value){
-            console.log(req)
-            if(err && err.type_error === "no-valid" || err.type_error === "validator"){
+        ImageService.addOneImage(req.file, req.body.place_id, req.user._id,function(err,value){
+            if(err && (err.type_error === "no-valid" || err.type_error === "validator")){
                 res.statusCode = 405
                 res.send(err)
             }else{
-                res.statusCode = 201
-                res.send(value)
+                if(req.url === "/image")
+                {
+                    res.statusCode = 201
+                    res.send(value)
+                }else{
+                    console.log(value, err)
+                    res.locals.image = value
+                    console.log(res.locals.image)
+                    next()
+                }
             }
         })  
     }
@@ -114,9 +121,12 @@ module.exports.ImageController = class ImageController{
         })  
     }
 
-    static async deleteOneImage(req, res){
+    static async deleteOneImage(req, res, next){
+        if(req.url === "/profilePhoto/user"){
+            req.user.profilePhoto._id? req.params.id = req.user.profilePhoto._id : next()
+        }
         req.log.info("delete one image in Database")
-        ImageService.deleteOneImage(req.params.id, req.user_id,null,function(err,value){
+        ImageService.deleteOneImage(req.params.id, function(err,value){
             if(err && (err.type_error === "no-valid")){
                 res.statusCode = 405
                 res.send(err)
@@ -127,8 +137,12 @@ module.exports.ImageController = class ImageController{
                 res.statusCode = 403
                 res.send(err)
             }else{
-                res.statusCode = 200
-                res.send(value)
+                if(req.url === "/profilePhoto/user"){
+                    next()
+                }else{
+                    res.statusCode = 200
+                    res.send(value)
+                }
             }
         })
     }

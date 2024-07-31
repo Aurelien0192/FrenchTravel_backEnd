@@ -222,6 +222,27 @@ module.exports.UserControllers = class UserControllers{
         })
     }
 
+    static updateUserProfilePhoto(req, res){
+        const opts = null
+        const update = {profilePhoto: res.locals.image._id}
+        UserService.updateUserProfilePhoto(req.user._id, update, opts, function(err, value){
+            req.log.info("Modification de la photo de profil d'un utilisateur")
+            if(err && (err.type_error === "no-valid" || err.type_error === "validator" || err.type_error === "duplicate")){
+                res.statusCode = 405
+                res.send(err)
+            }else if(err && err.type_error === "error-mongo"){
+                res.statusCode = 500
+                res.send(err)
+            }else if(err && err.type_error ==='no-found'){
+                res.statusCode = 404
+                res.send(err)
+            }else{
+                res.statusCode = 200
+                res.send(value)
+            }
+        })
+    }
+
     /**
  * @swagger
  * /user:

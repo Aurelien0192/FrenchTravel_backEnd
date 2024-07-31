@@ -61,6 +61,7 @@ app.post('/login',database.controlsBDD, UserControllers.loginUser)
 app.post('/user', database.controlsBDD, UserControllers.addOneUser)
 app.get('/user/:id', database.controlsBDD, UserControllers.findOneUserById)
 app.put('/user/:id', database.controlsBDD, UserControllers.updateOneUser)
+app.put('/profilePhoto/user', database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwner,ImageController.deleteOneImage,multerOneImage,ImageController.addOneImage,UserControllers.updateUserProfilePhoto)
 app.delete('/user/:id', database.controlsBDD, UserControllers.deleteOneUser)
 
 //routes for Place

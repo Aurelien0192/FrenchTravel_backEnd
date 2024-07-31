@@ -111,7 +111,6 @@ module.exports.PlaceService =  class PlaceService{
         if(q.hotelCategorie){
 
             queryMongo["moreInfo.hotelCategorie"] = {$gte: q.hotelCategorie}
-            console.log(queryMongo)
         }
 
         if(q.categorie){

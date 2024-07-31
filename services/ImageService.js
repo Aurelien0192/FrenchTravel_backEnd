@@ -26,6 +26,7 @@ module.exports.ImageService = class ImageService{
                 image.path = path
                 image.user_id = user_id
                 let errors = image.validateSync()
+                console.log(errors)
                 if(errors){
                     errors = errors['errors']
                     const text = Object.keys(errors).map((e) => {
@@ -43,8 +44,14 @@ module.exports.ImageService = class ImageService{
                     callback(err)
 
                 }else{
-                    await image.save()
-                    callback(null, image.toObject()) 
+                    try{
+                        const data = await image.save()
+                        console.log(data)
+                        callback(null, data.toObject()) 
+                    }catch(e){
+                        console.log(e)
+                        callback(e)
+                    }
                 }
             }
         }catch(err){
@@ -98,7 +105,6 @@ module.exports.ImageService = class ImageService{
             if(errors.length > 0){
                 callback(errors)
             }else{
-
                 try{
                 const data = await Image.insertMany(imageTab,{ordered: false})
                     callback(null, data) 
@@ -110,29 +116,32 @@ module.exports.ImageService = class ImageService{
         }
     }
 
-    static async deleteOneImage(image_id, user_id, place_id, callback){
+    static async deleteOneImage(image_id, callback){
         if (image_id && mongoose.isValidObjectId(image_id)){
-            Image.findByIdAndDelete(image_id).then((value) => {
-                try{
-                    if(value){
-                        callback(null, value.toObject())
-                        console.log(value.path)
-                        fs.unlink(value.path,function(err){
-                            if(err){
-                                console.log("echec de la suppression de l'image")
-                            }else{
-                                console.log("réussite de la suppression")
-                            }
-                        })
-                    }else{
-                        callback({ msg: "image non trouvé.", type_error: "no-found" })
+            if(image_id !== "66aa65e3841371a1955939dc"){
+                Image.findByIdAndDelete(image_id).then((value) => {
+                    try{
+                        if(value){
+                            callback(null, value.toObject())
+                            fs.unlink(value.path,function(err){
+                                if(err){
+                                    console.log("echec de la suppression de l'image")
+                                }else{
+                                    console.log("réussite de la suppression")
+                                }
+                            })
+                        }else{
+                            callback({ msg: "image non trouvé.", type_error: "no-found" })
+                        }
+                    }catch(e){
+                        callback(e)
                     }
-                }catch(e){
-                    callback(e)
-                }
-            }).catch((e) => {
-                callback({ msg: "Impossible de chercher l'élément.", type_error: "error-mongo" });
-            })
+                }).catch((e) => {
+                    callback({ msg: "Impossible de chercher l'élément.", type_error: "error-mongo" });
+                })
+            }else{
+                callback({msg:"image non supprimée"})
+            }
         }else{
             callback({ msg: "Id invalide.", type_error: 'no-valid' })
         }

@@ -189,6 +189,35 @@ module.exports.UserService = class UserService{
         }
     }
 
+    static async updateUserProfilePhoto(user_id, update, options, callback){
+        User.findByIdAndUpdate(new ObjectId(user_id), update, {returnDocument: 'after', runValidators: true}).then((value)=>{
+            try{
+                if(value){
+                    callback(null, value.toObject())
+                }else{
+                    callback({msg: "Utilisateur non trouvé", fields_with_error: [], fields:"", type_error:"no-found"})
+                }
+            }catch(e){
+                callback({msg: "Erreur avec la base de données", fields_with_error: [], fields:"", type_error:"error-mongo"})
+            }
+        }).catch((errors) =>{
+            errors = errors['errors']
+            var text = Object.keys(errors).map((e) => {
+                return errors[e]['properties']['message']
+            }).join(' ')
+            var fields = _.transform(Object.keys(errors), function (result, value) {
+                result[value] = errors[value]['properties']['message'];
+            }, {});
+            var err = {
+                msg: text,
+                fields_with_error: Object.keys(errors),
+                fields: fields,
+                type_error: "validator"
+            }
+            callback(err)  
+        })
+    }
+
     static async deleteOneUser(user_id, options,callback) {
     if (user_id && mongoose.isValidObjectId(user_id)) {
         

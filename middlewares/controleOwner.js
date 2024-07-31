@@ -1,7 +1,6 @@
 const UserService = require('../services/UserService').UserService
 
 module.exports.controleOwner = (req, res, next) => {
-    console.log(req)
     UserService.findOneUserById(req.user._id,null, function(err, value){
         req.log.info("recherche d'un utilisateur")
             if(err && (err.type_error === "no-valid")){
