@@ -228,7 +228,7 @@
                 },
                 "Image": {
                     "type": "object",
-                    "required":["name","place","user_id","path"],
+                    "required":["name","user_id","path"],
                     "properties":{
                         "name":{
                             "type": "string",

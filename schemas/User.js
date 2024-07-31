@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-module.exports.UserSchema = mongoose.Schema({
+UserSchema = mongoose.Schema({
     firstName : {
         type : String,
         validate : [function validator(){
@@ -38,11 +38,13 @@ module.exports.UserSchema = mongoose.Schema({
     about: String,
     token: String,
     profilePhoto :{
-        type: String,
-        default:"data/systemImages/noPhoto.png"
+        type: mongoose.Types.ObjectId,
+        ref:"Image",
+        default:"66aa65e3841371a1955939dc"
     },
     create_at:{
         type:Date,
         default:new Date()
     }
 })
+module.exports.UserSchema = UserSchema

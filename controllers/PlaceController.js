@@ -202,13 +202,14 @@ module.exports.PlaceControllers = class PlaceControllers {
     }
 
     static findManyPlaces(req, res){
+        console.log(req.query.hotelCategorie)
         const q = {search : req.query.search}
         if(req.query.notation){
             q.notation = req.query.notation
         }
 
         if(req.query.hotelCategorie){
-            q.hotelCategorie = req.query.hotelCategorie
+            q.hotelCategorie = Number(req.query.hotelCategorie)
         }
 
         if(req.query.categorie){

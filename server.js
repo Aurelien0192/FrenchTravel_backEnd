@@ -35,12 +35,15 @@ const passport = require("./utils/passport")
 app.use(passport.initialize())
 app.use(passport.session())
 
-
+// Import des controllers
 const UserControllers = require('./controllers/UserController').UserControllers
 const PlaceControllers = require("./controllers/PlaceController").PlaceControllers
 const ApiLocationControllers = require("./controllers/ApiLocationController").ApiLocationControllers
 const ImageController = require('./controllers/ImageController').ImageController
 
+// Import des middlewares
+
+const controleOwner = require('./middlewares/controleOwner')
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -77,6 +80,7 @@ app.get('/getlocation',ApiLocationControllers.getDataGeocode)
 
 app.post('/image',database.controlsBDD,passport.authenticate('jwt',{session:false}),multerOneImage,ImageController.addOneImage)
 app.post('/images',database.controlsBDD,passport.authenticate('jwt',{session:false}),multerManyImage,ImageController.addManyImages)
+app.delete('/image/:id',database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwner,ImageController.deleteOneImage)
 
 
 app.listen(Config.port, () => {

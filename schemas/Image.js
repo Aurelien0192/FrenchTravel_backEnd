@@ -8,7 +8,6 @@ module.exports.ImageSchema = mongoose.Schema({
     place:{
         type: mongoose.Types.ObjectId,
         ref:"Place",
-        required : true
     },
     user_id:{
         type: mongoose.Types.ObjectId,

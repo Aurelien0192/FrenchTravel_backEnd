@@ -96,7 +96,7 @@ module.exports.PlaceService =  class PlaceService{
     static findManyPlaces = async function (page, limit, q, options, callback){
         const populate = options && options.populate? ["images"]:[]
         page = !page ? 1 : page
-        limit = !limit ? 10 : limit
+        limit = !limit ? 7 : limit
         page = !Number.isNaN(page) ? Number(page): page
         limit = !Number.isNaN(limit) ? Number(limit): limit
         
@@ -110,7 +110,8 @@ module.exports.PlaceService =  class PlaceService{
 
         if(q.hotelCategorie){
 
-            queryMongo.hotelCategorie = q.hotelCategorie
+            queryMongo["moreInfo.hotelCategorie"] = {$gte: q.hotelCategorie}
+            console.log(queryMongo)
         }
 
         if(q.categorie){

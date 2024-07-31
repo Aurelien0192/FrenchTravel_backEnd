@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
 const _ = require('lodash')
+const fs = require('fs')
+const path = require('path')
 
 const ImageSchema = require('../schemas/Image').ImageSchema
 
@@ -105,6 +107,34 @@ module.exports.ImageService = class ImageService{
                     callback(err)
                 }
             }
+        }
+    }
+
+    static async deleteOneImage(image_id, user_id, place_id, callback){
+        if (image_id && mongoose.isValidObjectId(image_id)){
+            Image.findByIdAndDelete(image_id).then((value) => {
+                try{
+                    if(value){
+                        callback(null, value.toObject())
+                        console.log(value.path)
+                        fs.unlink(value.path,function(err){
+                            if(err){
+                                console.log("echec de la suppression de l'image")
+                            }else{
+                                console.log("réussite de la suppression")
+                            }
+                        })
+                    }else{
+                        callback({ msg: "image non trouvé.", type_error: "no-found" })
+                    }
+                }catch(e){
+                    callback(e)
+                }
+            }).catch((e) => {
+                callback({ msg: "Impossible de chercher l'élément.", type_error: "error-mongo" });
+            })
+        }else{
+            callback({ msg: "Id invalide.", type_error: 'no-valid' })
         }
     }
 }

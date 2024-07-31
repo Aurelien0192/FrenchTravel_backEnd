@@ -73,10 +73,10 @@ module.exports.UserService = class UserService{
 
     static async findOneUserById(user_id, options, callback) {
         if(user_id && mongoose.isValidObjectId(user_id)){
-            User.findById(user_id).then((value) => {
+            User.findById(user_id, null, {populate:["profilePhoto"], lean:true}).then((value) => {
                 try{
                     if (value){
-                        callback(null, value.toObject())
+                        callback(null, value)
                     }else{
                         callback({msg:"Aucun utilisateur trouvé", fields_with_error: [], fields:"", type_error: "no-found"})
                     }
@@ -101,7 +101,7 @@ module.exports.UserService = class UserService{
                 obj_find.push({ [e]: value})
             })
 
-            User.findOne({ $or: obj_find}).then((value) => {
+            User.findOne({ $or: obj_find},null, {populate:["profilePhoto"], lean:true}).then((value) => {
                 if (value){
                     callback(null, value)
                 }else{
