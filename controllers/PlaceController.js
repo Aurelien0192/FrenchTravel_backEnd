@@ -206,7 +206,9 @@ module.exports.PlaceControllers = class PlaceControllers {
         if(req.query.notation){
             q.notation = req.query.notation
         }
-
+        if(req.query.user_id){
+            q.user_id = req.query.user_id
+        }
         if(req.query.hotelCategorie){
             q.hotelCategorie = Number(req.query.hotelCategorie)
         }

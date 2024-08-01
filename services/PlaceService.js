@@ -113,6 +113,10 @@ module.exports.PlaceService =  class PlaceService{
             queryMongo["moreInfo.hotelCategorie"] = {$gte: q.hotelCategorie}
         }
 
+        if(q.user_id){
+            queryMongo["owner"] = q.user_id
+        }
+
         if(q.categorie){
             queryMongo.categorie = q.categorie
         }
@@ -236,6 +240,50 @@ module.exports.PlaceService =  class PlaceService{
                 })
             }
         
+        }
+    }
+
+    static updateOnePlace = async function(place_id, update, options, callback){
+        if(place_id && mongoose.isValidObjectId(place_id) && update){
+            Place.findByIdAndUpdate(new ObjectId(place_id), update, {returnDocument: 'after', runValidators: true, populate:["images"]}).then((value)=>{
+                try{
+                    if(value){
+                        callback(null, value.toObject())
+                    }else{
+                        callback({msg: "Place non trouvée", fields_with_error: [], fields:"", type_error:"no-found"})
+                    }
+                }catch(e){
+                    callback({msg: "Erreur avec la base de données", fields_with_error: [], fields:"", type_error:"error-mongo"})
+                }
+            }).catch((errors) =>{
+                if (errors.code === 11000) { // Erreur de duplicité
+                    var field = Object.keys(errors.keyPattern)[0];
+                    var err = {
+                        msg: `Duplicate key error: ${field} must be unique.`,
+                        fields_with_error: [field],
+                        fields: { [field]: `The ${field} is already taken.` },
+                        type_error: "duplicate"
+                    };
+                    callback(err);
+                }else{
+                    errors = errors['errors']
+                    var text = Object.keys(errors).map((e) => {
+                        return errors[e]['properties']['message']
+                    }).join(' ')
+                    var fields = _.transform(Object.keys(errors), function (result, value) {
+                        result[value] = errors[value]['properties']['message'];
+                    }, {});
+                    var err = {
+                        msg: text,
+                        fields_with_error: Object.keys(errors),
+                        fields: fields,
+                        type_error: "validator"
+                    }
+                    callback(err)
+                }
+            })
+        }else{
+            !update ? callback({msg: "propriété udpate inexistante", fields_with_error: [], fields:"", type_error: "no-valid"}) : callback({msg: "Id non conforme", type_error: "no-valid"})
         }
     }
 }

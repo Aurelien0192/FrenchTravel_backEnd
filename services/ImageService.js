@@ -131,7 +131,7 @@ module.exports.ImageService = class ImageService{
 
     static async deleteOneImage(image_id, callback){
         if (image_id && mongoose.isValidObjectId(image_id)){
-            if(image_id !== "66ab50f08771e6814561d90b"){
+            if(image_id !== new mongoose.Types.ObjectId("66ab90e7dcef4782e1850d5c")){
                 Image.findByIdAndDelete(image_id).then((value) => {
                     try{
                         if(value){
