@@ -59,7 +59,21 @@ module.exports.UserControllers = class UserControllers{
                             error_type:"internal"
                         })
                     }else{
-                        return res.send(user)
+                        UserService.updateOneUser(user._id,{token: user.token},null, function(err, value){
+                            if(err && (err.type_error === "no-valid" || err.type_error === "validator" || err.type_error === "duplicate")){
+                                res.statusCode = 405
+                                res.send(err)
+                            }else if(err && err.type_error === "error-mongo"){
+                                res.statusCode = 500
+                                res.send(err)
+                            }else if(err && err.type_error ==='no-found'){
+                                res.statusCode = 404
+                                res.send(err)
+                            }else{
+                                res.statusCode = 200
+                                return res.send(user)
+                            }
+                        })
                     }
                 })
             }
@@ -205,6 +219,7 @@ module.exports.UserControllers = class UserControllers{
     static updateOneUser(req, res){
         const opts = null
         UserService.updateOneUser(req.params.id, req.body, opts, function(err, value){
+            console.log(req.body)
             req.log.info("Modification d'un utilisateur")
             if(err && (err.type_error === "no-valid" || err.type_error === "validator" || err.type_error === "duplicate")){
                 res.statusCode = 405

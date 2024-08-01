@@ -1,4 +1,5 @@
 const multer = require('multer')
+const path = require('path')
 
 const MIME_TYPES = {
     'image/jpg' : 'jpg',
@@ -23,6 +24,22 @@ const storage = multer.diskStorage({
 
 
 
-module.exports.oneImage = multer({storage}).single('image')
+module.exports.oneImage = multer({
+    storage,
+    limits:{
+        fileSize: 4 * 1024 * 1024,
+    },
+    fileFilter:(req, file, callback) => {
+        const acceptedExtentionsList = ['.jpg','.jpeg','.png']
+        const extname = path.extname(file.originalname).toLowerCase()
+        console.log(path.extname(file.originalname).toLowerCase())
+        if(acceptedExtentionsList.includes(extname)){
+            callback(null, true)
+        }else{
+            callback(new Error("Invalid file extension"))
+        }
+
+    }    
+}).single('image')
 
 module.exports.manyImage = multer({storage}).array('images')

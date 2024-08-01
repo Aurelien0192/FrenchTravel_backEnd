@@ -147,7 +147,7 @@ module.exports.UserService = class UserService{
                     return callback({msg: "Erreur avec la base de données", fields_with_error: [], fields:"", type_error:"error-mongo"})
                 }
             }
-            User.findByIdAndUpdate(new ObjectId(user_id), update, {returnDocument: 'after', runValidators: true}).then((value)=>{
+            User.findByIdAndUpdate(new ObjectId(user_id), update, {returnDocument: 'after', runValidators: true, populate:["profilePhoto"]}).then((value)=>{
                 try{
                     if(value){
                         callback(null, value.toObject())
@@ -190,7 +190,7 @@ module.exports.UserService = class UserService{
     }
 
     static async updateUserProfilePhoto(user_id, update, options, callback){
-        User.findByIdAndUpdate(new ObjectId(user_id), update, {returnDocument: 'after', runValidators: true}).then((value)=>{
+        User.findByIdAndUpdate(new ObjectId(user_id), update, {returnDocument: 'after', runValidators: true,populate:["profilePhoto"]}).then((value)=>{
             try{
                 if(value){
                     callback(null, value.toObject())
