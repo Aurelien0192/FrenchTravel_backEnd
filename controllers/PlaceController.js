@@ -50,13 +50,13 @@ module.exports.PlaceControllers = class PlaceControllers {
                 }
             })
         }else{
-            res.statusCode=401
-            res.send({
-                    msg:"Cette action n'est pas autorisé en tant qu'utilisateur",
-                    fields_with_error:[""],
-                    fields:"",
-                    type_error: "unauthorized"
-                })
+        res.statusCode=401
+        res.send({
+                msg:"Cette action n'est pas autorisé en tant qu'utilisateur",
+                fields_with_error:[""],
+                fields:"",
+                type_error: "unauthorized"
+            })
         }
     }
 
@@ -222,6 +222,25 @@ module.exports.PlaceControllers = class PlaceControllers {
                 res.send(err)
             }else if(err && err.type_error === "no-valid"){
                 res.statusCode = 405
+                res.send(err)
+            }else{
+                res.statusCode = 200
+                res.send(value)
+            }
+        })
+    }
+
+    static updateOneplace(req, res){
+        PlaceService.updateOnePlace(req.params.id, req.body, null, function(err, value){
+            console.log(err)
+            if (err && (err.type_error === "validator" || err.type_error === "no-valid")){
+                res.statusCode = 405
+                res.send(err)
+            }else if(err && err.type_error === "no-found"){
+                res.statusCode = 404
+                res.send(err)
+            }else if(err && err.type_error === "error-mongo"){
+                res.statusCode = 500
                 res.send(err)
             }else{
                 res.statusCode = 200
