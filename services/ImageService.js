@@ -10,10 +10,14 @@ const Image = mongoose.model('Image',ImageSchema)
 module.exports.ImageService = class ImageService{
     static async addOneImage(imageInfo, place_id, user_id, callback){
         if(!mongoose.isValidObjectId(user_id)){
-            return callback({msg:"place_id is uncorrect", type_error:"no-valid"})
+            if(!user_id){
+                return callback({msg:"user_id is missing", type_error:"no-valid"})
+            }else{
+                return callback({msg:"user_id is uncorrect", type_error:"no-valid"})
+            } 
         }
-        if(!mongoose.isValidObjectId(user_id)){
-            return callback({msg:"user_id is uncorrect", type_error:"no-valid"})
+        if(!mongoose.isValidObjectId(place_id) && place_id){
+            return callback({msg:"place_id is uncorrect", type_error:"no-valid"})  
         }
         try{
             if(!imageInfo){
@@ -22,11 +26,12 @@ module.exports.ImageService = class ImageService{
                 const path = imageInfo.path.split('\\').join('/')
                 const image = new Image()
                 image.name = imageInfo.filename
-                image.place = place_id
+                if(place_id){
+                    image.place = place_id
+                }
                 image.path = path
                 image.user_id = user_id
                 let errors = image.validateSync()
-                console.log(errors)
                 if(errors){
                     errors = errors['errors']
                     const text = Object.keys(errors).map((e) => {
@@ -46,7 +51,6 @@ module.exports.ImageService = class ImageService{
                 }else{
                     try{
                         const data = await image.save()
-                        console.log(data)
                         callback(null, data.toObject()) 
                     }catch(e){
                         console.log(e)
@@ -60,12 +64,19 @@ module.exports.ImageService = class ImageService{
     }
 
     static async addManyImages(imagesInfo, place_id, user_id, callback){
+        if (!Array.isArray(imagesInfo) && imagesInfo){
+            imagesInfo = [imagesInfo]
+        }
         const errors = []
         if(!mongoose.isValidObjectId(user_id)){
-            return callback({msg:"place_id is uncorrect", type_error:"no-valid"})
+            if(!user_id){
+                return callback({msg:"user_id is missing", type_error:"no-valid"})
+            }else{
+                return callback({msg:"user_id is uncorrect", type_error:"no-valid"})
+            } 
         }
-        if(!mongoose.isValidObjectId(user_id)){
-            return callback({msg:"user_id is uncorrect", type_error:"no-valid"})
+        if(!mongoose.isValidObjectId(place_id) && place_id){
+            return callback({msg:"place_id is uncorrect", type_error:"no-valid"})  
         }
         if(!imagesInfo){
             callback({msg: "no image get for upload", type_error: "no-valid"})
@@ -77,7 +88,9 @@ module.exports.ImageService = class ImageService{
                 const path = imageInfo.path.split('\\').join('/')
                 const image = new Image()
                 image.name = imageInfo.filename
-                image.place = place_id
+                if(place_id){
+                    image.place = place_id
+                }
                 image.user_id = user_id
                 image.path = path
                 imageTab.push(image)
@@ -131,7 +144,7 @@ module.exports.ImageService = class ImageService{
                                 }
                             })
                         }else{
-                            callback({ msg: "image non trouvé.", type_error: "no-found" })
+                            callback({ msg: "image non trouvée", type_error: "no-found" })
                         }
                     }catch(e){
                         callback(e)
@@ -140,10 +153,14 @@ module.exports.ImageService = class ImageService{
                     callback({ msg: "Impossible de chercher l'élément.", type_error: "error-mongo" });
                 })
             }else{
-                callback({msg:"image non supprimée"})
+                callback(null,{msg:"image non supprimée"})
             }
         }else{
-            callback({ msg: "Id invalide.", type_error: 'no-valid' })
+            if(!image_id){
+                callback({msg:"Image ID is missing", type_error:'no-valid'})
+            }else{
+                callback({ msg: "Image ID invalid", type_error: 'no-valid' })
+            }
         }
     }
 }
