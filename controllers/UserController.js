@@ -219,7 +219,6 @@ module.exports.UserControllers = class UserControllers{
     static updateOneUser(req, res){
         const opts = null
         UserService.updateOneUser(req.params.id, req.body, opts, function(err, value){
-            console.log(req.body)
             req.log.info("Modification d'un utilisateur")
             if(err && (err.type_error === "no-valid" || err.type_error === "validator" || err.type_error === "duplicate")){
                 res.statusCode = 405

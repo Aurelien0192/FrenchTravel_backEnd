@@ -33,7 +33,6 @@ const PlaceSchema = mongoose.Schema({
         duration : {
             type : String,
             validate : [function validator(){
-                console.log(this._update.$set.categorie)
                 return this.categorie === "activity" || (this._update.$set.categorie === "activity")
             },{message : `duration is not allowed in categorie hotel or restaurant`}]
         },
@@ -73,7 +72,6 @@ const PlaceSchema = mongoose.Schema({
         equipment :{
             type : String,
             validate : [function validator(){
-                console.log(this.categorie)
                 return this.categorie === "hotel" || this._update.$set.categorie === "hotel"
             },{message : `services is not allowed in categorie activity or restaurant`}]
         },

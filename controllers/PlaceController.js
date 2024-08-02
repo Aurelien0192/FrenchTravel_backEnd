@@ -1,3 +1,5 @@
+const { ApiLocationControllers } = require('./ApiLocationController')
+
 const PlaceService = require('../services/PlaceService').PlaceService
 
 module.exports.PlaceControllers = class PlaceControllers {
@@ -230,9 +232,8 @@ module.exports.PlaceControllers = class PlaceControllers {
         })
     }
 
-    static updateOneplace(req, res){
+    static async updateOneplace(req, res, next){
         PlaceService.updateOnePlace(req.params.id, req.body, null, function(err, value){
-            console.log(err)
             if (err && (err.type_error === "validator" || err.type_error === "no-valid")){
                 res.statusCode = 405
                 res.send(err)

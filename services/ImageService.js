@@ -53,7 +53,6 @@ module.exports.ImageService = class ImageService{
                         const data = await image.save()
                         callback(null, data.toObject()) 
                     }catch(e){
-                        console.log(e)
                         callback(e)
                     }
                 }

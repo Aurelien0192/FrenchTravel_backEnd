@@ -32,7 +32,6 @@ module.exports.oneImage = multer({
     fileFilter:(req, file, callback) => {
         const acceptedExtentionsList = ['.jpg','.jpeg','.png']
         const extname = path.extname(file.originalname).toLowerCase()
-        console.log(path.extname(file.originalname).toLowerCase())
         if(acceptedExtentionsList.includes(extname)){
             callback(null, true)
         }else{

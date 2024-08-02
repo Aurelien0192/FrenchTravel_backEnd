@@ -55,9 +55,7 @@ module.exports.ImageController = class ImageController{
                     res.statusCode = 201
                     res.send(value)
                 }else{
-                    console.log(value, err)
                     res.locals.image = value
-                    console.log(res.locals.image)
                     next()
                 }
             }

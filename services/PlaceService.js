@@ -176,7 +176,6 @@ module.exports.PlaceService =  class PlaceService{
             }
             callback(null, placesToSend)
         }catch(e){
-            console.log(e)
             callback(e)
         }
     }
@@ -233,7 +232,6 @@ module.exports.PlaceService =  class PlaceService{
                 }
                 callback(null, placesToSend)
             }catch(e){
-                console.log(e)
                 callback({
                     msg: "erreur interne au serveur",
                     type_error:"error-mongo"
@@ -246,7 +244,6 @@ module.exports.PlaceService =  class PlaceService{
     static updateOnePlace = async function(place_id, update, options, callback){
         if(place_id && mongoose.isValidObjectId(place_id) && update){
             update.categorie = String(update.categorie)
-            console.log(update.categorie)
             Place.findByIdAndUpdate(place_id, update, {returnDocument: 'after', runValidators: true, populate:["images"]}).then((value)=>{
                 try{
                     if(value){
