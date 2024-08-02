@@ -23,7 +23,6 @@ module.exports.controleOwner = (req, res, next) => {
 module.exports.controleOwnerOfPlace = (req, res, next) => {
     PlaceService.findOnePlaceById(req.params.id,null, function(err, value){
         req.log.info("contrôle autorisation modification d'un lieu")
-        console.log(value.owner != req.user._id)
         if(err && (err.type_error === "no-valid")){
             res.statusCode = 405
             res.send(err)

@@ -26,14 +26,15 @@ const PlaceSchema = mongoose.Schema({
             type : [Object],
             default:undefined,
             validate : [function validator(){
-                return this.categorie === "activity"
+                return this.categorie === "activity" || (this._update.$set.categorie === "activity")
             },{message : `schedules is not allowed in categorie hotel or restaurant`}]
             
         },
         duration : {
             type : String,
             validate : [function validator(){
-                return this.categorie === "activity"
+                console.log(this._update.$set.categorie)
+                return this.categorie === "activity" || (this._update.$set.categorie === "activity")
             },{message : `duration is not allowed in categorie hotel or restaurant`}]
         },
         price : {
@@ -41,7 +42,7 @@ const PlaceSchema = mongoose.Schema({
             default:undefined,
             validate : [
                 {validator : function validator(){
-                    return this.categorie === "restaurant"
+                    return this.categorie === "restaurant" || (this._update.$set.categorie === "restaurant")
                 },message : `price is not allowed in categorie hotel or activity`},
                 {validator : function lengh(price){
                     return (price.length === 2 || price.lengh===0);
@@ -54,7 +55,7 @@ const PlaceSchema = mongoose.Schema({
         diner : {
             type : String,
             validate : [function validator(){
-                return this.categorie === "restaurant"
+                return this.categorie === "restaurant" || (this._update.$set.categorie === "restaurant")
             },{message : `diner is not allowed in categorie hotel or activity`}]
         },
         cook :{
@@ -66,26 +67,27 @@ const PlaceSchema = mongoose.Schema({
         services :{
             type : String,
             validate : [function validator(){
-                return this.categorie === "restaurant" || this.categorie === "hotel"
+                return (this.categorie === "restaurant" || this.categorie === "hotel") || (this._update.$set.categorie === "hotel"|| this._update.$set.categorie === "restaurant")
             },{message : `services is not allowed in categorie activity`}]
         },
         equipment :{
             type : String,
             validate : [function validator(){
-                return this.categorie === "hotel"
+                console.log(this.categorie)
+                return this.categorie === "hotel" || this._update.$set.categorie === "hotel"
             },{message : `services is not allowed in categorie activity or restaurant`}]
         },
         hotelCategorie:{
             type:Number,
             validate : [function validator(){
-                return this.categorie==="hotel"
+                return this.categorie==="hotel" || this._update.$set.categorie === "hotel"
             },{message : `duration is not allowed in categorie activity or restaurant`}]
         },
         accessibility :{
             type : [String],
             default:undefined,
             validate : [function validator(){
-                return this.categorie === "hotel"
+                return this.categorie === "hotel" || this._update.$set.categorie === "hotel"
             },{message : `services is not allowed in categorie activity or restaurant`}]
         },
     },
