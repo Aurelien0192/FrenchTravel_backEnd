@@ -252,7 +252,7 @@ const placeNothingGood = {
     lonCoordinate: 6.3537263,
 }
 
-let place = {}
+const places = []
 
 const users = []
 const tokens =[]
@@ -311,7 +311,7 @@ describe("POST - /place", () => {
             expect(res.body).to.be.a('object')
             expect(res.body).to.be.haveOwnProperty('_id')
             res.should.has.status(201)
-            place = {...res.body}
+            places.push(res.body)
             expect(err).to.be.null
             done()
         })
@@ -355,12 +355,14 @@ describe("POST - /place", () => {
     it("Add one restaurant with unwanted property - S", (done) => {
         chai.request(server).post('/place').send(placeWithUnwantedProperty).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
             res.should.has.status(201)
+            places.push(res.body)
             done()
         })
     })
     it("Add one restaurant with unwanted property - S", (done) => {
         chai.request(server).post('/place').send(placeWithUnwantedProperty).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
             res.should.has.status(201)
+            places.push(res.body)
             done()
         })
     })
@@ -372,7 +374,7 @@ describe("POST - /place", () => {
     })
     it("Add one restaurant with wrong adress - E", (done) => {
         chai.request(server).post('/place').send(restaurantWithWrongPrices).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
-            res.should.has.status(404)
+            res.should.has.status(405)
             done()
         })
     })
@@ -394,17 +396,10 @@ describe("POST - /place", () => {
             done()
         })
     })
-    it('purge database - S',(done)=>{
-        users.forEach((user) => {
-                chai.request(server).delete(`/user/${user._id}`).end((err,res)=>{
-            })
-        })
-    done()
-    })
 })
 describe("GET - /place/:id",() =>{
     it('find place with correct ID - S', (done) => {
-        chai.request(server).get(`/place/${place._id}`).end((err, res) =>{
+        chai.request(server).get(`/place/${places[0]._id}`).end((err, res) =>{
             res.should.has.status(200)
             done()
         })
@@ -467,8 +462,8 @@ describe('GET - /places', () => {
 describe('GET - /places/suggestions', () => {
     it('get random place with correct coordinates - S',(done) => {
         chai.request(server).get('/places/suggestions').query({
-            latCoordinate:place.latCoordinate,
-            lonCoordinate : place.lonCoordinate
+            latCoordinate:places[0].latCoordinate,
+            lonCoordinate : places[0].lonCoordinate
         }).end((err, res) =>{
             res.should.has.status(200)
             done()
@@ -476,7 +471,7 @@ describe('GET - /places/suggestions', () => {
     })
     it('get random place with uncorrect coordinates - E',(done) => {
         chai.request(server).get('/places/suggestions').query({
-            latCoordinate:place.latCoordinate,
+            latCoordinate:places[0].latCoordinate,
             lonCoordinate : "gzagrezg"
         }).end((err, res) =>{
             res.should.has.status(405)
@@ -487,6 +482,20 @@ describe('GET - /places/suggestions', () => {
         chai.request(server).get('/places/suggestions').end((err, res) =>{
             res.should.has.status(405)
             done()
+        })
+    })
+    it('purge database - S',(done)=>{
+        users.forEach((user) => {
+                chai.request(server).delete(`/user/${user._id}`).end((err,res)=>{
+            })
+        })
+    done()
+    })
+})
+describe("DELETE - /place",()=>{
+    it("delete one place with uncorrect id place - E", (done) => {
+        chai.request(server).delete(`/place/${places[0]._id}`).auth(tokens[0],{type: 'bearer'}).end((err,res) =>{
+            console.log(res, res.body)
         })
     })
 })

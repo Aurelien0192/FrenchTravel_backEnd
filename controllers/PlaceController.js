@@ -138,8 +138,8 @@ module.exports.PlaceControllers = class PlaceControllers {
  */
 
 
-    static FindManyPlaceRandom(req, res){
-        PlaceService.findManyPlaceRandom(function(err, value){
+    static findManyPlacesRandom(req, res){
+        PlaceService.findManyPlacesRandom(function(err, value){
             if(err && err.type_error === "error-mongo"){
                 res.statusCode = 500
                 res.send(err)
@@ -249,4 +249,40 @@ module.exports.PlaceControllers = class PlaceControllers {
             }
         })
     }
+
+    static async deleteOnePlace(req, res, next){
+        PlaceService.deleteOnePlace(req.params.id, null, function(err, value){
+            if (err && (err.type_error === "validator" || err.type_error === "no-valid")){
+                res.statusCode = 405
+                res.send(err)
+            }else if(err && err.type_error === "no-found"){
+                res.statusCode = 404
+                res.send(err)
+            }else if(err && err.type_error === "error-mongo"){
+                res.statusCode = 500
+                res.send(err)
+            }else{
+                res.statusCode = 200
+                res.send(value)
+            }
+        })
+    }
+    static async deleteManyPlaces(req, res, next){
+        PlaceService.deleteManyPlaces(req.query.ids, null, function(err, value){
+            if (err && (err.type_error === "validator" || err.type_error === "no-valid")){
+                res.statusCode = 405
+                res.send(err)
+            }else if(err && err.type_error === "no-found"){
+                res.statusCode = 404
+                res.send(err)
+            }else if(err && err.type_error === "error-mongo"){
+                res.statusCode = 500
+                res.send(err)
+            }else{
+                res.statusCode = 200
+                res.send(value)
+            }
+        })
+    }
+
 }

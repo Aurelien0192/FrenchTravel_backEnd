@@ -4,12 +4,14 @@ module.exports.ApiLocationControllers = class ApiLocationControllers{
     static async getDataGeocode(req, res, next){
         if(req.body.street){
             req.log.info("Get coordinate from geocode")
+            console.log(req.body.codePostal)
             const params = req.body && {
                 street: req.body.street,
                 city: req.body.city,
                 country: "France",
                 postalCode : req.body.codePostal
             }
+            console.log(params)
             ApiLocationService.getDataGeocode(params, function(err, value){
                 if(err && err.type_error === "no-valid"){
                     res.statusCode = 405

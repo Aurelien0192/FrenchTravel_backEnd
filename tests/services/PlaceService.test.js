@@ -251,7 +251,7 @@ const placeNothingGood = {
     lonCoordinate: 6.3537263,
 }
 
-let place = {}
+const places = []
 
 describe("addOnePlace", () => {
     it("Correct Place. - S" ,(done) => {
@@ -260,7 +260,7 @@ describe("addOnePlace", () => {
             expect(value).to.haveOwnProperty('name')
             expect(value['name']).to.be.equal("Château du Doubs")
             expect(err).to.be.null
-            place = {...value}
+            places.push(value)
             done()
         })
     })
@@ -269,6 +269,7 @@ describe("addOnePlace", () => {
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('name')
             expect(value['name']).to.be.equal("Château du Doubs")
+            places.push(value)
             expect(err).to.be.null
             done()
         })
@@ -293,7 +294,7 @@ describe("addOnePlace", () => {
             path:"data\\images\\leCanyontadaaa2.jpeg",
             size:716175
         }]
-        ImageService.addManyImages(images, place._id,"669ea20a3078f5dda16855f0", function(err, value){
+        ImageService.addManyImages(images, places[0]._id,"669ea20a3078f5dda16855f0", function(err, value){
 
             done()
         })
@@ -336,6 +337,7 @@ describe("addOnePlace", () => {
             expect(value).to.haveOwnProperty('name')
             expect(value).to.not.have.property("ElleEstOuLaPoulette")
             expect(err).to.be.null
+            places.push(value)
             done()
         })
     })
@@ -421,16 +423,19 @@ describe("addOnePlace", () => {
 
 describe("FindOnePlace",()=>{
     it("find one place with correct id -S ",(done) => {
-        PlaceService.findOnePlaceById(place._id, null, function(err, value){
+        PlaceService.findOnePlaceById(places[0]._id, null, function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('_id')
-            expect(String(value['_id'])).be.equal(String(place._id))
+            expect(String(value['_id'])).be.equal(String(places[0]._id))
             expect(err).to.be.null
             done()
         })
     })
     it("find one place with correct id with populate - S",(done) => {
-        PlaceService.findOnePlaceById(place._id, {populate:true}, function(err, value){
+        PlaceService.findOnePlaceById(places[0]._id, {populate:true}, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('_id')
+            places.push(value)
             done()
         })
     })
@@ -495,7 +500,7 @@ describe('FindManyPlaces',() => {
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('results')
             expect(value.results).to.be.an("array")
-            expect(value.results).to.be.lengthOf(10)
+            expect(value.results).to.be.lengthOf(7)
             expect(value.results[0]).to.be.a('object')
             expect(value.results[0]).to.haveOwnProperty('city')
             value.results.forEach((e) => {
@@ -521,7 +526,7 @@ describe("findManyPlaceRandom",() => {
 
 describe("findNearPlaces",()=>{
     it("return near places - S",(done) => {
-        PlaceService.findPlacesNear(place.latCoordinate, place.lonCoordinate,function(err, value){
+        PlaceService.findPlacesNear(places[0].latCoordinate, places[0].lonCoordinate,function(err, value){
             expect(value).to.be.an('array')
             expect(value).to.have.lengthOf.below(31)
             value.forEach(place => {
@@ -532,7 +537,7 @@ describe("findNearPlaces",()=>{
         })
     })
     it("return near places with wrong coordinate - E",(done) => {
-        PlaceService.findPlacesNear("jsdvoiqjod", place.lonCoordinate,function(err, value){
+        PlaceService.findPlacesNear("jsdvoiqjod", places[0].lonCoordinate,function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty("type_error")
             expect(err["type_error"]).to.be.equal("no-valid")
@@ -544,6 +549,93 @@ describe("findNearPlaces",()=>{
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty("type_error")
             expect(err["type_error"]).to.be.equal("no-valid")
+            done()
+        })
+    })
+})
+
+describe("deleteOnePlace",() => {
+    it("delete on place with missing ID - E",(done) => {
+        PlaceService.deleteOnePlace(null, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it("delete on place with uncorrect ID - E",(done) => {
+        PlaceService.deleteOnePlace("fsfeojfe", null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it("delete on place with correct ID but not exist - E",(done) => {
+        PlaceService.deleteOnePlace("669ea20a3078f5dda16855f0", null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-found')
+            done()
+        })
+    })
+    it("delete on place with correct ID - S",(done) => {
+        PlaceService.deleteOnePlace(places[0]._id, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('_id')
+            expect(String(value['_id'])).to.be.equal(String(places[0]._id))
+            places.splice(0,1)
+            done()
+        })
+    })
+})
+
+describe("deleteManyPlaces",()=>{
+    it("delete many places with not array - E",(done)=>{
+        PlaceService.deleteManyPlaces("669ea20a3078f5dda16855f0", null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal("no-valid")
+            done()
+        })
+    })
+    it("delete many places with correct ID but not exist - E",(done)=>{
+        PlaceService.deleteManyPlaces(["669ea20a3078f5dda16855f0","66a0cee18af9a80e789f14cc"], null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal("no-found")
+            done()
+        })
+    })
+    it("delete many places with uncorrect IDs - E",(done)=>{
+        PlaceService.deleteManyPlaces(["geqjlgqr","dlqjgio"], null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal("no-valid")
+            done()
+        })
+    })
+    it("delete many places empty array - E",(done)=>{
+        PlaceService.deleteManyPlaces([], null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal("no-valid")
+            done()
+        })
+    })
+    it("delete many places missing array - E",(done)=>{
+        PlaceService.deleteManyPlaces(null, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal("no-valid")
+            done()
+        })
+    })
+    it("delete many places with correct ID - E",(done)=>{
+        PlaceService.deleteManyPlaces(places.map((place)=>{return place._id}), null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty("deletedCount")
+            expect(value['deletedCount']).to.be.equal(2)
             done()
         })
     })

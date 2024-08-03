@@ -60,9 +60,9 @@ app.use('/data/systemImages',express.static(path.join(__dirname, '/data/systemIm
 app.post('/login',database.controlsBDD, UserControllers.loginUser)
 app.post('/user', database.controlsBDD, UserControllers.addOneUser)
 app.get('/user/:id', database.controlsBDD, UserControllers.findOneUserById)
-app.put('/user/:id', database.controlsBDD, UserControllers.updateOneUser)
+app.put('/user/:id', database.controlsBDD,passport.authenticate('jwt',{session:false}),UserControllers.updateOneUser)
 app.put('/profilePhoto/user', database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwner,ImageController.deleteOneImage,multerOneImage,ImageController.addOneImage,UserControllers.updateUserProfilePhoto)
-app.delete('/user/:id', database.controlsBDD, UserControllers.deleteOneUser)
+app.delete('/user/:id', database.controlsBDD,passport.authenticate('jwt',{session:false}),UserControllers.deleteOneUser)
 
 //routes for Place
 
@@ -70,8 +70,10 @@ app.post('/place',database.controlsBDD, passport.authenticate('jwt',{session:fal
 app.put('/place/:id',database.controlsBDD, passport.authenticate('jwt',{session:false}), controleOwner.controleOwnerOfPlace,ApiLocationControllers.getDataGeocode,PlaceControllers.updateOneplace)
 app.get('/place/:id',database.controlsBDD,PlaceControllers.FindOnePlaceById)
 app.get('/places', database.controlsBDD,PlaceControllers.findManyPlaces)
-app.get('/places/random',database.controlsBDD,PlaceControllers.FindManyPlaceRandom)
+app.get('/places/random',database.controlsBDD,PlaceControllers.findManyPlacesRandom)
 app.get('/places/suggestions',database.controlsBDD,PlaceControllers.findPlacesNear)
+app.delete('/place/:id', database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwnerOfPlace,PlaceControllers.deleteOnePlace)
+app.delete('/places', database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwnerOfPlace,PlaceControllers.deleteOnePlace)
 
 //routes for api call
     //routes for geocodes

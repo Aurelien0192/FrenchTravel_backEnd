@@ -142,7 +142,7 @@ module.exports.PlaceService =  class PlaceService{
         }
     }
 
-    static findManyPlaceRandom = async function (callback){
+    static findManyPlacesRandom = async function (callback){
         const categories = ["activity","restaurant","hotel"]
         let placesToSend = []
         try{
@@ -283,6 +283,51 @@ module.exports.PlaceService =  class PlaceService{
             })
         }else{
             !update ? callback({msg: "propriété udpate inexistante", fields_with_error: [], fields:"", type_error: "no-valid"}) : callback({msg: "Id non conforme", type_error: "no-valid"})
+        }
+    }
+
+    static deleteOnePlace(place_id, options, callback){
+        if (place_id && mongoose.isValidObjectId(place_id)){   
+            Place.findByIdAndDelete(place_id).then((value) => {
+                try{
+                    if(value){
+                        callback(null, value.toObject())
+                    }else{
+                        callback({ msg: "Place non trouvée", type_error: "no-found" })
+                    }
+                }catch(e){
+                    callback(e)
+                }
+            }).catch((e) => {
+                callback({ msg: "Impossible de chercher l'élément.", type_error: "error-mongo" });
+            })
+        }else{
+            callback({msg:"ID incorrecte", type_error:"no-valid"})
+        }
+    }
+
+    static deleteManyPlaces(places_id, options, callback){
+        if (places_id && Array.isArray(places_id) && places_id.length>0  && places_id.filter((e) => { return mongoose.isValidObjectId(e) }).length == places_id.length){
+            places_id = places_id.map((place) => { return new mongoose.Types.ObjectId(place) })
+            Place.deleteMany({_id: places_id}).then((value) => {
+                if (value && value.deletedCount !== 0){
+                    callback(null, value)
+                }else{
+                    callback({msg: "Aucun lieu trouvé", type_error: "no-found"})
+                }
+            }).catch((err) => {
+                callback({msg:"Erreur avec la base de donnée", type_error: "error-mongo"})
+            })
+        }
+        else if (places_id && Array.isArray(places_id) && places_id.length > 0 && places_id.filter((e) => { return mongoose.isValidObjectId(e) }).length != places_id.length) {
+            callback({ msg: "Tableau non conforme plusieurs éléments ne sont pas des ObjectId.", type_error: 'no-valid', fields: places_id.filter((e) => { return !mongoose.isValidObjectId(e) }) });
+        }
+        else if (places_id && !Array.isArray(places_id)) {
+            callback({ msg: "L'argument n'est pas un tableau.", type_error: 'no-valid' });
+
+        }
+        else {
+            callback({ msg: "Tableau non conforme.", type_error: 'no-valid' });
         }
     }
 }

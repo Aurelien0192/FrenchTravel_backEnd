@@ -14,7 +14,8 @@ const PlaceSchema = mongoose.Schema({
         type: String,
         enum : ["hotel","restaurant","activity"],
         default:"activity",
-        required: true
+        required: true,
+        immutable:true
     },
     notation : Number,
     describe : {

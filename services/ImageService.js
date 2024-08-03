@@ -162,4 +162,29 @@ module.exports.ImageService = class ImageService{
             }
         }
     }
+    
+    static async deleteManyImages(images_id, callback){
+        if (images_id && Array.isArray(images_id) && images_id.length>0  && images_id.filter((e) => { return mongoose.isValidObjectId(e) }).length == images_id.length){
+            images_id = users_id.map((image) => { return new ObjectId(image) })
+            Image.deleteMany({_id: images_id}).then((value) => {
+                if (value && value.deletedCount !== 0){
+                    callback(null, value)
+                }else{
+                    callback({msg: "Aucune images trouvées", type_error: "no-found"})
+                }
+            }).catch((err) => {
+                callback({msg:"Erreur avec la base de donnée", type_error: "error-mongo"})
+            })
+        }
+        else if (images_id && Array.isArray(images_id) && images_id.length > 0 && images_id.filter((e) => { return mongoose.isValidObjectId(e) }).length != images_id.length) {
+            callback({ msg: "Tableau non conforme plusieurs éléments ne sont pas des ObjectId.", type_error: 'no-valid', fields: images_id.filter((e) => { return !mongoose.isValidObjectId(e) }) });
+        }
+        else if (images_id && !Array.isArray(images_id)) {
+            callback({ msg: "L'argement n'est pas un tableau.", type_error: 'no-valid' });
+
+        }
+        else {
+            callback({ msg: "Tableau non conforme.", type_error: 'no-valid' });
+        }
+    }
 }
