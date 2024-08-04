@@ -1,8 +1,11 @@
 const mongoose = require('mongoose')
 const UserSchema = require('../schemas/User').UserSchema
+const PlaceService = require("../services/PlaceService").PlaceService
+const ImageService = require("../services/ImageService").ImageService
 const _ = require('lodash')
 const bcrypt = require("bcryptjs")
 const TokenUtils = require('./../utils/token')
+
 const SALT_WORK_FACTOR = 10
 
 const ObjectId = mongoose.Types.ObjectId
@@ -221,22 +224,78 @@ module.exports.UserService = class UserService{
 
     static async deleteOneUser(user_id, options,callback) {
     if (user_id && mongoose.isValidObjectId(user_id)) {
-        
-        User.findByIdAndDelete(user_id).then((value) => {
-            try {
-                if (value)
-                    callback(null, value.toObject())
-                else
-                callback({ msg: "Utilisateur non trouvé.", fields_with_error: [], fields:"", type_error: "no-found" });
+        console.log(user_id)
+            const places = await User.aggregate([{
+                $match: {_id: new mongoose.Types.ObjectId(user_id)} 
+                },
+                {
+                    $lookup: {
+                        from: "places",
+                        localField: "_id",
+                        foreignField: "owner",
+                        as: 'places'
+                    }
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        places: 1
+                    }
+                }
+            ]);
+
+            const places_id = _.map(places[0].places,"_id")
+
+            const images = await User.aggregate([{
+                $match: {_id: new mongoose.Types.ObjectId(user_id)} 
+                },
+                {
+                    $lookup: {
+                        from: "images",
+                        localField: "_id",
+                        foreignField: "user_id",
+                        as: 'images'
+                    }
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        images: 1
+                    }
+                }
+            ]);
+
+            const images_id = _.map(images[0].images,"_id")
+
+            if(places_id.length>0){
+                PlaceService.deleteManyPlaces(places_id,null, function(err, value){
+                    if(err){
+                        return callback({msg:"la suppression des lieux n'a pas fonctionné", type_error:"aborded", err})
+                    }
+                })
             }
-            catch (e) {  
-                callback(e)
+            if(images_id.length>0){
+                ImageService.deleteManyImages(images_id, function(err, value){
+                    if (err){
+                        return callback({msg:"la suppression des images a rencontré un problème",type_error:"aborded", err})
+                    }
+                })
             }
-        }).catch((e) => {
-            callback({ msg: "Impossible de chercher l'élément.", fields_with_error: [], fields:"", type_error: "error-mongo" });
-        })
-    }
-    else {
+
+            await User.findByIdAndDelete(user_id).then((value) => {
+                    try {
+                        if (value)
+                            callback(null, value.toObject())
+                        else
+                        callback({ msg: "Utilisateur non trouvé.", fields_with_error: [], fields:"", type_error: "no-found" });
+                }
+                catch (e) {  
+                    callback(e)
+                }
+            }).catch((e) => {
+                callback({ msg: "Impossible de chercher l'élément.", fields_with_error: [], fields:"", type_error: "error-mongo" });
+            })
+    } else {
         callback({ msg: "Id invalide.", fields_with_error: [], fields:"", type_error: 'no-valid' })
     }
 }

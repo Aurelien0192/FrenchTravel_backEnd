@@ -59,7 +59,7 @@ app.use('/data/systemImages',express.static(path.join(__dirname, '/data/systemIm
 
 app.post('/login',database.controlsBDD, UserControllers.loginUser)
 app.post('/user', database.controlsBDD, UserControllers.addOneUser)
-app.get('/user/:id', database.controlsBDD, UserControllers.findOneUserById)
+app.get('/user/:id', database.controlsBDD, passport.authenticate('jwt',{session:false}), UserControllers.findOneUserById)
 app.put('/user/:id', database.controlsBDD,passport.authenticate('jwt',{session:false}),UserControllers.updateOneUser)
 app.put('/profilePhoto/user', database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwner,ImageController.deleteOneImage,multerOneImage,ImageController.addOneImage,UserControllers.updateUserProfilePhoto)
 app.delete('/user/:id', database.controlsBDD,passport.authenticate('jwt',{session:false}),UserControllers.deleteOneUser)
@@ -77,7 +77,7 @@ app.delete('/places', database.controlsBDD,passport.authenticate('jwt',{session:
 
 //routes for api call
     //routes for geocodes
-app.get('/getlocation',ApiLocationControllers.getDataGeocode)
+app.get('/getlocation',database.controlsBDD,passport.authenticate('jwt',{session:false}), ApiLocationControllers.getDataGeocode)
 
 
 //routes images
