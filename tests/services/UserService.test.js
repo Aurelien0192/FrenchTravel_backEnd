@@ -1,8 +1,12 @@
 const chai = require('chai') 
-const UserService = require("../../services/UserService").UserService;
+const { ImageService } = require('../../services/ImageService')
+const UserService = require("../../services/UserService").UserService
+const PlaceService = require("../../services/PlaceService").PlaceService
 let expect = chai.expect
 
 const users =[]
+let place = {}
+let image = {}
 
 describe("AddOneUser",()=> {
     
@@ -21,6 +25,46 @@ describe("AddOneUser",()=> {
             expect(value['username']).to.equal(goodUserUser.username)
             expect(err).to.be.null
             users.push(value)
+            done()
+        })
+    })
+    it("Add good place to good user -S",(done)=>{
+        const goodHotel = {
+            name: "Château du Doubs",
+            describe : "Super chateau dans le centre du Doubs",
+            categorie : "hotel",
+            moreInfo:{
+                services:"ascensceur"
+            },
+            street: "2 rue du Moulin Parnet",
+            city: "Pontarlier",
+            codePostal : "25300",
+            country: "France",
+            county: "Doubs",
+            latCoordinate: 46.907258,
+            lonCoordinate:6.3537263
+        }
+        PlaceService.addOnePlace(goodHotel, users[0]._id, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('name')
+            expect(String(value['name'])).to.be.equal("Château du Doubs")
+            expect(err).to.be.null
+            place={...value}
+            done()
+        })
+    })
+    it("add one image associated to place by first user - S",(done)=>{
+        const correctImageInfo = {
+            path: "\\data\\images\\superbePhoto.jpg",
+            filename: "superbePhoto.jpg",
+        }
+        ImageService.addOneImage(correctImageInfo, place._id, users[0]._id, function(err,value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty("_id")
+            expect(value).to.haveOwnProperty("user_id")
+            expect(String(value["user_id"])).to.be.equal(String(users[0]._id))
+            image={... image}
+            expect(err).to.be.null
             done()
         })
     })
@@ -294,7 +338,7 @@ describe("DeleteOneUser",()=>{
             done()
         })
     })
-    it("Delete with correct id - S",(done)=> {
+    it("Delete with correct id and associated place and image - S",(done)=> {
         UserService.deleteOneUser(users[0]._id,null, function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('firstName')
@@ -304,12 +348,32 @@ describe("DeleteOneUser",()=>{
             done()
         })
     })
-    it("Delete user with good id - S",(done)=>{
-        users.forEach((e) => {
-            UserService.deleteOneUser(e._id, null, function(err, value){ 
-            })
+    it("Delete user without associated place and image - S",(done)=>{
+        UserService.deleteOneUser(users[0]._id, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('_id')
+            expect(String(value['_id'])).to.be.equal(String(users[0]._id))
+            expect(err).to.be.null
+            users.splice(0,1)
+            done()
         })
-        done()
     })
-
+    it("verify place correctly deleted - S",(done) => {
+        PlaceService.findOnePlaceById(place._id, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-found')
+            done()
+        })
+    })
+    it("Delete user with good id - S",(done)=>{
+        UserService.deleteOneUser(users[0]._id, null, function(err, value){ 
+            done()
+        })  
+    })
+    it("Delete user with good id - S",(done)=>{
+        UserService.deleteOneUser(users[1]._id, null, function(err, value){ 
+            done()
+        })  
+    })
 })

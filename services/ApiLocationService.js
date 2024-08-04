@@ -24,7 +24,6 @@ module.exports.ApiLocationServices =  class ApiLocationServices {
         params.api_key = keyApi.getKeyGeocode()
         try{
             const data = await http_geocode.get(`search?`,{params})
-            console.log(params)
             setTimeout(() => {   
                 if(data.data.length !==0){
                     return callback(null,data.data)

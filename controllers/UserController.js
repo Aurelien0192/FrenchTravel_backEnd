@@ -291,7 +291,6 @@ module.exports.UserControllers = class UserControllers{
 
     static deleteOneUser(req, res){
         const opts = null
-        console.log(req.params)
         UserService.deleteOneUser(req.params.id, opts, function(err, value){
             if(err && (err.type_error === "no-valid")){
                 res.statusCode = 405

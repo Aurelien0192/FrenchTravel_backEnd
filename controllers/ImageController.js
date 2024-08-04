@@ -121,7 +121,6 @@ module.exports.ImageController = class ImageController{
 
     static async deleteOneImage(req, res, next){
         if(req.url === "/profilePhoto/user"){
-            console.log(req.user)
             req.user.profilePhoto? req.params.id = req.user.profilePhoto._id : next()
         }
         req.log.info("delete one image in Database")

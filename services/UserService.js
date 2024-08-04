@@ -204,7 +204,6 @@ module.exports.UserService = class UserService{
                 callback({msg: "Erreur avec la base de données", fields_with_error: [], fields:"", type_error:"error-mongo"})
             }
         }).catch((errors) =>{
-            console.log(errors)
             errors = errors['errors']
             var text = Object.keys(errors).map((e) => {
                 return errors[e]['properties']['message']
@@ -224,7 +223,6 @@ module.exports.UserService = class UserService{
 
     static async deleteOneUser(user_id, options,callback) {
     if (user_id && mongoose.isValidObjectId(user_id)) {
-        console.log(user_id)
             const places = await User.aggregate([{
                 $match: {_id: new mongoose.Types.ObjectId(user_id)} 
                 },
@@ -243,8 +241,8 @@ module.exports.UserService = class UserService{
                     }
                 }
             ]);
-
-            const places_id = _.map(places[0].places,"_id")
+            
+            const places_id = (places.length>0 && places[0].places)? _.map(places[0].places,"_id") : []
 
             const images = await User.aggregate([{
                 $match: {_id: new mongoose.Types.ObjectId(user_id)} 
@@ -265,7 +263,7 @@ module.exports.UserService = class UserService{
                 }
             ]);
 
-            const images_id = _.map(images[0].images,"_id")
+            const images_id = (images.length>0 && images[0].images)? _.map(images[0].images,"_id") : 0
 
             if(places_id.length>0){
                 PlaceService.deleteManyPlaces(places_id,null, function(err, value){
@@ -284,10 +282,11 @@ module.exports.UserService = class UserService{
 
             await User.findByIdAndDelete(user_id).then((value) => {
                     try {
-                        if (value)
+                        if (value){
                             callback(null, value.toObject())
-                        else
-                        callback({ msg: "Utilisateur non trouvé.", fields_with_error: [], fields:"", type_error: "no-found" });
+                        }else{
+                            callback({ msg: "Utilisateur non trouvé.", fields_with_error: [], fields:"", type_error: "no-found" });
+                        }
                 }
                 catch (e) {  
                     callback(e)
