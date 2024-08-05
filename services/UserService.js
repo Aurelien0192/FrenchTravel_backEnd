@@ -263,17 +263,16 @@ module.exports.UserService = class UserService{
                 }
             ]);
 
-            const images_id = (images.length>0 && images[0].images)? _.map(images[0].images,"_id") : 0
-
+            const images_id = (images.length>0 && images[0].images)? _.map(images[0].images,"_id") : []
             if(places_id.length>0){
-                PlaceService.deleteManyPlaces(places_id,null, function(err, value){
+                await PlaceService.deleteManyPlaces(places_id,null, function(err, value){
                     if(err){
                         return callback({msg:"la suppression des lieux n'a pas fonctionné", type_error:"aborded", err})
                     }
                 })
             }
             if(images_id.length>0){
-                ImageService.deleteManyImages(images_id, function(err, value){
+                await ImageService.deleteManyImages(images_id, function(err, value){
                     if (err){
                         return callback({msg:"la suppression des images a rencontré un problème",type_error:"aborded", err})
                     }

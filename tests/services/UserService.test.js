@@ -1,7 +1,7 @@
 const chai = require('chai') 
-const { ImageService } = require('../../services/ImageService')
 const UserService = require("../../services/UserService").UserService
 const PlaceService = require("../../services/PlaceService").PlaceService
+const ImageService = require("../../services/ImageService").ImageService
 let expect = chai.expect
 
 const users =[]
@@ -63,7 +63,7 @@ describe("AddOneUser",()=> {
             expect(value).to.haveOwnProperty("_id")
             expect(value).to.haveOwnProperty("user_id")
             expect(String(value["user_id"])).to.be.equal(String(users[0]._id))
-            image={... image}
+            image={...value}
             expect(err).to.be.null
             done()
         })
@@ -360,6 +360,14 @@ describe("DeleteOneUser",()=>{
     })
     it("verify place correctly deleted - S",(done) => {
         PlaceService.findOnePlaceById(place._id, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-found')
+            done()
+        })
+    })
+    it("verify image correctly deleted - S",(done) => {
+        ImageService.findOneImageById(image._id, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('no-found')

@@ -128,6 +128,27 @@ module.exports.ImageService = class ImageService{
         }
     }
 
+    static async findOneImageById(image_id, options, callback) {
+        if(image_id && mongoose.isValidObjectId(image_id)){
+            Image.findById(image_id).then((value) => {
+                try{
+                    if (value){
+                        callback(null, value.toObject())
+                    }else{
+                        callback({msg:"Aucune image trouvée", fields_with_error: [], fields:"", type_error: "no-found"})
+                    }
+                }catch(e){
+                    console.log(e)
+                    callback({msg: "Erreur avec la base de donnée", fields_with_error: [], fields:"", type_error:"error-mongo"})
+                }
+            }).catch((err) => {
+                callback(err)
+            })
+        }else{
+            callback({msg: "Id non conforme", fields_with_error: [], fields:"", type_error: "no-valid"})
+        }
+    }
+
     static async deleteOneImage(image_id, callback){
         if (image_id && mongoose.isValidObjectId(image_id)){
             if(image_id !== new mongoose.Types.ObjectId("66ab90e7dcef4782e1850d5c")){
@@ -165,7 +186,7 @@ module.exports.ImageService = class ImageService{
     
     static async deleteManyImages(images_id, callback){
         if (images_id && Array.isArray(images_id) && images_id.length>0  && images_id.filter((e) => { return mongoose.isValidObjectId(e) }).length == images_id.length){
-            images_id = users_id.map((image) => { return new ObjectId(image) })
+            images_id = images_id.map((image) => {return new mongoose.Types.ObjectId(image)})
             Image.deleteMany({_id: images_id}).then((value) => {
                 if (value && value.deletedCount !== 0){
                     callback(null, value)
@@ -177,6 +198,7 @@ module.exports.ImageService = class ImageService{
             })
         }
         else if (images_id && Array.isArray(images_id) && images_id.length > 0 && images_id.filter((e) => { return mongoose.isValidObjectId(e) }).length != images_id.length) {
+            console.log('ok')
             callback({ msg: "Tableau non conforme plusieurs éléments ne sont pas des ObjectId.", type_error: 'no-valid', fields: images_id.filter((e) => { return !mongoose.isValidObjectId(e) }) });
         }
         else if (images_id && !Array.isArray(images_id)) {
@@ -184,6 +206,7 @@ module.exports.ImageService = class ImageService{
 
         }
         else {
+            
             callback({ msg: "Tableau non conforme.", type_error: 'no-valid' });
         }
     }

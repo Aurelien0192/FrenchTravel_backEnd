@@ -306,7 +306,7 @@ module.exports.PlaceService =  class PlaceService{
         }
     }
 
-    static deleteManyPlaces(places_id, options, callback){
+    static async deleteManyPlaces(places_id, options, callback){
         if (places_id && Array.isArray(places_id) && places_id.length>0  && places_id.filter((e) => { return mongoose.isValidObjectId(e) }).length == places_id.length){
             places_id = places_id.map((place) => { return new mongoose.Types.ObjectId(place) })
             Place.deleteMany({_id: places_id}).then((value) => {
