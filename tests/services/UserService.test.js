@@ -298,6 +298,15 @@ describe("UpdateOneUser",() => {
             done()
         })
     })
+    it("modify profile photo of user - E",(done)=> {
+        UserService.updateOneUser(users[0]._id, {profilePhoto:"eziojergjorie"}, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal("no-valid")
+            expect(value).to.be.undefined
+            done()
+        })
+    })
     it("modify user with null update - E",(done)=> {
         UserService.updateOneUser(users[0]._id, null, null, function(err, value){
             expect(err).to.be.a('object')

@@ -137,6 +137,9 @@ module.exports.UserService = class UserService{
 
     static async updateOneUser(user_id, update, options, callback){
         if(user_id && mongoose.isValidObjectId(user_id) && update){
+            if(Object.keys(update).includes("profilePhoto")){
+                return callback({msg:"you can't change profile photos with this path", type_error:"no-valid"})
+            }
             if((Object.keys(update).includes('firstName') && update.firstName ==="") || (Object.keys(update).includes('lastName')) && update.lastName ===""){
                 const user = await User.findById(user_id)
                 try{
