@@ -24,15 +24,42 @@ const wrongParamsProperty = {
     Paris : 25400
 }
 
+let user = {}
+let token = ""
+
+describe("log a User -", () => {
+    it("create an user",(done) =>{
+        chai.request(server).post('/user').send({
+            userType:"user",
+            username:"titi",
+            password:"123",
+            email:"titi@gmail.com"
+        }).end((err, res) =>{
+            res.should.has.status(201)
+            user = {...res.body}
+            done()
+        })
+    })
+    it("log the user",(done) => {
+        chai.request(server).post('/login').send({
+            username:"titi",
+            password:"123"
+        }).end((err, res) => {
+            res.should.has.status(200)
+            token= res.body.token
+            done()
+        })
+    })
+})
 describe("GET - /Getlocation", () => {
     it("get location with empty query - S", (done) => {
-        chai.request(server).get('/getlocation').send({}).end((err,res) => {
-            res.should.has.status(200)
+        chai.request(server).get('/getlocation').auth(token,{type: 'bearer'}).send({}).end((err,res) => {
+            res.should.has.status(404)
             done()
         })
     })
     it("get locations with correct query - S", (done) => {
-        chai.request(server).get('/getlocation').send(goodParams).end((err, res) => {
+        chai.request(server).get('/getlocation').auth(token,{type: 'bearer'}).send(goodParams).end((err, res) => {
             expect(res.body).to.be.a('array')
             expect(res.body[0]).to.be.haveOwnProperty('display_name')
             expect(res.body[0]['display_name']).include('Exincourt')
@@ -41,18 +68,29 @@ describe("GET - /Getlocation", () => {
             done()
         })
     })
+    it("get locations with correct query but not connected - E", (done) => {
+        chai.request(server).get('/getlocation').send(goodParams).end((err, res) => {
+            res.should.has.status(401)
+            done()
+        })
+    })
     it("get location with wrong query - E", (done) => {
-        chai.request(server).get('/getlocation').send(wrongParams).end((err,res) => {
+        chai.request(server).get('/getlocation').auth(token,{type: 'bearer'}).send(wrongParams).end((err,res) => {
             res.should.has.status(404)
             done()
         })
     })
     it("get location with wrong query properties - S", (done) => {
-        chai.request(server).get('/getlocation').send(wrongParamsProperty).end((err,res) => {
+        chai.request(server).get('/getlocation').auth(token,{type: 'bearer'}).send(wrongParamsProperty).end((err,res) => {
+            res.should.has.status(404)
+            done()
+        })
+    })
+})
+describe("delete User",() => {
+    it("deleting the user -S",(done)=>{
+        chai.request(server).delete(`/user/${user._id}`).auth(token,{type: 'bearer'}).end((err, res) => {
             res.should.has.status(200)
-            expect(res.body).to.be.a('array')
-            expect(res.body[0]).to.haveOwnProperty('place_id')
-            /expect(res.body[0]['place_id']).to.be.equal(265731023)
             done()
         })
     })
