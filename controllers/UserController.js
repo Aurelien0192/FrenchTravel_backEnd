@@ -80,6 +80,25 @@ module.exports.UserControllers = class UserControllers{
         })(req, res, next)
     }
 
+    static async logoutUser(req, res){
+        req.log.info("Déconnexion d'un utilisation")
+        UserService.updateOneUser(req.user._id, {token:""}, null, function(err, value){
+            if(err && (err.type_error === "no-valid" || err.type_error === "validator" || err.type_error === "duplicate")){
+                res.statusCode = 405
+                res.send(err)
+            }else if(err && err.type_error === "error-mongo"){
+                res.statusCode = 500
+                res.send(err)
+            }else if(err && err.type_error ==='no-found'){
+                res.statusCode = 404
+                res.send(err)
+            }else{
+                res.statusCode = 200
+                return res.send(user)
+            }
+        })
+    }
+
 /**
  * @swagger
  * /user:

@@ -42,7 +42,6 @@ const ApiLocationControllers = require("./controllers/ApiLocationController").Ap
 const ImageController = require('./controllers/ImageController').ImageController
 
 // Import des middlewares
-
 const controleOwner = require('./middlewares/controleOwner')
 
 app.use((req, res, next) => {
@@ -58,6 +57,8 @@ app.use('/data/systemImages',express.static(path.join(__dirname, '/data/systemIm
 //routes for User
 
 app.post('/login',database.controlsBDD, UserControllers.loginUser)
+app.post ('/logout', database.controlsBDD,passport.authenticate('jwt',{session:false}), UserControllers.logoutUser)
+
 app.post('/user', database.controlsBDD, UserControllers.addOneUser)
 app.get('/user/:id', database.controlsBDD, passport.authenticate('jwt',{session:false}), UserControllers.findOneUserById)
 app.put('/user/:id', database.controlsBDD,passport.authenticate('jwt',{session:false}),UserControllers.updateOneUser)

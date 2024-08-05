@@ -496,6 +496,7 @@ describe("DELETE - /place",()=>{
     it("delete one place with uncorrect id place - E", (done) => {
         chai.request(server).delete(`/place/${places[0]._id}`).auth(tokens[0],{type: 'bearer'}).end((err,res) =>{
             console.log(res, res.body)
+            done()
         })
     })
 })
