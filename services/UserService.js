@@ -204,20 +204,7 @@ module.exports.UserService = class UserService{
                 callback({msg: "Erreur avec la base de données", fields_with_error: [], fields:"", type_error:"error-mongo"})
             }
         }).catch((errors) =>{
-            errors = errors['errors']
-            var text = Object.keys(errors).map((e) => {
-                return errors[e]['properties']['message']
-            }).join(' ')
-            var fields = _.transform(Object.keys(errors), function (result, value) {
-                result[value] = errors[value]['properties']['message'];
-            }, {});
-            var err = {
-                msg: text,
-                fields_with_error: Object.keys(errors),
-                fields: fields,
-                type_error: "validator"
-            }
-            callback(err)  
+            console.log(errors)
         })
     }
 

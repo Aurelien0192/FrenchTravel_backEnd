@@ -4,9 +4,9 @@ require("../utils/database")
 //    require('./controllers/ApiLocationController.test')
 // })
 
-// describe("PlaceService", () => {
-//    require('./services/PlaceService.test')
-// })
+describe("PlaceService", () => {
+   require('./services/PlaceService.test')
+})
 
 // describe("PlaceControllers", () => {
 //    require('./controllers/PlaceController.test')
@@ -16,9 +16,9 @@ require("../utils/database")
 //    require('./services/UserService.test')
 // })
 
-describe("UserController",() => {
-   require('./controllers/UserController.test')
-})
+// describe("UserController",() => {
+//    require('./controllers/UserController.test')
+// })
 
 // describe("ApiLocationService", () => [
 //    require('./services/ApiLocationService.test')

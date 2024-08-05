@@ -1,5 +1,5 @@
 const PlaceSchema = require ("../schemas/Place").PlaceSchema
-const ApiLocationService = require("../services/ApiLocationService").ApiLocationServices
+const ImageService = require("../services/ImageService").ImageService
 const { log } = require("async");
 const _ = require('lodash')
 const mongoose = require('mongoose');
@@ -301,8 +301,35 @@ module.exports.PlaceService =  class PlaceService{
         }
     }
 
-    static deleteOnePlace(place_id, options, callback){
-        if (place_id && mongoose.isValidObjectId(place_id)){   
+    static async deleteOnePlace(place_id, options, callback){
+        if (place_id && mongoose.isValidObjectId(place_id)){
+            const images = await Place.aggregate([{
+                $match: {_id: new mongoose.Types.ObjectId(place_id)} 
+                },
+                {
+                    $lookup: {
+                        from: "images",
+                        localField: "_id",
+                        foreignField: "place",
+                        as: 'images'
+                    }
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        images: 1
+                    }
+                }
+            ]);
+            const images_id = (images.length>0 && images[0].images)? _.map(images[0].images,"_id") : []
+
+            if(images_id.length>0){
+                await ImageService.deleteManyImages(images_id, function(err, value){
+                    if (err){
+                        return callback({msg:"la suppression des images a rencontré un problème",type_error:"aborded", err})
+                    }
+                })
+            }   
             Place.findByIdAndDelete(place_id).then((value) => {
                 try{
                     if(value){
@@ -324,6 +351,38 @@ module.exports.PlaceService =  class PlaceService{
     static async deleteManyPlaces(places_id, options, callback){
         if (places_id && Array.isArray(places_id) && places_id.length>0  && places_id.filter((e) => { return mongoose.isValidObjectId(e) }).length == places_id.length){
             places_id = places_id.map((place) => { return new mongoose.Types.ObjectId(place) })
+            let images_id = []
+            for(let i=0; i<places_id.length; i++){
+                const images = await Place.aggregate([{
+                    $match: {_id: new mongoose.Types.ObjectId(places_id[i])} 
+                    },
+                    {
+                        $lookup: {
+                            from: "images",
+                            localField: "_id",
+                            foreignField: "place",
+                            as: 'images'
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            images: 1
+                        }
+                    }
+                ])
+                const imagesIdForOnePlace = images.length>0 && images[0].images ? _.map(images[0].images,"_id") : []
+                images_id = [...images_id, ...imagesIdForOnePlace]
+            }
+
+            if(images_id.length>0){
+                await ImageService.deleteManyImages(images_id, function(err, value){
+                    if (err){
+                        return callback({msg:"la suppression des images a rencontré un problème",type_error:"aborded", err})
+                    }
+                })
+            }
+
             Place.deleteMany({_id: places_id}).then((value) => {
                 if (value && value.deletedCount !== 0){
                     callback(null, value)

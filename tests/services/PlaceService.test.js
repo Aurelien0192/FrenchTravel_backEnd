@@ -252,6 +252,7 @@ const placeNothingGood = {
 }
 
 const places = []
+let imagesTab = []
 
 describe("addOnePlace", () => {
     it("Correct Place. - S" ,(done) => {
@@ -295,7 +296,33 @@ describe("addOnePlace", () => {
             size:716175
         }]
         ImageService.addManyImages(images, places[0]._id,"669ea20a3078f5dda16855f0", function(err, value){
+            imagesTab = [...value]
+            done()
+        })
+    })
 
+    it("add image to correct hotel - S", (done) => {
+        const images=[{
+            fieldname: 'images',
+            originalname: 'leCanyon.jpg',
+            encoding:'7bit',
+            mimetype:'image/jpeg',
+            destination:'data/images',
+            filename:'leCanyontadaaa.jpeg',
+            path:"data\\images\\leCanyontadaaa.jpeg",
+            size:716175
+        },{
+            fieldname: 'images',
+            originalname: 'leCanyon2.jpg',
+            encoding:'7bit',
+            mimetype:'image/jpeg',
+            destination:'data/images',
+            filename:'leCanyontadaaa2.jpeg',
+            path:"data\\images\\leCanyontadaaa2.jpeg",
+            size:716175
+        }]
+        ImageService.addManyImages(images, places[1]._id,"669ea20a3078f5dda16855f0", function(err, value){
+            imagesTab = [...imagesTab, ...value]
             done()
         })
     })
@@ -338,6 +365,31 @@ describe("addOnePlace", () => {
             expect(value).to.not.have.property("ElleEstOuLaPoulette")
             expect(err).to.be.null
             places.push(value)
+            done()
+        })
+    })
+    it("add image to place with unwanted property - S", (done) => {
+        const images=[{
+            fieldname: 'images',
+            originalname: 'leCanyon.jpg',
+            encoding:'7bit',
+            mimetype:'image/jpeg',
+            destination:'data/images',
+            filename:'leCanyontadaaa.jpeg',
+            path:"data\\images\\leCanyontadaaa.jpeg",
+            size:716175
+        },{
+            fieldname: 'images',
+            originalname: 'leCanyon2.jpg',
+            encoding:'7bit',
+            mimetype:'image/jpeg',
+            destination:'data/images',
+            filename:'leCanyontadaaa2.jpeg',
+            path:"data\\images\\leCanyontadaaa2.jpeg",
+            size:716175
+        }]
+        ImageService.addManyImages(images, places[2]._id,"669ea20a3078f5dda16855f0", function(err, value){
+            imagesTab = [...imagesTab, ...value]
             done()
         })
     })
@@ -456,7 +508,7 @@ describe('FindManyPlaces',() => {
             done()
         })
     })
-    it("find many places with correct informations search:Besançon and Category:restaurant - S", (done) =>{
+    it("find many places with correct informations search:Pontarlier and Category:activity - S", (done) =>{
         PlaceService.findManyPlaces(1,5,{search:"Pontarlier",categorie:"activity"}, null, function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('results')
@@ -513,7 +565,7 @@ describe('FindManyPlaces',() => {
 
 describe("findManyPlaceRandom",() => {
     it("find random place - S",(done)=> {
-        PlaceService.findManyPlaceRandom(function(err, value){
+        PlaceService.findManyPlacesRandom(function(err, value){
             expect(value).to.be.an('array')
             expect(value[0]).to.be.a('object')
             expect(value[0]).to.haveOwnProperty('images')
@@ -588,6 +640,20 @@ describe("deleteOnePlace",() => {
             done()
         })
     })
+    it("verify images deleting - S",(done) => {
+        ImageService.findOneImageById(imagesTab[0]._id, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err['type_error']).to.be.equal('no-found')
+        })
+        ImageService.findOneImageById(imagesTab[1]._id, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err['type_error']).to.be.equal('no-found')
+        })
+        imagesTab.splice(0,2)
+        done()
+    })
 })
 
 describe("deleteManyPlaces",()=>{
@@ -631,12 +697,35 @@ describe("deleteManyPlaces",()=>{
             done()
         })
     })
-    it("delete many places with correct ID - E",(done)=>{
+    it("delete many places with correct ID - S",(done)=>{
         PlaceService.deleteManyPlaces(places.map((place)=>{return place._id}), null, function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty("deletedCount")
             expect(value['deletedCount']).to.be.equal(2)
             done()
         })
+    })
+    it("verify images deleting - S",(done) => {
+        ImageService.findOneImageById(imagesTab[0]._id, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err['type_error']).to.be.equal('no-found')
+        })
+        ImageService.findOneImageById(imagesTab[1]._id, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err['type_error']).to.be.equal('no-found')
+        })
+        ImageService.findOneImageById(imagesTab[2]._id, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err['type_error']).to.be.equal('no-found')
+        })
+        ImageService.findOneImageById(imagesTab[3]._id, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err['type_error']).to.be.equal('no-found')
+        })
+        done()
     })
 })
