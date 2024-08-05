@@ -85,7 +85,7 @@ app.get('/getlocation',database.controlsBDD,passport.authenticate('jwt',{session
 
 app.post('/image',database.controlsBDD,passport.authenticate('jwt',{session:false}),multerOneImage,ImageController.addOneImage)
 app.post('/images',database.controlsBDD,passport.authenticate('jwt',{session:false}),multerManyImage,ImageController.addManyImages)
-app.delete('/image/:id',database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwner,ImageController.deleteOneImage)
+app.delete('/image/:id',database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwnerOfImage,ImageController.deleteOneImage)
 
 
 app.listen(Config.port, () => {
