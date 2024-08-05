@@ -1,5 +1,6 @@
 const PlaceSchema = require ("../schemas/Place").PlaceSchema
 const ApiLocationService = require("../services/ApiLocationService").ApiLocationServices
+const { log } = require("async");
 const _ = require('lodash')
 const mongoose = require('mongoose');
 
@@ -80,7 +81,7 @@ module.exports.PlaceService =  class PlaceService{
                     if (value){
                         callback(null, value)
                     }else{
-                        callback({msg: "Aucun article trouvé", type_error: "no-found"})
+                        callback({msg: "Aucun lieu trouvé", type_error: "no-found"})
                     }
                 }catch(e){
                     callback({msg: "Erreur avec la base de donnée", fields_with_error: [], fields:"", type_error:"error-mongo"})
@@ -88,6 +89,20 @@ module.exports.PlaceService =  class PlaceService{
             }).catch((err) => {
                 callback(err)
             })
+        }else{
+            callback({ msg: "ObjectId non conforme.", type_error: 'no-valid' });
+        }
+    }
+
+    static findManyPlacesById = function (places_id, options, callback){
+        if(places_id && Array.isArray(places_id) && places_id.length>0  && places_id.filter((e) => { return mongoose.isValidObjectId(e) }).length == places_id.length){
+            Place.find({_id:{$in : places_id}}).then((results) => {
+                if(results.length >0){
+                    callback(null, results)
+                }else{
+                    callback({msg: "Aucun lieu trouvé", type_error: "no-found"})
+                }
+                })
         }else{
             callback({ msg: "ObjectId non conforme.", type_error: 'no-valid' });
         }

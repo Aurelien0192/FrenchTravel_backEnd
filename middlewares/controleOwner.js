@@ -40,3 +40,32 @@ module.exports.controleOwnerOfPlace = (req, res, next) => {
         }
     })
 }
+
+module.exports.controleOwnerOfPlaces = (req, res, next) => {
+    PlaceService.findManyPlacesById(req.query.ids,null, function(err, value){
+        req.log.info("contrôle autorisation modification d'un lieu")
+        if(err && (err.type_error === "no-valid")){
+            res.statusCode = 405
+            res.send(err)
+        }else if(err && err.type_error === "error-mongo"){
+            res.statusCode = 500
+            res.send(err)
+        }else if(err && err.type_error ==='no-found'){
+            res.statusCode = 404
+            res.send(err)
+        }else{
+            let valid = true
+            value.forEach((e) => {
+                if(String(e.owner) !== String(req.user._id)){
+                    valid = false
+                }
+            })
+            if(valid){
+                next()
+            }else{
+                res.statusCode = 401
+                res.send({msg:"vous n'êtes pas autorisé à modifier ce lieu", type_error:"authorization"})
+            }
+        }
+    })
+}

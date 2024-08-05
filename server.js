@@ -74,7 +74,7 @@ app.get('/places', database.controlsBDD,PlaceControllers.findManyPlaces)
 app.get('/places/random',database.controlsBDD,PlaceControllers.findManyPlacesRandom)
 app.get('/places/suggestions',database.controlsBDD,PlaceControllers.findPlacesNear)
 app.delete('/place/:id', database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwnerOfPlace,PlaceControllers.deleteOnePlace)
-app.delete('/places', database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwnerOfPlace,PlaceControllers.deleteOnePlace)
+app.delete('/places', database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwnerOfPlaces,PlaceControllers.deleteManyPlaces)
 
 //routes for api call
     //routes for geocodes

@@ -484,18 +484,93 @@ describe('GET - /places/suggestions', () => {
             done()
         })
     })
-    it('purge database - S',(done)=>{
-        users.forEach((user) => {
-                chai.request(server).delete(`/user/${user._id}`).end((err,res)=>{
-            })
-        })
-    done()
-    })
+    
 })
 describe("DELETE - /place",()=>{
+    it("delete one place with missing id place - E", (done) => {
+        chai.request(server).delete(`/place/${users[0]._id}`).auth(tokens[0],{type: 'bearer'}).end((err,res) =>{
+            res.should.has.status(404)
+            done()
+        })
+    })
     it("delete one place with uncorrect id place - E", (done) => {
+        chai.request(server).delete(`/place/efgzr`).auth(tokens[0],{type: 'bearer'}).end((err,res) =>{
+            res.should.has.status(405)
+            done()
+        })
+    })
+    it("delete one place with wrong users - E", (done) => {
+        chai.request(server).delete(`/place/${places[0]._id}`).auth(tokens[1],{type: 'bearer'}).end((err,res) =>{
+            res.should.has.status(401)
+            done()
+        })
+    })
+    it("delete one place not authentifiate- E", (done) => {
+        chai.request(server).delete(`/place/${places[0]._id}`).end((err,res) =>{
+            res.should.has.status(401)
+            done()
+        })
+    })
+    it("delete one place success - S", (done) => {
         chai.request(server).delete(`/place/${places[0]._id}`).auth(tokens[0],{type: 'bearer'}).end((err,res) =>{
-            console.log(res, res.body)
+            places.splice(0,1)
+            res.should.has.status(200)
+            done()
+        })
+    })   
+})
+describe('DELETE "/places', () => {
+    it('delete many places with missing ids - E',(done) => {
+        chai.request(server).delete(`/places`).query({ids:[users[0]._id, users[1]._id]}).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
+            res.should.has.status(404)
+            done()
+        })
+    })
+    it('delete many places with uncorrect ids - E',(done) => {
+        chai.request(server).delete(`/places`).query({ids:["titi","loulou"]}).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
+            res.should.has.status(405)
+            done()
+        })
+    })
+    it('delete many places with uncorrect ids - E',(done) => {
+        chai.request(server).delete(`/places`).query({ids:["titi","loulou"]}).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
+            res.should.has.status(405)
+            done()
+        })
+    })
+    it('delete many places with missing query - E',(done) => {
+        chai.request(server).delete(`/places`).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
+            res.should.has.status(405)
+            done()
+        })
+    })
+    it('delete many places not authentifiate - E',(done) => {
+        chai.request(server).delete(`/places`).query({ids:[places[0]._id, places[1]._id]}).end((err, res) => {
+            res.should.has.status(401)
+            done()
+        })
+    })
+    it('delete many places uncorrect users - E',(done) => {
+        chai.request(server).delete(`/places`).query({ids:[places[0]._id, places[1]._id]}).auth(tokens[1],{type: 'bearer'}).end((err, res) => {
+            res.should.has.status(401)
+            done()
+        })
+    })
+    it('delete many places success - S',(done) => {
+        chai.request(server).delete(`/places`).query({ids:[places[0]._id, places[1]._id]}).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
+            res.should.has.status(200)
+            done()
+        })
+    })
+    it('purge database - S',(done)=>{
+        chai.request(server).delete(`/user/${users[0]._id}`).auth(tokens[0],{type: 'bearer'}).end((err,res)=>{
+            res.should.has.status(200)
+            done()
+        })
+    })
+    it('purge database - S',(done)=>{
+        chai.request(server).delete(`/user/${users[1]._id}`).auth(tokens[1],{type: 'bearer'}).end((err,res)=>{
+            res.should.has.status(200)
             done()
         })
     })

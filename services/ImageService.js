@@ -198,7 +198,6 @@ module.exports.ImageService = class ImageService{
             })
         }
         else if (images_id && Array.isArray(images_id) && images_id.length > 0 && images_id.filter((e) => { return mongoose.isValidObjectId(e) }).length != images_id.length) {
-            console.log('ok')
             callback({ msg: "Tableau non conforme plusieurs éléments ne sont pas des ObjectId.", type_error: 'no-valid', fields: images_id.filter((e) => { return !mongoose.isValidObjectId(e) }) });
         }
         else if (images_id && !Array.isArray(images_id)) {
