@@ -3,7 +3,7 @@ const { PlaceService } = require('../services/PlaceService')
 const UserService = require('../services/UserService').UserService
 
 module.exports.controleOwner = (req, res, next) => {
-    UserService.findOneUserById(req.user._id,null, function(err, value){
+    UserService.findOneUserById(req.params.id,null, function(err, value){
         req.log.info("recherche d'un utilisateur")
             if(err && (err.type_error === "no-valid")){
                 res.statusCode = 405
@@ -14,9 +14,12 @@ module.exports.controleOwner = (req, res, next) => {
             }else if(err && err.type_error ==='no-found'){
                 res.statusCode = 404
                 res.send(err)
-            }else{
-                next()
-            }
+            }else if (String(value._id) !== String(req.user._id)){
+            res.statusCode = 401
+            res.send({msg:"vous n'êtes pas autorisé à effectuer cette action", type_error:"authorization"})
+        }else{
+            next()
+        }
     })
 }
 

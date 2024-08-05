@@ -60,10 +60,10 @@ app.post('/login',database.controlsBDD, UserControllers.loginUser)
 app.post ('/logout', database.controlsBDD,passport.authenticate('jwt',{session:false}), UserControllers.logoutUser)
 
 app.post('/user', database.controlsBDD, UserControllers.addOneUser)
-app.get('/user/:id', database.controlsBDD, passport.authenticate('jwt',{session:false}), UserControllers.findOneUserById)
-app.put('/user/:id', database.controlsBDD,passport.authenticate('jwt',{session:false}),UserControllers.updateOneUser)
+app.get('/user/:id', database.controlsBDD, passport.authenticate('jwt',{session:false}),UserControllers.findOneUserById)
+app.put('/user/:id', database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwner,UserControllers.updateOneUser)
 app.put('/profilePhoto/user', database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwner,ImageController.deleteOneImage,multerOneImage,ImageController.addOneImage,UserControllers.updateUserProfilePhoto)
-app.delete('/user/:id', database.controlsBDD,passport.authenticate('jwt',{session:false}),UserControllers.deleteOneUser)
+app.delete('/user/:id', database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwner,UserControllers.deleteOneUser)
 
 //routes for Place
 
