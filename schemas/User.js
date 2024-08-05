@@ -40,7 +40,7 @@ UserSchema = mongoose.Schema({
     profilePhoto :{
         type: mongoose.Types.ObjectId,
         ref:"Image",
-        default:"66ab50f08771e6814561d90b"
+        default:"66b107e5b351b4b540f57270"
     },
     create_at:{
         type:Date,

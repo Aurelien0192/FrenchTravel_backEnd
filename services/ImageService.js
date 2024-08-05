@@ -150,31 +150,27 @@ module.exports.ImageService = class ImageService{
     }
 
     static async deleteOneImage(image_id, callback){
-        if (image_id && mongoose.isValidObjectId(image_id)){
-            if(image_id !== new mongoose.Types.ObjectId("66ab90e7dcef4782e1850d5c")){
-                Image.findByIdAndDelete(image_id).then((value) => {
-                    try{
-                        if(value){
-                            callback(null, value.toObject())
-                            fs.unlink(value.path,function(err){
-                                if(err){
-                                    console.log("echec de la suppression de l'image")
-                                }else{
-                                    console.log("réussite de la suppression")
-                                }
-                            })
-                        }else{
-                            callback({ msg: "image non trouvée", type_error: "no-found" })
-                        }
-                    }catch(e){
-                        callback(e)
+        if (image_id && mongoose.isValidObjectId(image_id)){ 
+            Image.findByIdAndDelete(image_id).then((value) => {
+                try{
+                    if(value){
+                        callback(null, value.toObject())
+                        fs.unlink(value.path,function(err){
+                            if(err){
+                                console.log("echec de la suppression de l'image")
+                            }else{
+                                console.log("réussite de la suppression")
+                            }
+                        })
+                    }else{
+                        callback({ msg: "image non trouvée", type_error: "no-found" })
                     }
-                }).catch((e) => {
-                    callback({ msg: "Impossible de chercher l'élément.", type_error: "error-mongo" });
-                })
-            }else{
-                callback(null,{msg:"image non supprimée"})
-            }
+                }catch(e){
+                    callback(e)
+                }
+            }).catch((e) => {
+                callback({ msg: "Impossible de chercher l'élément.", type_error: "error-mongo" });
+            })
         }else{
             if(!image_id){
                 callback({msg:"Image ID is missing", type_error:'no-valid'})
