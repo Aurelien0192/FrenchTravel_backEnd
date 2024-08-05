@@ -94,7 +94,7 @@ module.exports.UserControllers = class UserControllers{
                 res.send(err)
             }else{
                 res.statusCode = 200
-                return res.send(user)
+                return res.send(value)
             }
         })
     }
