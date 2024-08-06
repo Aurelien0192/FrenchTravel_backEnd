@@ -149,6 +149,37 @@ module.exports.ImageService = class ImageService{
         }
     }
 
+        static findManyImagesByUserId = async function (page, limit, q, options, callback){
+        if(q && mongoose.isValidObjectId(q)){
+            const user_id = new mongoose.Types.ObjectId(q)
+
+            page = !page ? 1 : page
+            limit = !limit ? 7 : limit
+            page = !Number.isNaN(page) ? Number(page): page
+            limit = !Number.isNaN(limit) ? Number(limit): limit
+            
+            if (Number.isNaN(page) || Number.isNaN(limit)){
+                callback ({msg: `format de ${Number.isNaN(page) ? "page" : "limit"} est incorrect`, type_error:"no-valid"})
+            }else{
+                Image.countDocuments({$and:[{user_id:user_id},{place:{$ne:null}}]}).then((value) => {
+                    if (value > 0){
+                        const skip = ((page-1) * limit)
+                        Image.find({$and:[{user_id:user_id},{place:{$ne:null}}]}, null, {skip:skip, limit:limit}).then((results) => {
+                            callback(null, {
+                                count : value,
+                                results : results
+                            })
+                        })
+                    }else{
+                        callback(null,{count : 0, results : []})
+                    }
+                }).catch((e) => {
+                    callback(e)
+                })
+            }
+        }
+    }
+
     static async deleteOneImage(image_id, callback){
         if (image_id && mongoose.isValidObjectId(image_id)){ 
             Image.findByIdAndDelete(image_id).then((value) => {

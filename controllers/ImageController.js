@@ -1,6 +1,7 @@
 const { default: mongoose } = require('mongoose')
 const multer = require('../middlewares/multer.config')
 const ImageService = require('../services/ImageService').ImageService
+const responseOfServer = require('../utils/response').responseOfServer
 
 module.exports.ImageController = class ImageController{
     static async addOneImage(req, res, next){
@@ -34,6 +35,13 @@ module.exports.ImageController = class ImageController{
                 res.send(value)
             }
         })  
+    }
+
+    static async findManyImagesByUserId(req, res){
+        req.log.info("find many image by user ID")
+        ImageService.findManyImagesByUserId(req.query.page, req.query.limit, req.user._id, null, function(err, value){
+            responseOfServer(req, res,req, res, false)
+        })
     }
 
     static async deleteOneImage(req, res, next){
