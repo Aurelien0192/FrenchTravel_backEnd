@@ -19,7 +19,7 @@ const PlaceSchema = mongoose.Schema({
     },
     notation :{
         type: Number,
-        min: 1,
+        min: 0,
         max: 5
     },
     describe : {

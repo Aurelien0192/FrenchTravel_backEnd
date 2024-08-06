@@ -41,7 +41,7 @@ module.exports.UserControllers = class UserControllers{
     static async logoutUser(req, res){
         req.log.info("Déconnexion d'un utilisation")
         UserService.updateOneUser(req.user._id, {token:""}, null, function(err, value){
-            responseOfServer(err, user, req, res, false)
+            responseOfServer(err, value, req, res, false)
         })
     }
 
@@ -58,10 +58,9 @@ module.exports.UserControllers = class UserControllers{
 
     
     static findOneUserById(req, res){
-        const opts = null
-        UserService.findOneUserById(req.params.id, opts, function(err, value){
+        UserService.findOneUserById(req.params.id, null, function(err, value){
             req.log.info("recherche d'un utilisateur")
-            responseOfServer(err, user, req, res, false)
+            responseOfServer(err, value, req, res, false)
         })
     }
 
@@ -69,9 +68,9 @@ module.exports.UserControllers = class UserControllers{
 
     static updateOneUser(req, res){
         const opts = null
-        UserService.updateOneUser(req.params.id, req.body, opts, function(err, value){
+        UserService.updateOneUser(req.params.id, req.body, null, function(err, value){
             req.log.info("Modification d'un utilisateur")
-            responseOfServer(err, user, req, res, false)
+            responseOfServer(err, value, req, res, false)
         })
     }
 

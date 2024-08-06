@@ -198,7 +198,6 @@ module.exports.UserService = class UserService{
 
     static async updateUserProfilePhoto(user_id, update, options, callback){
         update.update_at = new Date()
-        console.log(update)
         User.findByIdAndUpdate(new ObjectId(user_id), update, {returnDocument: 'after', runValidators: true,populate:["profilePhoto"]}).then((value)=>{
             try{
                 if(value){

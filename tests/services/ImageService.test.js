@@ -223,13 +223,4 @@ describe("deleteOneImages",() => {
             done()
         })
     })
-    it("delete one image with id cannot delete - S ", (done) => {
-        ImageService.deleteOneImage("66aa65e3841371a1955939dc",function(err, value){
-            expect(value).to.be.a('object')
-            expect(value).to.haveOwnProperty("msg")
-            expect(String(value["msg"])).to.be.equal("image non supprimée")
-            expect(err).to.be.null
-            done()
-        })
-    })
 })

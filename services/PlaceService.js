@@ -12,6 +12,7 @@ const Place = mongoose.model('Place', PlaceSchema)
 module.exports.PlaceService =  class PlaceService{
 
     static addOnePlace = async function (place, user_id, options, callback){
+        
         try{
             if(!place){
                 callback({msg:"body is missing", type_error:"no-valid"})
