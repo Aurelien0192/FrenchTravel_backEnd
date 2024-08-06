@@ -12,6 +12,7 @@
                 "description": "Development server"
             }
         ],
+        
         "components" : {
             "securitySchemes": {
                 "bearerAuth": {
@@ -71,6 +72,12 @@
                             "description": "path to fin profile photos of user, have default value"
                         },
                         "create_at":{
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "Date when the user was created",
+                            "exemple" :"2024-01-01T00:00:00Z"
+                        },
+                        "update_at":{
                             "type": "string",
                             "format": "date-time",
                             "description": "Date when the user was created",
@@ -366,6 +373,9 @@
             }
         },"tags": [
             {
+                "name": "Authentification",
+                "description": "Operation about Login"
+            },{
                 "name": "User",
                 "description": "Operation about User"
             },{
@@ -377,6 +387,6 @@
             }
         ]
     },"apis": [
-        "./controllers/*.js"
+        "./SwaggerDocs/*.js"
     ]
 }
