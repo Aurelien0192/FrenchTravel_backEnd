@@ -259,6 +259,7 @@ module.exports.PlaceService =  class PlaceService{
     static updateOnePlace = async function(place_id, update, options, callback){
         if(place_id && mongoose.isValidObjectId(place_id) && update){
             update.categorie = String(update.categorie)
+            update.update_at = new Date()
             Place.findByIdAndUpdate(place_id, update, {returnDocument: 'after', runValidators: true, populate:["images"]}).then((value)=>{
                 try{
                     if(value){

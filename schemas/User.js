@@ -33,18 +33,20 @@ UserSchema = mongoose.Schema({
         type:String,
         required : true,
         index:true,
-        unique:true
+        unique:true,
+        match : /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
     },
     about: String,
     token: String,
     profilePhoto :{
         type: mongoose.Types.ObjectId,
         ref:"Image",
-        default:"66b107e5b351b4b540f57270"
+        default:"66b10cef9e16844449b99acb"
     },
     create_at:{
         type:Date,
         default:new Date()
-    }
+    },
+    update_at: Date
 })
 module.exports.UserSchema = UserSchema

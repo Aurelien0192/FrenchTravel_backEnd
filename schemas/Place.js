@@ -17,7 +17,11 @@ const PlaceSchema = mongoose.Schema({
         required: true,
         immutable:true
     },
-    notation : Number,
+    notation :{
+        type: Number,
+        min: 1,
+        max: 5
+    },
     describe : {
         type : String,
         required : true
@@ -50,7 +54,7 @@ const PlaceSchema = mongoose.Schema({
                 {validator : function lengh(price){
                     return (price[0] !== null && price[1]!== null);
                 },message: "Les prix renseignées doivent être un nombre"}
-                ]
+            ]
         },
         diner : {
             type : String,
@@ -78,6 +82,8 @@ const PlaceSchema = mongoose.Schema({
         },
         hotelCategorie:{
             type:Number,
+            min:1,
+            max:5,
             validate : [function validator(){
                 return this.categorie==="hotel" || this._update.$set.categorie === "hotel"
             },{message : `duration is not allowed in categorie activity or restaurant`}]
@@ -96,40 +102,52 @@ const PlaceSchema = mongoose.Schema({
     },
     city : {
         type : String,
-        required: true
+        required: true,
+        match: /^[a-zA-ZÀ-ÿ' -]+(?: [a-zA-ZÀ-ÿ' -]+)*$/
     },
     codePostal : {
         type : String,
-        required : true
+        required : true,
+        match: /^\d{5}$/
     },
     county :{
         type: String,
-        required: true
+        required: true,
+        match: /^[a-zA-ZÀ-ÿ' -]+(?: [a-zA-ZÀ-ÿ' -]+)*$/
     },
     country : {
         type : String,
-        required: true
+        required: true,
+        match: /^[a-zA-ZÀ-ÿ' -]+(?: [a-zA-ZÀ-ÿ' -]+)*$/
     },
     latCoordinate : {
         type : Number,
-        required: true
+        required: true,
+        match: /^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?)$/
     },
     lonCoordinate : {
         type : Number,
-        required: true
+        required: true,
+        match: /^[-+]?((1[0-7]\d|\d{1,2})(\.\d+)?|180(\.0+)?)$/
     },
-    phone : String,
+    phone : {
+        type:String,
+        match :/^(?:0[1-9](?:\.\d{2}){4}|\+33\.[1-9](?:\.\d{2}){4})$/
+    },
     typeOfPlace : {
         type :[String],
         default:undefined
     },
-    email : String,
+    email :{
+        type: String,
+        match: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    },
     bookingLink : String,
     create_at:{
         type:Date,
         default: new Date()
     },
-    udpate_at: Date
+    update_at: Date
 })
 
 PlaceSchema.virtual('images',{
