@@ -19,7 +19,7 @@ module.exports.CommentSchema = mongoose.Schema({
         type: Number,
         default:0
     },
-    notation:{
+    note:{
         type: Number,
         min:1,
         max:5,
