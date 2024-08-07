@@ -65,4 +65,44 @@ module.exports.CommentServices = class CommentService{
             callback(e)
         }
     }
+
+    static async findOneCommentById(comment_id, option, callback){
+        if(comment_id && mongoose.isValidObjectId(comment_id)){
+            Comment.findById(comment_id, null, opts).then((value) => {
+                try{
+                    if (value){
+                        callback(null, value)
+                    }else{
+                        callback({msg: "Aucun commentaire trouvé", type_error: "no-found"})
+                    }
+                }catch(e){
+                    callback({msg: "Erreur avec la base de donnée", fields_with_error: [], fields:"", type_error:"error-mongo"})
+                }
+            }).catch((err) => {
+                callback(err)
+            })
+        }else{
+            callback({ msg: "ObjectId non conforme.", type_error: 'no-valid' });
+        }
+    }
+
+    static findManyCommentsByUserId = async function (q, options, callback){
+        if(q && mongoose.isValidObjectId(q)){
+            const user_id = new mongoose.Types.ObjectId(q)
+                Image.countDocuments({user_id:user_id}).then((value) => {
+                    if (value > 0){
+                        Image.find({user_id:user_id}).then((results) => {
+                            callback(null, {
+                                count : value,
+                                results : results
+                            })
+                        })
+                    }else{
+                        callback(null,{count : 0, results : []})
+                    }
+                }).catch((e) => {
+                    callback(e)
+                })
+            }
+        }
 }
