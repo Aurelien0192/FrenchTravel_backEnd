@@ -20,7 +20,13 @@ const PlaceSchema = mongoose.Schema({
     notation :{
         type: Number,
         min: 0,
-        max: 5
+        max: 5,
+        default: 0,
+    },
+    numberOfNote:{
+        type: Number,
+        default: 0,
+        min: 0
     },
     describe : {
         type : String,

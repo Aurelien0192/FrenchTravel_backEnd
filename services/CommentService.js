@@ -1,18 +1,21 @@
 const mongoose = require('mongoose')
 const CommentSchema = require('../schemas/Comment').CommentSchema
+const PlaceService = require('./PlaceService').PlaceService
 const _ = require('lodash')
 
 const Comment = mongoose.model('Comment',CommentSchema)
-
-
 module.exports.CommentServices = class CommentService{
     
     static async addOneComment(user_id, place_id, comment, options, callback){
         try{
             if(user_id && mongoose.isValidObjectId(user_id) && place_id && mongoose.isValidObjectId(place_id) && comment){
+                console.log(comment)
                 const newComment = new Comment(comment)
                 newComment.place_id = new mongoose.Types.ObjectId(place_id)
                 newComment.user_id = new mongoose.Types.ObjectId(user_id)
+                const categorie = comment.categorie
+                const numberOfNote = comment.numberOfNote
+                const notation = comment.notation
                 let errors = newComment.validateSync()
                 if(errors){
                     errors = errors['errors']
@@ -39,6 +42,15 @@ module.exports.CommentServices = class CommentService{
                 }else{
                     newComment.notation = 0
                     await newComment.save()
+                    try{
+                        PlaceService.updateOnePlace(place_id,{
+                            categorie: categorie,
+                            notation: (notation * numberOfNote + newComment.note)/(numberOfNote+1),
+                            numberOfNote: numberOfNote + 1
+                        })
+                    }catch{
+                        callback({msg:"une erreur c'est produite lors de la mise à jour de la note du lieu", type_error:"interne"}, newComment.toObject())
+                    }
                     callback(null, newComment.toObject())
                 }
                 

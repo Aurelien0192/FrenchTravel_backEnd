@@ -39,7 +39,7 @@ describe("/POST - addOneComment",() => {
     it("add correct comment to a good place with correct user - S",(done) => {
         chai.request(server).post('/comment').auth(token,{type: 'bearer'}).query({place_id:"66b0658a72ecd115102b3d42"}).send({
             comment:"superbe après-midi dans ce lieu",
-            note:5,
+            note:4,
             dateVisited: new Date()
         }).end((err, res)=>{
             res.should.has.status(201)
