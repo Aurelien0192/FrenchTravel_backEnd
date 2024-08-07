@@ -11,9 +11,8 @@ module.exports.CommentServices = class CommentService{
         try{
             if(user_id && mongoose.isValidObjectId(user_id) && place_id && mongoose.isValidObjectId(place_id) && comment){
                 const newComment = new Comment(comment)
-                newComment.place_id = place_id
-                newComment.user_id = user_id
-
+                newComment.place_id = new mongoose.Types.ObjectId(place_id)
+                newComment.user_id = new mongoose.Types.ObjectId(user_id)
                 let errors = newComment.validateSync()
                 if(errors){
                     errors = errors['errors']
@@ -62,6 +61,7 @@ module.exports.CommentServices = class CommentService{
                 }
             }
         }catch(e){
+            console.log(e)
             callback(e)
         }
     }

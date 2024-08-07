@@ -31,3 +31,7 @@ require("../utils/database")
 describe("CommentServices",() => {
    require("./services/CommentServices.test")
 })
+
+describe("CommentController",() => {
+   require("./controllers/CommentController.test")
+})

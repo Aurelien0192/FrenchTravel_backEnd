@@ -204,7 +204,7 @@ describe("findManyCommentsByUserId  - S",()=>{
             done()
         })
     })
-    it("find comments with correct user ID but not present in database - E",(done) => {
+    it("find comments with correct user ID but not present in database - S",(done) => {
         CommentService.findManyCommentsByUserId("669f589f75435542ceef47ea",null, function(err,value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('count')

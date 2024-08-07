@@ -1,4 +1,4 @@
-module.exports.responseOfServer = function (err, value, req, res, created){
+module.exports.responseOfServer = function (err, value, req, res, created, next){
     if(err && (err.type_error === "no-valid" || err.type_error === "validator" || err.type_error === "duplicate")){
         res.statusCode = 405
         res.send(err)
@@ -9,7 +9,11 @@ module.exports.responseOfServer = function (err, value, req, res, created){
         res.statusCode = 404
         res.send(err)
     }else{
-        res.statusCode = created ? 201 : 200
-        res.send(value)
+        if(next){
+            next()    
+        }else{
+            res.statusCode = created ? 201 : 200
+            res.send(value)
+        }
     }
 }

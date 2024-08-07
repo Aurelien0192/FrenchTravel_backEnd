@@ -40,9 +40,11 @@ const UserControllers = require('./controllers/UserController').UserControllers
 const PlaceControllers = require("./controllers/PlaceController").PlaceControllers
 const ApiLocationControllers = require("./controllers/ApiLocationController").ApiLocationControllers
 const ImageController = require('./controllers/ImageController').ImageController
+const CommentController = require('./controllers/CommentController').CommentController
 
 // Import des middlewares
 const controleOwner = require('./middlewares/controleOwner')
+const controlePlaceExist = require('./middlewares/controlePlaceExist').controlePlaceExist
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -87,6 +89,10 @@ app.post('/image',database.controlsBDD,passport.authenticate('jwt',{session:fals
 app.post('/images',database.controlsBDD,passport.authenticate('jwt',{session:false}),multerManyImage,ImageController.addManyImages)
 app.get('/images',database.controlsBDD,passport.authenticate('jwt',{session:false}),ImageController.findManyImagesByUserId)
 app.delete('/image/:id',database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwnerOfImage,ImageController.deleteOneImage)
+
+//routes postComment
+
+app.post('/comment',database.controlsBDD,passport.authenticate('jwt',{session:false}),controlePlaceExist,CommentController.addOneComment)
 
 
 app.listen(Config.port, () => {
