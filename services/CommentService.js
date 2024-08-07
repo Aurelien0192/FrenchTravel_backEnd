@@ -68,10 +68,10 @@ module.exports.CommentServices = class CommentService{
 
     static async findOneCommentById(comment_id, option, callback){
         if(comment_id && mongoose.isValidObjectId(comment_id)){
-            Comment.findById(comment_id, null, opts).then((value) => {
+            Comment.findById(comment_id).then((value) => {
                 try{
                     if (value){
-                        callback(null, value)
+                        callback(null, value.toObject())
                     }else{
                         callback({msg: "Aucun commentaire trouvé", type_error: "no-found"})
                     }
