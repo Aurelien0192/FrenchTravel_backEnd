@@ -40,7 +40,7 @@ module.exports.ImageController = class ImageController{
     static async findManyImagesByUserId(req, res){
         req.log.info("find many image by user ID")
         ImageService.findManyImagesByUserId(req.query.page, req.query.limit, req.user._id, null, function(err, value){
-            responseOfServer(req, res,req, res, false)
+            responseOfServer(err, value, req, res, false)
         })
     }
 

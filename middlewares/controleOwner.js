@@ -77,49 +77,48 @@ module.exports.controleOwnerOfPlaces = (req, res, next) => {
 module.exports.controleOwnerOfImage = (req, res, next) => {
     UserService.findOneUserById(req.user._id, null, function(err, user){
         req.log.info("recherche d'un utilisateur")
-            if(err && (err.type_error === "no-valid")){
-                res.statusCode = 405
-                res.send(err)
-            }else if(err && err.type_error === "error-mongo"){
-                res.statusCode = 500
-                res.send(err)
-            }else if(err && err.type_error ==='no-found'){
-                res.statusCode = 404
-                res.send(err)
-            }else{
-                ImageService.findOneImageById(req.params.id, null, function(err, image){
-                    if(err && (err.type_error === "no-valid")){
-                        res.statusCode = 405
-                    }else if(err && err.type_error === "error-mongo"){
-                        res.statusCode = 500
-                    }else if(err && err.type_error === "no-found"){
-                        res.statusCode = 404
-                        res.send(err)
+        if(err && (err.type_error === "no-valid")){
+            res.statusCode = 405
+            res.send(err)
+        }else if(err && err.type_error === "error-mongo"){
+            res.statusCode = 500
+            res.send(err)
+        }else if(err && err.type_error ==='no-found'){
+            res.statusCode = 404
+            res.send(err)
+        }else{
+            ImageService.findOneImageById(req.params.id, null, function(err, image){
+                if(err && (err.type_error === "no-valid")){
+                    res.statusCode = 405
+                }else if(err && err.type_error === "error-mongo"){
+                    res.statusCode = 500
+                }else if(err && err.type_error === "no-found"){
+                    res.statusCode = 404
+                    res.send(err)
+                }else{
+                    if(String(req.user._id) === String(image.user_id)){
+                        next()
                     }else{
-                        if(String(req.user._id === image.user_id)){
-                            next()
-                        }else{
-                            PlaceService.findOnePlaceById(image.place, null, function(err, place){
-                                if (err && (err.type_error === "validator" || err.type_error === "no-valid")){
-                                    res.statusCode = 405
-                                    res.send(err)
-                                }else if(err && err.type_error === "no-found"){
-                                    res.statusCode = 404
-                                    res.send(err)
-                                }else if(err && err.type_error === "error-mongo"){
-                                    res.statusCode = 500
-                                    res.send(err)
-                                }else if(req.user._id !== place.owner){
-                                    res.statusCode = 401
-                                    res.send({msg:"vous n'êtes pas autorisé à supprimer cette image", type_error:"authorization"})
-                                }else{
-                                    next()
-                                }
-                            })
-                        }
+                        PlaceService.findOnePlaceById(image.place, null, function(err, place){
+                            if (err && (err.type_error === "validator" || err.type_error === "no-valid")){
+                                res.statusCode = 405
+                                res.send(err)
+                            }else if(err && err.type_error === "no-found"){
+                                res.statusCode = 404
+                                res.send(err)
+                            }else if(err && err.type_error === "error-mongo"){
+                                res.statusCode = 500
+                                res.send(err)
+                            }else if(String(req.user._id) !== String(place.owner)){
+                                res.statusCode = 401
+                                res.send({msg:"vous n'êtes pas autorisé à supprimer cette image", type_error:"authorization"})
+                            }else{
+                                next()
+                            }
+                        })
                     }
-                })
-            next()
+                }
+            })
         }
     })
 }
