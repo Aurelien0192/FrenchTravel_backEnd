@@ -2,6 +2,7 @@ const chai = require('chai')
 const CommentService = require("../../services/CommentService").CommentServices
 let expect = chai.expect
 
+const comments = []
 
 describe("AddOneComment",() => {
     it('Add one correct comment - S',(done) => {
@@ -15,6 +16,7 @@ describe("AddOneComment",() => {
             expect(value).to.haveOwnProperty("note")
             expect(value["note"]).to.be.equal(5)
             expect(err).to.be.null
+            comments.push(value)
             done()
         })
     })
@@ -134,6 +136,40 @@ describe("AddOneComment",() => {
             expect(err).to.haveOwnProperty("fields_with_error")
             expect(err['type_error']).to.be.equal("validator")
             expect(err["fields_with_error"][0]).to.be.equal("note")
+            done()
+        })
+    })
+})
+describe("findCommentById",()=>{
+    it('find comment with correct ID - S',(done)=>{
+        CommentService.findOneCommentById(comments[0]._id, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('_id')
+            expect(String(value['_id'])).to.be.equal(String(comments[0]._id))
+            done()
+        })
+    })
+    it('find comment with uncorrect ID - E',(done)=>{
+        CommentService.findOneCommentById("comments[0]._id", null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it('find comment with missing ID - E',(done)=>{
+        CommentService.findOneCommentById(null, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it('find comment with correct ID but not exist in database - E',(done)=>{
+        CommentService.findOneCommentById("66b0dca10a74cd8a171aae0d", null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-found')
             done()
         })
     })
