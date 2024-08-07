@@ -174,3 +174,42 @@ describe("findCommentById",()=>{
         })
     })
 })
+
+
+describe("findManyCommentsByUserId  - S",()=>{
+    it("find comments with good user ID",(done) => {
+        CommentService.findManyCommentsByUserId("66b0dca10a74cd8a171aae0d",null, function(err,value){
+            expect(value).to.haveOwnProperty('results')
+            expect(value['results']).to.be.an('array')
+            expect(value['results']).to.have.lengthOf.at.least(1)
+            expect(value['results'][0]).to.be.a('object')
+            expect(value['results'][0]).to.haveOwnProperty('user_id')
+            expect(String(value['results'][0]['user_id'])).to.be.equal("66b0dca10a74cd8a171aae0d")
+            done()
+        })
+    })
+    it("find comments with uncorrect user ID - E",(done) => {
+        CommentService.findManyCommentsByUserId("66b0dca10a74",null, function(err,value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it("find comments with missing user ID - E",(done) => {
+        CommentService.findManyCommentsByUserId(null,null, function(err,value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it("find comments with correct user ID but not present in database - E",(done) => {
+        CommentService.findManyCommentsByUserId("669f589f75435542ceef47ea",null, function(err,value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('count')
+            expect(value["count"]).to.be.equal(0)
+            done()
+        })
+    })
+})

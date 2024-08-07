@@ -89,9 +89,9 @@ module.exports.CommentServices = class CommentService{
     static findManyCommentsByUserId = async function (q, options, callback){
         if(q && mongoose.isValidObjectId(q)){
             const user_id = new mongoose.Types.ObjectId(q)
-                Image.countDocuments({user_id:user_id}).then((value) => {
+                Comment.countDocuments({user_id:user_id}).then((value) => {
                     if (value > 0){
-                        Image.find({user_id:user_id}).then((results) => {
+                        Comment.find({user_id:user_id},null,{lean:true}).then((results) => {
                             callback(null, {
                                 count : value,
                                 results : results
@@ -103,6 +103,8 @@ module.exports.CommentServices = class CommentService{
                 }).catch((e) => {
                     callback(e)
                 })
+            }else{
+                callback({ msg: "ObjectId non conforme.", type_error: 'no-valid' });
             }
         }
 }
