@@ -9,7 +9,6 @@ module.exports.CommentServices = class CommentService{
     static async addOneComment(user_id, place_id, comment, options, callback){
         try{
             if(user_id && mongoose.isValidObjectId(user_id) && place_id && mongoose.isValidObjectId(place_id) && comment){
-                console.log(comment)
                 const newComment = new Comment(comment)
                 newComment.place_id = new mongoose.Types.ObjectId(place_id)
                 newComment.user_id = new mongoose.Types.ObjectId(user_id)
@@ -98,25 +97,59 @@ module.exports.CommentServices = class CommentService{
         }
     }
 
-    static findManyCommentsByUserId = async function (q, options, callback){
-        if(q && mongoose.isValidObjectId(q)){
-            const user_id = new mongoose.Types.ObjectId(q)
-                Comment.countDocuments({user_id:user_id}).then((value) => {
+    static async findManyComments(page, limit, q, options, callback){
+        const populate = options && options.populate? ["user_id"]:[]
+        page = !page ? 1 : page
+        limit = !limit ? 0 : limit
+        page = !Number.isNaN(page) ? Number(page): page
+        limit = !Number.isNaN(limit) ? Number(limit): limit
+        if(q){
+
+            const fieldsToSearch = Object.keys(q)
+            
+            if(fieldsToSearch.includes('user_id')){
+                if(mongoose.isValidObjectId(q.user_id)){
+                    q.user_id = new mongoose.Types.ObjectId(q.user_id)
+                }else{
+                    return callback({msg:"user_id is not a valid id",type_error:"no-valid"})
+                }
+            }
+            
+            if(fieldsToSearch.includes('place_id')){
+                if(mongoose.isValidObjectId(q.place_id)){
+                    q.place_id = new mongoose.Types.ObjectId(q.place_id)
+                }else{
+                    return callback({msg:"place_id is not a valid id",type_error:"no-valid"})
+                }
+            }
+            
+            if (Number.isNaN(page) || Number.isNaN(limit)){
+                
+                callback ({msg: `format de ${Number.isNaN(page) ? "page" : "limit"} est incorrect`, type_error:"no-valid"})
+            }else{
+                Comment.countDocuments(q).then((value) => {
                     if (value > 0){
-                        Comment.find({user_id:user_id},null,{lean:true}).then((results) => {
-                            callback(null, {
-                                count : value,
-                                results : results
+                        const skip = ((page-1) * limit)
+                        try{
+                            Comment.find(q, null, {skip:skip, limit:limit, populate:populate, lean:true}).then((results) => {
+                                callback(null, {
+                                    count : value,
+                                    results : results
+                                })
                             })
-                        })
+                        }catch(e){
+                            console.log(e)
+                        }
                     }else{
                         callback(null,{count : 0, results : []})
                     }
                 }).catch((e) => {
                     callback(e)
                 })
-            }else{
-                callback({ msg: "ObjectId non conforme.", type_error: 'no-valid' });
             }
+        }else{
+            callback({msg: "query is missing", type_error:"no-valid"})
         }
+    
+    }
 }

@@ -5,7 +5,7 @@ module.exports.CommentController = class CommentController{
 
     static addOneComment(req, res){
         req.log.info("Ajout d'un commentaire par un utilisateur")
-        CommentServices.findManyCommentsByUserId(req.user._id, null, function(err, value){
+        CommentServices.findManyComments(null, null, {user_id: req.user._id}, null, function(err, value){
             if(err && err.type_error === "no-valid"){
                 res.statusCode = 405
                 res.send(err)
