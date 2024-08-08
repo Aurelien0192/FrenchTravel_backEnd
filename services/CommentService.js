@@ -102,13 +102,19 @@ module.exports.CommentServices = class CommentService{
     }
 
     static async findManyComments(page, limit, q, options, callback){
-        const populate = options && options.populate? {
-                                path: "user_id",
-                                populate:{
-                                    path:"profilePhoto"
-                                }
-                            }:[]
+        console.log(options.populate)
 
+        const populate = options && options.populate.includes("user_id")? [{
+                path: "user_id",
+                populate:{
+                    path:"profilePhoto"
+                }
+            }] : []
+
+        if(options && options.populate.includes("place_id")){
+            populate.push("place_id")
+        }
+                            
         page = !page ? 1 : page
         limit = !limit ? 0 : limit
         page = !Number.isNaN(page) ? Number(page): page
