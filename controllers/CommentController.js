@@ -21,14 +21,24 @@ module.exports.CommentController = class CommentController{
     }
 
     static findManyComments(req, res){
+        let options={}
         req.log.info("Rechercher des commentaires")
+        if(req.query.options === "populate"){
+            options = {populate: {
+                path: "user_id",
+                populate:{
+                    path:"images"
+                }
+            }}
+        }
+        let q = {}
         if(req.query.place_id){
             q.place_id = req.query.place_id
         }
         if(req.query.user_id){
             q.user_id = req.query.user_id
         }
-        CommentServices.findManyComments(req.query.page, req.query.limit, q, null, function(err, value){
+        CommentServices.findManyComments(req.query.page, req.query.limit, q, options, function(err, value){
             responseOfServer(err, value, req, res, false)
         })
     }
