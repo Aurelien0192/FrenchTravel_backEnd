@@ -221,7 +221,6 @@ describe("findCommentById",()=>{
 describe("findManyComments  - S",()=>{
     it("find comments with good user ID",(done) => {
         CommentService.findManyComments(null, null, {user_id :user._id},null, function(err,value){
-            console.log(err, value)
             expect(value).to.haveOwnProperty('results')
             expect(value['results']).to.be.an('array')
             expect(value['results']).to.have.lengthOf.at.least(1)
@@ -273,7 +272,6 @@ describe("findManyComments  - S",()=>{
     })
     it("find comments with correct place ID with populate - S",(done) => {
         CommentService.findManyComments(null, null, {place_id:place._id},{populate:true}, function(err,value){
-            console.log(value.results[0].user_id)
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('results')
             expect(value["results"]).to.have.lengthOf.at.least(1)

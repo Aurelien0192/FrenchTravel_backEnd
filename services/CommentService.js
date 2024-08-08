@@ -46,9 +46,13 @@ module.exports.CommentServices = class CommentService{
                             categorie: categorie,
                             notation: (notation * numberOfNote + newComment.note)/(numberOfNote+1),
                             numberOfNote: numberOfNote + 1
+                        },null, function(err,value){
+                            if(err){
+                                callback({msg:"une erreur c'est produite lors de la mise à jour de la note du lieu", type_error:"interne"}, newComment.toObject())
+                            }
                         })
-                    }catch{
-                        callback({msg:"une erreur c'est produite lors de la mise à jour de la note du lieu", type_error:"interne"}, newComment.toObject())
+                    }catch (e){
+                        callback(e)
                     }
                     callback(null, newComment.toObject())
                 }

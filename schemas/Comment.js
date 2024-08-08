@@ -26,7 +26,8 @@ module.exports.CommentSchema = mongoose.Schema({
         required : true
     },
     dateVisited:{
-        type: Date
+        type: Date,
+        required: true
     },
     create_at:{
         type: Date,
