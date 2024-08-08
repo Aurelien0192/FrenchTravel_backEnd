@@ -93,7 +93,7 @@ app.delete('/image/:id',database.controlsBDD,passport.authenticate('jwt',{sessio
 //routes postComment
 
 app.post('/comment',database.controlsBDD,passport.authenticate('jwt',{session:false}),controlePlaceExist,CommentController.addOneComment)
-
+app.get('/comments',database.controlsBDD, CommentController.findManyComments)
 
 app.listen(Config.port, () => {
     Logger.info(`Serveur démarré sur le port ${Config.port}.`)
