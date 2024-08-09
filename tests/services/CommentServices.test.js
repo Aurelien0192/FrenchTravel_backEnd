@@ -290,12 +290,6 @@ describe("findManyComments  - S",()=>{
             done()
         })
     })
-    // it("find comments with correct place ID and check no comment of user- S",(done) => {
-    //     CommentService.findManyComments(null, null, {user_id:user._id}, user._id, null, function(err,value){
-    //         console.log(err, value)
-    //         done()
-    //     })
-    // })
 })
 
 describe("updateOneComment",()=>{

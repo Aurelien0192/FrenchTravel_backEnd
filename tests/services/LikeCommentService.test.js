@@ -124,7 +124,12 @@ describe("addOneLike",() => {
             done()
         })
     })
-    
+    it(("add a like with correct user_id and place_id - S"),(done)=>{
+        LikeCommentService.addOneLikeOnComment(comment._id,user._id, 0, null, function(err, value){
+            console.log(err, value)
+            done()
+        })
+    })
 })
 
 describe("delete user",() => {

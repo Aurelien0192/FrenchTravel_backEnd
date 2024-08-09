@@ -7,8 +7,9 @@ CommentSchema.set('toJSON',{virtuals:true})
 CommentSchema.set('toObject',{virtuals:true})
 
 const Comment = mongoose.model('Comment',CommentSchema)
-module.exports.CommentServices = class CommentService{
 
+
+module.exports.CommentServices = class CommentService{
 
     static async addOneComment(user_id, place_id, comment, options, callback){
         try{
@@ -101,15 +102,8 @@ module.exports.CommentServices = class CommentService{
         }
     }
 
-    static async findManyComments(page, limit, filter, user_id , options, callback){
+    static async findManyComments(page, limit, filter, options, callback){
         const populate = []
-
-        if(user_id && mongoose.isValidObjectId(user_id)){
-            populate.push({
-                path:"likes",
-                match:{user_id:{$eq: new mongoose.Types.ObjectId(user_id)}}
-            })
-        }
 
         if(options && options.populate && options.populate.includes("user_id")){ 
             populate.push({
@@ -192,7 +186,6 @@ module.exports.CommentServices = class CommentService{
                     callback({msg: "Erreur avec la base de données", fields_with_error: [], fields:"", type_error:"error-mongo"})
                 }
             }).catch((errors) =>{
-                console.log(errors)
                 if (errors.code === 11000) { // Erreur de duplicité
                     var field = Object.keys(errors.keyPattern)[0];
                     var err = {
