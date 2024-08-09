@@ -3,9 +3,13 @@ const CommentSchema = require('../schemas/Comment').CommentSchema
 const PlaceService = require('./PlaceService').PlaceService
 const _ = require('lodash')
 
+CommentSchema.set('toJSON',{virtuals:true})
+CommentSchema.set('toObject',{virtuals:true})
+
 const Comment = mongoose.model('Comment',CommentSchema)
 module.exports.CommentServices = class CommentService{
-    
+
+
     static async addOneComment(user_id, place_id, comment, options, callback){
         try{
             if(user_id && mongoose.isValidObjectId(user_id) && place_id && mongoose.isValidObjectId(place_id) && comment){
@@ -26,11 +30,7 @@ module.exports.CommentServices = class CommentService{
                         errors[value].properties ? result[value] = errors[value]['properties']['message'] : result[value] = ""
                     },{})
                     let fields_with_error = Object.keys(errors)
-                    if(fields_with_error.includes("moreInfo.price")){
-                        fields_with_error[_.findIndex(fields_with_error,(e)=>{return e ==="moreInfo.price"})] = ["price1","price2"]
-                        fields_with_error= _.flatten(fields_with_error)
-                    }
-                    
+
                     const err = {
                         msg: text,
                         fields_with_error: fields_with_error,
@@ -101,15 +101,24 @@ module.exports.CommentServices = class CommentService{
         }
     }
 
-    static async findManyComments(page, limit, q, options, callback){
+    static async findManyComments(page, limit, q, user_id , options, callback){
         console.log(options.populate)
+        const populate = []
 
-        const populate = options && options.populate && options.populate.includes("user_id")? [{
-                path: "user_id",
-                populate:{
-                    path:"profilePhoto"
-                }
-            }] : []
+        if(user_id && mongoose.isValidObjectId(user_id)){
+            populate.push({
+                path:"likes",
+                match:{user_id: mongoose.Types.ObjectId(user_id)}
+            })
+        }
+
+        if(options && options.populate && options.populate.includes("user_id")){ 
+            populate.push({
+            path: "user_id",
+            populate:{
+                path:"profilePhoto"
+            }
+        })}
 
         if(options && options.populate && options.populate.includes("place_id")){
             populate.push("place_id")
@@ -167,5 +176,50 @@ module.exports.CommentServices = class CommentService{
             callback({msg: "query is missing", type_error:"no-valid"})
         }
     
+    }
+
+    static async updateOneComment(comment_id, update, options, callback){
+        if(comment_id && mongoose.isValidObjectId(comment_id) && update){
+  
+            Comment.findByIdAndUpdate(new mongoose.Types.ObjectId(comment_id), update, {returnDocument: 'after'}).then((value)=>{
+                try{
+                    if(value){
+                        callback(null, value.toObject())
+                    }else{
+                        callback({msg: "Commentaire non trouvé", fields_with_error: [], fields:"", type_error:"no-found"})
+                    }
+                }catch(e){
+                    callback({msg: "Erreur avec la base de données", fields_with_error: [], fields:"", type_error:"error-mongo"})
+                }
+            }).catch((errors) =>{
+                if (errors.code === 11000) { // Erreur de duplicité
+                    var field = Object.keys(errors.keyPattern)[0];
+                    var err = {
+                        msg: `Duplicate key error: ${field} must be unique.`,
+                        fields_with_error: [field],
+                        fields: { [field]: `The ${field} is already taken.` },
+                        type_error: "duplicate"
+                    };
+                    callback(err);
+                }else{
+                    errors = errors['errors']
+                    var text = Object.keys(errors).map((e) => {
+                        return errors[e]['properties']['message']
+                    }).join(' ')
+                    var fields = _.transform(Object.keys(errors), function (result, value) {
+                        result[value] = errors[value]['properties']['message'];
+                    }, {});
+                    var err = {
+                        msg: text,
+                        fields_with_error: Object.keys(errors),
+                        fields: fields,
+                        type_error: "validator"
+                    }
+                    callback(err)
+                }
+            })
+        }else{
+            !update ? callback({msg: "propriété udpate inexistante", fields_with_error: [], fields:"", type_error: "no-valid"}) : callback({msg: "Id non conforme", type_error: "no-valid"})
+        }
     }
 }

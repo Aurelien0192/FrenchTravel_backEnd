@@ -41,6 +41,7 @@ const PlaceControllers = require("./controllers/PlaceController").PlaceControlle
 const ApiLocationControllers = require("./controllers/ApiLocationController").ApiLocationControllers
 const ImageController = require('./controllers/ImageController').ImageController
 const CommentController = require('./controllers/CommentController').CommentController
+const LikeCommentController = require('./controllers/LikeCommentController').LikeCommentController
 
 // Import des middlewares
 const controleOwner = require('./middlewares/controleOwner')
@@ -94,6 +95,10 @@ app.delete('/image/:id',database.controlsBDD,passport.authenticate('jwt',{sessio
 
 app.post('/comment',database.controlsBDD,passport.authenticate('jwt',{session:false}),controlePlaceExist,CommentController.addOneComment)
 app.get('/comments',database.controlsBDD, CommentController.findManyComments)
+
+//routes likeComment
+
+app.post('/like',database.controlsBDD,passport.authenticate('jwt',{session:false}),LikeCommentController.addOneLikeOnComment)
 
 app.listen(Config.port, () => {
     Logger.info(`Serveur démarré sur le port ${Config.port}.`)

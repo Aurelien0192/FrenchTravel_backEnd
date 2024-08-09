@@ -38,3 +38,9 @@ module.exports.CommentSchema = mongoose.Schema({
     }
     
 })
+
+Comment.virtual('likes',{
+    ref:"LikeComment",
+    localField: '_id',
+    foreignField:'comment_id'
+})
