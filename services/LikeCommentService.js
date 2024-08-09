@@ -1,12 +1,15 @@
 const mongoose = require('mongoose')
-const LikeComment = require('../schemas/LikeCommment').LikeComment
 const CommentService = require('./CommentService').CommentServices
 const _ = require('lodash')
 
-module.exports.LikeCommentServices = class LikeCommentService{
+const LikeCommentSchema = require('../schemas/LikeComment').LikeCommentSchemas
+
+const LikeComment = mongoose.model('LikeComment',LikeCommentSchema)
+
+module.exports.LikeCommentService = class LikeCommentService{
     static async addOneLikeOnComment(comment_id, user_id, nbOfLike, options, callback){
         if(comment_id && mongoose.isValidObjectId(comment_id) && user_id && mongoose.isValidObjectId(user_id)){
-            const newLike = LikeComment({
+            const newLike = new LikeComment({
                 comment_id: new mongoose.Types.ObjectId(comment_id),
                 user_id: new mongoose.Types.ObjectId(user_id)
             })
@@ -39,6 +42,16 @@ module.exports.LikeCommentServices = class LikeCommentService{
                 } catch(e){
                     callback({msg:"erreur lié à la base de donéee", type_error:"error-mongo"})
                 }
+            }
+        }else{
+            if(!comment_id){
+                callback({msg: "comment ID is missing", type_error:"no-valid"})
+            }else if(!mongoose.isValidObjectId(comment_id)){
+                callback({msg: "comment ID is uncorrect", type_error:"no-valid"})
+            }else if(!user_id){
+                callback({msg: "user ID is missing", type_error:"no-valid"})
+            }else if(!mongoose.isValidObjectId(user_id)){
+                callback({msg: "user ID is uncorrect", type_error:"no-valid"})
             }
         }
     }

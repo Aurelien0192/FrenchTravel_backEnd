@@ -1,5 +1,5 @@
 const CommentServices = require('../services/CommentService').CommentServices
-const LikeCommentService = require('../services/LikeCommentService').LikeCommentServices
+const LikeCommentService = require('../services/LikeCommentService').LikeCommentService
 const responseOfServer = require('../utils/response').responseOfServer
 
 module.exports.LikeCommentController = class LikeCommentController{

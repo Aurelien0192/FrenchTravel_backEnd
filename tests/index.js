@@ -28,10 +28,14 @@ require("../utils/database")
 //    require("./services/ImageService.test")
 // })
 
-describe("CommentServices",() => {
-   require("./services/CommentServices.test")
-})
+// describe("CommentServices",() => {
+//    require("./services/CommentServices.test")
+// })
 
 // describe("CommentController",() => {
 //    require("./controllers/CommentController.test")
 // })
+
+describe("LikeCommentService",() => {
+   require("./services/LikeCommentService.test")
+})
