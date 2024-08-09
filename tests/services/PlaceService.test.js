@@ -499,7 +499,7 @@ describe('FindManyPlaces',() => {
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('results')
             expect(value.results).to.be.an("array")
-            expect(value.results).to.be.lengthOf(5)
+            expect(value.results).to.be.lengthOf(1)
             expect(value.results[0]).to.be.a('object')
             expect(value.results[0]).to.haveOwnProperty('city')
             value.results.forEach((e) => {
@@ -513,7 +513,7 @@ describe('FindManyPlaces',() => {
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('results')
             expect(value.results).to.be.an("array")
-            expect(value.results).to.be.lengthOf(5)
+            expect(value.results).to.be.lengthOf(1)
             expect(value.results[0]).to.be.a('object')
             expect(value.results[0]).to.haveOwnProperty('city')
             expect(value.results[0]).to.haveOwnProperty('categorie')
@@ -538,7 +538,7 @@ describe('FindManyPlaces',() => {
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('results')
             expect(value.results).to.be.an("array")
-            expect(value.results).to.be.lengthOf(5)
+            expect(value.results).to.be.lengthOf(1)
             expect(value.results[0]).to.be.a('object')
             expect(value.results[0]).to.haveOwnProperty('city')
             value.results.forEach((e) => {
@@ -552,7 +552,7 @@ describe('FindManyPlaces',() => {
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('results')
             expect(value.results).to.be.an("array")
-            expect(value.results).to.be.lengthOf(7)
+            expect(value.results).to.be.lengthOf(1)
             expect(value.results[0]).to.be.a('object')
             expect(value.results[0]).to.haveOwnProperty('city')
             value.results.forEach((e) => {

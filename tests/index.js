@@ -8,9 +8,9 @@ describe("PlaceService", () => {
    require('./services/PlaceService.test')
 })
 
-// describe("PlaceControllers", () => {
-//    require('./controllers/PlaceController.test')
-// })
+describe("PlaceControllers", () => {
+   require('./controllers/PlaceController.test')
+})
 
 describe("UserService",() => {
    require('./services/UserService.test')
@@ -24,9 +24,9 @@ describe("UserController",() => {
 //    require('./services/ApiLocationService.test')
 // ])
 
-// describe("ImageService",() => {
-//    require("./services/ImageService.test")
-// })
+describe("ImageService",() => {
+   require("./services/ImageService.test")
+})
 
 describe("CommentServices",() => {
    require("./services/CommentServices.test")
