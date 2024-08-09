@@ -4,7 +4,6 @@ const responseOfServer = require('../utils/response').responseOfServer
 
 module.exports.LikeCommentController = class LikeCommentController{
     static addOneLikeOnComment(req, res, next){
-        console.l
         CommentServices.findOneCommentById(req.query.comment_id, null, function(err, value){
             if(err && (err.type_error === "no-valid" || err.type_error === "validator" || err.type_error === "duplicate")){
                 res.statusCode = 405

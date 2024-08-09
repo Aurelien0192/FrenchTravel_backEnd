@@ -7,6 +7,7 @@ const server = require('./../../server')
 chai.use(chaiHttp)
 
 const user = []
+let place = {}
 let token = ""
 
 describe("post and login correct user",()=>{
@@ -14,7 +15,7 @@ describe("post and login correct user",()=>{
         chai.request(server).post('/user').send({
             firstName : "Eric",
             lastName : "Dupond",
-            userType:"user",
+            userType:"professional",
             username:"EricLaDébrouille",
             password:"coucou",
             email:"eric.dupond@gmail.com"
@@ -34,10 +35,30 @@ describe("post and login correct user",()=>{
             done()
         })
     })
+    it("create a good place",(done) => {
+        const goodHotel = {
+            name: "Château du Doubs",
+            describe : "Super chateau dans le centre du Doubs",
+            categorie : "hotel",
+            moreInfo:{
+                services:"ascensceur"
+            },
+            street: "2 rue du Moulin Parnet",
+            city: "Pontarlier",
+            codePostal : "25300",
+            country: "France",
+            county: "Doubs",
+        }
+        chai.request(server).post('/place').send(goodHotel).auth(token,{type: 'bearer'}).end((err, res)=>{
+            res.should.has.status(201)
+            place = {...res.body}
+            done()
+        })
+    })
 })
 describe("/POST - addOneComment",() => {
     it("add correct comment to a good place with correct user - S",(done) => {
-        chai.request(server).post('/comment').auth(token,{type: 'bearer'}).query({place_id:"66b0658a72ecd115102b3d42"}).send({
+        chai.request(server).post('/comment').auth(token,{type: 'bearer'}).query({place_id:place._id}).send({
             comment:"superbe après-midi dans ce lieu",
             note:4,
             dateVisited: new Date()
@@ -67,7 +88,7 @@ describe("/POST - addOneComment",() => {
         })
     })
     it("add correct comment to a good place with user not authentifiate - E",(done) => {
-        chai.request(server).post('/comment').query({place_id:"66b0658a72ecd115102b3d42"}).send({
+        chai.request(server).post('/comment').query({place_id:place._id}).send({
             comment:"superbe après-midi dans ce lieu",
             note:5,
             dateVisited: new Date()
@@ -77,7 +98,7 @@ describe("/POST - addOneComment",() => {
         })
     })
     it("add comment missing comment property to a good place with correct user - E",(done) => {
-        chai.request(server).post('/comment').auth(token,{type: 'bearer'}).query({place_id:"66b0658a72ecd115102b3d42"}).send({
+        chai.request(server).post('/comment').auth(token,{type: 'bearer'}).query({place_id:place._id}).send({
             note:5,
             dateVisited: new Date()
         }).end((err, res)=>{
@@ -86,7 +107,7 @@ describe("/POST - addOneComment",() => {
         })
     })
     it("add comment with string in note to a good place with correct user - E",(done) => {
-        chai.request(server).post('/comment').auth(token,{type: 'bearer'}).query({place_id:"66b0658a72ecd115102b3d42"}).send({
+        chai.request(server).post('/comment').auth(token,{type: 'bearer'}).query({place_id:place._id}).send({
             comment:"superbe après-midi dans ce lieu",
             note:"dvjvovjeio",
             dateVisited: new Date()
@@ -96,7 +117,7 @@ describe("/POST - addOneComment",() => {
         })
     })
     it("add comment with note above of max to a good place with correct user - E",(done) => {
-        chai.request(server).post('/comment').auth(token,{type: 'bearer'}).query({place_id:"66b0658a72ecd115102b3d42"}).send({
+        chai.request(server).post('/comment').auth(token,{type: 'bearer'}).query({place_id:place._id}).send({
             comment:"superbe après-midi dans ce lieu",
             note:10,
             dateVisited: new Date()
@@ -106,7 +127,7 @@ describe("/POST - addOneComment",() => {
         })
     })
     it("add correct comment to a good place with correct user but second post - E",(done) => {
-        chai.request(server).post('/comment').auth(token,{type: 'bearer'}).query({place_id:"66b0658a72ecd115102b3d42"}).send({
+        chai.request(server).post('/comment').auth(token,{type: 'bearer'}).query({place_id:place._id}).send({
             comment:"superbe après-midi dans ce lieu",
             note:5,
             dateVisited: new Date()

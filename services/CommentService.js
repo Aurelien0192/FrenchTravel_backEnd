@@ -80,7 +80,6 @@ module.exports.CommentServices = class CommentService{
                 }
             }
         }catch(e){
-            console.log(e)
             callback(e)
         }
     }
@@ -95,11 +94,9 @@ module.exports.CommentServices = class CommentService{
                         callback({msg: "Aucun commentaire trouvé", type_error: "no-found"})
                     }
                 }catch(e){
-                    console.log(e)
                     callback({msg: "Erreur avec la base de donnée", fields_with_error: [], fields:"", type_error:"error-mongo"})
                 }
             }).catch((err) => {
-                console.log(err)
                 callback(err)
             })
         }else{
@@ -129,7 +126,6 @@ module.exports.CommentServices = class CommentService{
         if(filter){
 
             const fieldsToSearch = Object.keys(filter)
-            
             if(fieldsToSearch.includes('user_id')){
                 if(mongoose.isValidObjectId(filter.user_id)){
                     filter.user_id = new mongoose.Types.ObjectId(filter.user_id)
@@ -188,7 +184,6 @@ module.exports.CommentServices = class CommentService{
                         return callback({msg: "Commentaire non trouvé", fields_with_error: [], fields:"", type_error:"no-found"})
                     }
                 }catch(e){
-                    console.log('ok')
                     callback({msg: "Erreur avec la base de données", fields_with_error: [], fields:"", type_error:"error-mongo"})
                 }
             }).catch((errors) =>{

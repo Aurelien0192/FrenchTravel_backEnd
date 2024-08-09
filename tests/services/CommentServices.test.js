@@ -222,7 +222,6 @@ describe("findManyComments  - S",()=>{
     it("find comments with good user ID",(done) => {
         CommentService.findManyComments(null, null, {user_id :user._id}, null, null, function(err,value){
             expect(value).to.haveOwnProperty('results')
-            console.log(value.results)
             expect(value['results']).to.be.an('array')
             expect(value['results']).to.have.lengthOf.at.least(1)
             expect(value['results'][0]).to.be.a('object')
@@ -271,26 +270,26 @@ describe("findManyComments  - S",()=>{
             done()
         })
     })
-    // it("find comments with correct place ID with populate in user_id - S",(done) => {
-    //     CommentService.findManyComments(null, null, {place_id:place._id},"populateuser_id", null, function(err,value){
-    //         expect(value).to.be.a('object')
-    //         expect(value).to.haveOwnProperty('results')
-    //         expect(value["results"]).to.be.an('Array')
-    //         expect(value["results"]).to.have.lengthOf.at.least(1)
-    //         expect(value["results"][0]).to.haveOwnProperty("_id")
-    //         done()
-    //     })
-    // })
-    // it("find comments with correct user ID with populate in place_id - S",(done) => {
-    //     CommentService.findManyComments(null, null, {user_id:user._id},"populateplace_id", null, function(err,value){
-    //         expect(value).to.be.a('object')
-    //         expect(value).to.haveOwnProperty('results')
-    //         expect(value["results"]).to.be.an('Array')
-    //         expect(value["results"]).to.have.lengthOf.at.least(1)
-    //         expect(value["results"][0]).to.haveOwnProperty("_id")
-    //         done()
-    //     })
-    // })
+    it("find comments with correct place ID with populate in user_id - S",(done) => {
+        CommentService.findManyComments(null, null, {place_id:place._id},"populateuser_id", null, function(err,value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('results')
+            expect(value["results"]).to.be.an('Array')
+            expect(value["results"]).to.have.lengthOf.at.least(1)
+            expect(value["results"][0]).to.haveOwnProperty("_id")
+            done()
+        })
+    })
+    it("find comments with correct user ID with populate in place_id - S",(done) => {
+        CommentService.findManyComments(null, null, {user_id:user._id},"populateplace_id", null, function(err,value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('results')
+            expect(value["results"]).to.be.an('Array')
+            expect(value["results"]).to.have.lengthOf.at.least(1)
+            expect(value["results"][0]).to.haveOwnProperty("_id")
+            done()
+        })
+    })
 })
 
 describe("updateOneComment",()=>{

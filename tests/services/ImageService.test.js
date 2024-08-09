@@ -183,7 +183,6 @@ describe("AddManyImages",() => {
 describe("findManyImages",() => {
     it("find many image with correct ID - S",(done)=>{
         ImageService.findManyImagesByUserId(1,10,"669f545475435542ceef47e6", null,function(err, value){
-            console.log(err, value)
             done()
         })
     })

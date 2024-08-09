@@ -61,4 +61,30 @@ module.exports.LikeCommentService = class LikeCommentService{
         }
     }
 
+    static async deleteOneLikeComment(user_id, options, callback){
+        if(user_id && mongoose.isValidObjectId(user_id)){
+            const userId = new mongoose.Types.ObjectId(user_id)
+            await LikeComment.deleteOne({user_id:userId}, null, {lean:true}).then((value) => {
+                try {
+                    if (value){
+                        callback(null, value)
+                    }else{
+                        callback({ msg: "Utilisateur non trouvé.", fields_with_error: [], fields:"", type_error: "no-found" });
+                    }
+                }
+                catch (e) {  
+                    callback(e)
+                }
+            }).catch((e) => {
+                callback({ msg: "Impossible de chercher l'élément.", fields_with_error: [], fields:"", type_error: "error-mongo" });
+            })
+        }else{
+            if(!user_id){
+                callback({msg: "user ID is missing", type_error:"no-valid"})
+            }else{
+                callback({msg: "user ID is uncorrect", type_error:"no-valid"})
+            }
+        }
+    }
+
 }
