@@ -21,6 +21,7 @@ module.exports.CommentController = class CommentController{
     }
 
     static findManyComments(req, res){
+        console.log(req.user)
         let options={}
         req.log.info("Rechercher des commentaires")
         if (req.query.options === "populateuser_id"){
@@ -36,7 +37,7 @@ module.exports.CommentController = class CommentController{
         if(req.query.user_id){
             q.user_id = req.query.user_id
         }
-        CommentServices.findManyComments(req.query.page, req.query.limit, q, options, function(err, value){
+        CommentServices.findManyComments(req.query.page, req.query.limit, q, options, req.query.visitor_id, function(err, value){
             responseOfServer(err, value, req, res, false)
         })
     }
