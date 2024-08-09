@@ -111,6 +111,32 @@ describe('POST - /like',() => {
         })
     })
 })
+describe('Delete - /like',() => {
+    it("delete a like to a comment but user not authentifiate - E",(done)=>{
+        chai.request(server).delete(`/like/${comment._id}`).end((err, res) => {
+            res.should.has.status(401)
+            done()
+        })
+    })
+    it("delete a like to a comment but comment id uncorrect - E",(done)=>{
+        chai.request(server).delete("/like/feklero").auth(token,{type: 'bearer'}).end((err, res) => {
+            res.should.has.status(405)
+            done()
+        })
+    })
+    it("delete a like to a comment but comment id missing - E",(done)=>{
+        chai.request(server).delete("/like/").auth(token,{type: 'bearer'}).end((err, res) => {
+            res.should.has.status(404)
+            done()
+        })
+    })
+    it("delete a like to a comment - S",(done)=>{
+        chai.request(server).delete(`/like/${comment._id}`).auth(token,{type: 'bearer'}).end((err, res) => {
+            res.should.has.status(200)
+            done()
+        })
+    })
+})
 
 describe("deleteTheUser",() => {
     it("delete user - S",(done) => {

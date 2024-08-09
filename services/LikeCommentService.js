@@ -61,13 +61,22 @@ module.exports.LikeCommentService = class LikeCommentService{
         }
     }
 
-    static async deleteOneLikeComment(user_id, options, callback){
+    static async deleteOneLikeComment(comment_id, user_id, nbOfLike ,options, callback){
         if(user_id && mongoose.isValidObjectId(user_id)){
             const userId = new mongoose.Types.ObjectId(user_id)
             await LikeComment.deleteOne({user_id:userId}, null, {lean:true}).then((value) => {
                 try {
-                    if (value){
-                        callback(null, value)
+                    if (value.deletedCount>0){
+                        try{
+                            CommentService.updateOneComment(comment_id,{like: nbOfLike -1},null, function(err, value){
+                                if(err){
+                                    return callback({msg:"une erreur c'est produite lors de la mise à jour du commentaire", type_error:err.type_error})
+                                }
+                            })
+                            callback(null, value)
+                        }catch(e){
+                           callback({msg:"erreur lié à la base de donéee", type_error:"error-mongo"}) 
+                        }
                     }else{
                         callback({ msg: "Utilisateur non trouvé.", fields_with_error: [], fields:"", type_error: "no-found" });
                     }

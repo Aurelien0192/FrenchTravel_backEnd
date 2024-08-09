@@ -158,7 +158,7 @@ describe("addOneLike",() => {
 
 describe("deleteOneLikeComment",() => {
     it("delete LikeComment with uncorrect user_id - E",(done) =>{
-        LikeCommentService.deleteOneLikeComment("dsfoqhjos", null, function(err, value){
+        LikeCommentService.deleteOneLikeComment(comment._id,"dsfoqhjos",1, null, function(err, value){
             expect(err).to.be.a("object")
             expect(err).to.haveOwnProperty("type_error")
             expect(err['type_error']).to.be.equal("no-valid")
@@ -166,7 +166,7 @@ describe("deleteOneLikeComment",() => {
         })
     })
     it("delete LikeComment with missing user_id - E",(done) =>{
-        LikeCommentService.deleteOneLikeComment(null, null, function(err, value){
+        LikeCommentService.deleteOneLikeComment(comment._id, null,1 ,null, function(err, value){
             expect(err).to.be.a("object")
             expect(err).to.haveOwnProperty("type_error")
             expect(err['type_error']).to.be.equal("no-valid")
@@ -174,18 +174,28 @@ describe("deleteOneLikeComment",() => {
         })
     })
     it("delete LikeComment with correc user_id but not exist in database - E",(done) =>{
-        LikeCommentService.deleteOneLikeComment(place._id, null, function(err, value){
-            expect(value).to.be.a('object')
-            expect(value).to.haveOwnProperty('deletedCount')
-            expect(value["deletedCount"]).to.be.equal(0)
+        LikeCommentService.deleteOneLikeComment(comment._id, place._id,1,null, function(err, value){
+            expect(err).to.be.a("object")
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err['type_error']).to.be.equal("no-found")
             done()
         })
     })
     it("delete LikeComment with correct user_id - S",(done) => {
-        LikeCommentService.deleteOneLikeComment(user._id,null, function(err, value){
+        LikeCommentService.deleteOneLikeComment(comment._id, user._id,1,null, function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('deletedCount')
             expect(value["deletedCount"]).to.be.equal(1)
+            done()
+        })
+    })
+    it(("check number of like update un comment - S"),(done)=>{
+        CommentService.findManyComments(null, null, {_id: comment._id}, null, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty("results")
+            expect(value['results']).to.be.an('array')
+            expect(value['results'][0]).to.haveOwnProperty('like')
+            expect(value['results'][0]['like']).to.be.equal(0)
             done()
         })
     })

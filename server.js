@@ -99,6 +99,7 @@ app.get('/comments',database.controlsBDD, CommentController.findManyComments)
 //routes likeComment
 
 app.post('/like',database.controlsBDD,passport.authenticate('jwt',{session:false}),LikeCommentController.addOneLikeOnComment)
+app.delete('/like/:id',database.controlsBDD,passport.authenticate('jwt',{session:false}),LikeCommentController.deleteOneLikeOnComment)
 
 app.listen(Config.port, () => {
     Logger.info(`Serveur démarré sur le port ${Config.port}.`)

@@ -3,7 +3,7 @@ const LikeCommentService = require('../services/LikeCommentService').LikeComment
 const responseOfServer = require('../utils/response').responseOfServer
 
 module.exports.LikeCommentController = class LikeCommentController{
-    static addOneLikeOnComment(req, res, next){
+    static addOneLikeOnComment(req, res){
         CommentServices.findOneCommentById(req.query.comment_id, null, function(err, value){
             if(err && (err.type_error === "no-valid" || err.type_error === "validator" || err.type_error === "duplicate")){
                 res.statusCode = 405
@@ -18,6 +18,25 @@ module.exports.LikeCommentController = class LikeCommentController{
                 req.query.nbOfLike = value.like
                 LikeCommentService.addOneLikeOnComment(req.query.comment_id, req.user._id, req.query.nbOfLike, null, function(err, value){
                     responseOfServer(err, value, req, res, true)
+                })
+            }
+        })
+    }
+    static deleteOneLikeOnComment(req, res){
+        CommentServices.findOneCommentById(req.params.id, null, function(err, value){
+            if(err && (err.type_error === "no-valid" || err.type_error === "validator" || err.type_error === "duplicate")){
+                res.statusCode = 405
+                res.send(err)
+            }else if(err && err.type_error === "error-mongo"){
+                res.statusCode = 500
+                res.send(err)
+            }else if(err && err.type_error ==='no-found'){
+                res.statusCode = 404
+                res.send(err)
+            }else{
+                req.query.nbOfLike = value.like
+                LikeCommentService.deleteOneLikeComment(req.params.id, req.user._id, req.query.nbOfLike, null, function(err, value){
+                    responseOfServer(err, value, req, res, false)
                 })
             }
         })
