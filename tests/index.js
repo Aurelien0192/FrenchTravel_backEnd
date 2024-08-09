@@ -36,6 +36,10 @@ require("../utils/database")
 //    require("./controllers/CommentController.test")
 // })
 
-describe("LikeCommentService",() => {
-   require("./services/LikeCommentService.test")
+// describe("LikeCommentService",() => {
+//    require("./services/LikeCommentService.test")
+// })
+
+describe("LikeCommentController",() => {
+   require('./controllers/LikeCommentController.test')
 })
