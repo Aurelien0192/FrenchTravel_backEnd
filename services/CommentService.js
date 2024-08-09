@@ -101,14 +101,13 @@ module.exports.CommentServices = class CommentService{
         }
     }
 
-    static async findManyComments(page, limit, q, user_id , options, callback){
-        console.log(options.populate)
+    static async findManyComments(page, limit, filter, user_id , options, callback){
         const populate = []
 
         if(user_id && mongoose.isValidObjectId(user_id)){
             populate.push({
                 path:"likes",
-                match:{user_id: mongoose.Types.ObjectId(user_id)}
+                match:{user_id:{$eq: new mongoose.Types.ObjectId(user_id)}}
             })
         }
 
@@ -128,21 +127,21 @@ module.exports.CommentServices = class CommentService{
         limit = !limit ? 0 : limit
         page = !Number.isNaN(page) ? Number(page): page
         limit = !Number.isNaN(limit) ? Number(limit): limit
-        if(q){
+        if(filter){
 
-            const fieldsToSearch = Object.keys(q)
+            const fieldsToSearch = Object.keys(filter)
             
             if(fieldsToSearch.includes('user_id')){
-                if(mongoose.isValidObjectId(q.user_id)){
-                    q.user_id = new mongoose.Types.ObjectId(q.user_id)
+                if(mongoose.isValidObjectId(filter.user_id)){
+                    filter.user_id = new mongoose.Types.ObjectId(filter.user_id)
                 }else{
                     return callback({msg:"user_id is not a valid id",type_error:"no-valid"})
                 }
             }
             
             if(fieldsToSearch.includes('place_id')){
-                if(mongoose.isValidObjectId(q.place_id)){
-                    q.place_id = new mongoose.Types.ObjectId(q.place_id)
+                if(mongoose.isValidObjectId(filter.place_id)){
+                    filter.place_id = new mongoose.Types.ObjectId(filter.place_id)
                 }else{
                     return callback({msg:"place_id is not a valid id",type_error:"no-valid"})
                 }
@@ -152,11 +151,11 @@ module.exports.CommentServices = class CommentService{
                 
                 callback ({msg: `format de ${Number.isNaN(page) ? "page" : "limit"} est incorrect`, type_error:"no-valid"})
             }else{
-                Comment.countDocuments(q).then((value) => {
+                Comment.countDocuments(filter).then((value) => {
                     if (value > 0){
                         const skip = ((page-1) * limit)
                         try{
-                            Comment.find(q, null, {skip:skip, limit:limit, populate:populate, lean:true}).then((results) => {
+                            Comment.find(filter, null, {skip:skip, limit:limit, populate:populate, lean:true}).then((results) => {
                                 callback(null, {
                                     count : value,
                                     results : results
@@ -181,17 +180,19 @@ module.exports.CommentServices = class CommentService{
     static async updateOneComment(comment_id, update, options, callback){
         if(comment_id && mongoose.isValidObjectId(comment_id) && update){
   
-            Comment.findByIdAndUpdate(new mongoose.Types.ObjectId(comment_id), update, {returnDocument: 'after'}).then((value)=>{
+            Comment.findByIdAndUpdate(new mongoose.Types.ObjectId(comment_id), update, {returnDocument: 'after', runValidators: true}).then((value)=>{
                 try{
                     if(value){
                         callback(null, value.toObject())
                     }else{
-                        callback({msg: "Commentaire non trouvé", fields_with_error: [], fields:"", type_error:"no-found"})
+                        return callback({msg: "Commentaire non trouvé", fields_with_error: [], fields:"", type_error:"no-found"})
                     }
                 }catch(e){
+                    console.log('ok')
                     callback({msg: "Erreur avec la base de données", fields_with_error: [], fields:"", type_error:"error-mongo"})
                 }
             }).catch((errors) =>{
+                console.log(errors)
                 if (errors.code === 11000) { // Erreur de duplicité
                     var field = Object.keys(errors.keyPattern)[0];
                     var err = {
@@ -202,18 +203,28 @@ module.exports.CommentServices = class CommentService{
                     };
                     callback(err);
                 }else{
-                    errors = errors['errors']
-                    var text = Object.keys(errors).map((e) => {
-                        return errors[e]['properties']['message']
-                    }).join(' ')
-                    var fields = _.transform(Object.keys(errors), function (result, value) {
-                        result[value] = errors[value]['properties']['message'];
-                    }, {});
-                    var err = {
-                        msg: text,
-                        fields_with_error: Object.keys(errors),
-                        fields: fields,
-                        type_error: "validator"
+                    let err = {}
+                    if(errors['errors']){
+                        errors = errors['errors']
+                        let text = Object.keys(errors).map((e) => {
+                            return errors[e]['properties']['message']
+                        }).join(' ')
+                        let fields = _.transform(Object.keys(errors), function (result, value) {
+                            result[value] = errors[value]['properties']['message'];
+                        }, {});
+                        err = {
+                            msg: text,
+                            fields_with_error: Object.keys(errors),
+                            fields: fields,
+                            type_error: "validator"
+                        }
+                    }else{
+                        err ={
+                            msg: `${errors.kind} not allowed in ${errors.path}`,
+                            fields_with_error: [errors.path],
+                            fields:"",
+                            type_error:"validator"
+                        }
                     }
                     callback(err)
                 }

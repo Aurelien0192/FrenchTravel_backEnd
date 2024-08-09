@@ -220,7 +220,7 @@ describe("findCommentById",()=>{
 
 describe("findManyComments  - S",()=>{
     it("find comments with good user ID",(done) => {
-        CommentService.findManyComments(null, null, {user_id :user._id},null, function(err,value){
+        CommentService.findManyComments(null, null, {user_id :user._id},null, null, function(err,value){
             expect(value).to.haveOwnProperty('results')
             expect(value['results']).to.be.an('array')
             expect(value['results']).to.have.lengthOf.at.least(1)
@@ -231,7 +231,7 @@ describe("findManyComments  - S",()=>{
         })
     })
     it("find comments with uncorrect user ID - E",(done) => {
-        CommentService.findManyComments(null, null, {user_id:"66b0dca10a74"}, null, function(err,value){
+        CommentService.findManyComments(null, null, {user_id:"66b0dca10a74"}, null, null, function(err,value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('no-valid')
@@ -239,7 +239,7 @@ describe("findManyComments  - S",()=>{
         })
     })
     it("find comments with missing user ID - E",(done) => {
-        CommentService.findManyComments(null, null, {user_id:null}, null, function(err,value){
+        CommentService.findManyComments(null, null, {user_id:null}, null, null, function(err,value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('no-valid')
@@ -247,7 +247,7 @@ describe("findManyComments  - S",()=>{
         })
     })
     it("find comments with missing query - E",(done) => {
-        CommentService.findManyComments(null, null, null, null, function(err,value){
+        CommentService.findManyComments(null, null, null, null, null, function(err,value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('no-valid')
@@ -255,7 +255,7 @@ describe("findManyComments  - S",()=>{
         })
     })
     it("find comments with correct user ID but not present in database - S",(done) => {
-        CommentService.findManyComments(null, null, {user_id:place._id},null, function(err,value){
+        CommentService.findManyComments(null, null, {user_id:place._id}, null, null, function(err,value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('count')
             expect(value["count"]).to.be.equal(0)
@@ -263,18 +263,95 @@ describe("findManyComments  - S",()=>{
         })
     })
     it("find comments with correct place ID - S",(done) => {
-        CommentService.findManyComments(null, null, {place_id:place._id},null, function(err,value){
+        CommentService.findManyComments(null, null, {place_id:place._id}, null, null, function(err,value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('results')
             expect(value["results"]).to.have.lengthOf.at.least(1)
             done()
         })
     })
-    it("find comments with correct place ID with populate - S",(done) => {
-        CommentService.findManyComments(null, null, {place_id:place._id},{populate:true}, function(err,value){
+    it("find comments with correct place ID with populate in user_id - S",(done) => {
+        CommentService.findManyComments(null, null, {place_id:place._id}, null,"populateuser_id", function(err,value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('results')
+            expect(value["results"]).to.be.an('Array')
             expect(value["results"]).to.have.lengthOf.at.least(1)
+            expect(value["results"][0]).to.haveOwnProperty("_id")
+            done()
+        })
+    })
+    it("find comments with correct user ID with populate in place_id - S",(done) => {
+        CommentService.findManyComments(null, null, {user_id:user._id}, null,"populateplace_id", function(err,value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('results')
+            expect(value["results"]).to.be.an('Array')
+            expect(value["results"]).to.have.lengthOf.at.least(1)
+            expect(value["results"][0]).to.haveOwnProperty("_id")
+            done()
+        })
+    })
+    // it("find comments with correct place ID and check no comment of user- S",(done) => {
+    //     CommentService.findManyComments(null, null, {user_id:user._id}, user._id, null, function(err,value){
+    //         console.log(err, value)
+    //         done()
+    //     })
+    // })
+})
+
+describe("updateOneComment",()=>{
+    it('update one comment with good comment_id - S',(done)=>{
+        CommentService.updateOneComment(comments[0]._id, {like:1}, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('like')
+            expect(value['like']).to.be.equal(1)
+            done()
+        })
+    })
+    it('update one comment with good id but uncorrect type of like - E',(done)=>{
+        CommentService.updateOneComment(comments[0]._id, {like:"todoo"}, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal("validator")
+            done()
+        })
+    })
+    it('update one comment with good id but empty comment field - E',(done)=>{
+        CommentService.updateOneComment(comments[0]._id, {comment:""}, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal("validator")
+            done()
+        })
+    })
+    it('update one comment with good id but missing update - E',(done)=>{
+        CommentService.updateOneComment(comments[0]._id, null, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal("no-valid")
+            done()
+        })
+    })
+    it('update one comment with uncorrect id  - E',(done)=>{
+        CommentService.updateOneComment("efzezfefz", {like:2}, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal("no-valid")
+            done()
+        })
+    })
+    it('update one comment with missing id  - E',(done)=>{
+        CommentService.updateOneComment(null, {like:2}, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal("no-valid")
+            done()
+        })
+    })
+    it('update one comment with correct id but not exist in database - E',(done)=>{
+        CommentService.updateOneComment(user._id, {comment:"hello"}, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal("no-found")
             done()
         })
     })

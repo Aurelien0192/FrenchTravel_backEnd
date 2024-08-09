@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-module.exports.CommentSchema = mongoose.Schema({
+const CommentSchema = mongoose.Schema({
     user_id:{
         type: mongoose.Types.ObjectId,
         ref:"User",
@@ -13,10 +13,12 @@ module.exports.CommentSchema = mongoose.Schema({
     },
     comment:{
         type: String,
-        required: true
+        required: true,
+        index:true
     },
     like:{
         type: Number,
+        required:true,
         default:0
     },
     note:{
@@ -39,8 +41,10 @@ module.exports.CommentSchema = mongoose.Schema({
     
 })
 
-Comment.virtual('likes',{
+CommentSchema.virtual('likes',{
     ref:"LikeComment",
     localField: '_id',
     foreignField:'comment_id'
 })
+
+module.exports.CommentSchema = CommentSchema
