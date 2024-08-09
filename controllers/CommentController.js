@@ -27,7 +27,7 @@ module.exports.CommentController = class CommentController{
             options.populate = "user_id"
         }
         if (req.query.options === 'populateplace_id'){
-            options.populate = options.populate, "place_id"
+            options.populate = "place_id"
         }
         let q = {}
         if(req.query.place_id){
