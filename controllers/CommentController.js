@@ -36,7 +36,7 @@ module.exports.CommentController = class CommentController{
         if(req.query.user_id){
             q.user_id = req.query.user_id
         }
-        CommentServices.findManyComments(req.query.page, req.query.limit, q, req.query.user_id, options, function(err, value){
+        CommentServices.findManyComments(req.query.page, req.query.limit, q, options, function(err, value){
             responseOfServer(err, value, req, res, false)
         })
     }

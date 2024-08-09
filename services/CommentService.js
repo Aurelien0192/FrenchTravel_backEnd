@@ -2,6 +2,9 @@ const mongoose = require('mongoose')
 const CommentSchema = require('../schemas/Comment').CommentSchema
 const PlaceService = require('./PlaceService').PlaceService
 const _ = require('lodash')
+const LikeCommentSchema = require('../schemas/LikeComment').LikeCommentSchemas
+
+const LikeComment = mongoose.model('LikeComment',LikeCommentSchema)
 
 CommentSchema.set('toJSON',{virtuals:true})
 CommentSchema.set('toObject',{virtuals:true})
@@ -96,6 +99,7 @@ module.exports.CommentServices = class CommentService{
                     callback({msg: "Erreur avec la base de donnée", fields_with_error: [], fields:"", type_error:"error-mongo"})
                 }
             }).catch((err) => {
+                console.log(err)
                 callback(err)
             })
         }else{
@@ -103,8 +107,8 @@ module.exports.CommentServices = class CommentService{
         }
     }
 
-    static async findManyComments(page, limit, filter, options, callback){
-        const populate = []
+    static async findManyComments(page, limit, filter, options, user_id, callback){
+        const populate = [{path:"likes",match:{user_id: user_id}}]
 
         if(options && options.populate && options.populate.includes("user_id")){ 
             populate.push({
@@ -151,9 +155,10 @@ module.exports.CommentServices = class CommentService{
                         const skip = ((page-1) * limit)
                         try{
                             Comment.find(filter, null, {skip:skip, limit:limit, populate:populate, lean:true}).then((results) => {
+                                const finalResults = results.map((result)=>{return {...result, liked: result.likes.length > 0}})
                                 callback(null, {
                                     count : value,
-                                    results : results
+                                    results : finalResults
                                 })
                             })
                         }catch(e){
