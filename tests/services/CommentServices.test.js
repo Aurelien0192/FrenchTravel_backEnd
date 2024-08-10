@@ -1,5 +1,6 @@
 const chai = require('chai') 
 const CommentService = require("../../services/CommentService").CommentServices
+const LikeCommentService = require("../../services/LikeCommentService").LikeCommentService
 const UserService = require('../../services/UserService').UserService
 const PlaceService = require('../../services/PlaceService').PlaceService
 let expect = chai.expect
@@ -62,6 +63,16 @@ describe("AddOneComment",() => {
             done()
         })
     })
+    it('Add a like in the comment - S',(done)=>{
+        LikeCommentService.addOneLikeOnComment(comments[0]._id, user._id, 0, null, function(err, value){
+            console.log(err, value)
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('user_id')
+            expect(String(value['user_id'])).to.be.equal(String(user._id))
+            expect(value).to.haveOwnProperty('comment_id')
+            expect(String(value['comment_id'])).to.be.equal(String(comments[0]._id))
+        })
+    })
     it('Add one correct comment with uncorrect user-id - E',(done) => {
         const goodComment = {
             comment:"superbe après-midi dans ce lieu",
@@ -122,7 +133,7 @@ describe("AddOneComment",() => {
             done()
         })
     })
-    it('Add one comment with comment empty - S',(done) => {
+    it('Add one comment with comment empty - E',(done) => {
         const goodComment = {
             comment:"",
             note:5,
@@ -167,7 +178,7 @@ describe("AddOneComment",() => {
             done()
         })
     })
-    it('Add one comment with field note missing - S',(done) => {
+    it('Add one comment with field note missing - E',(done) => {
         const goodComment = {
             comment:"superbe après-midi dans ce lieu",
             dateVisited: new Date()
@@ -350,10 +361,19 @@ describe("updateOneComment",()=>{
         })
     })
 })
+describe("deleteManyComments",() => {
+    it("delete many comments with corrects ID",(done)=>{
+        CommentService.deleteManyComments([comments[0]._id], function(err, value){
+            console.log(err, value)
+            done()
+        })
+    })
+})
 
 describe("delete user",() => {
     it("delete",(done)=>{
         UserService.deleteOneUser(user._id, null, function(err, value){
+            console.log(err, value)
             done()
         })
     })

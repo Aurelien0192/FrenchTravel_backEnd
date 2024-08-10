@@ -6,6 +6,7 @@ const LikeCommentSchema = require('../schemas/LikeComment').LikeCommentSchemas
 
 const LikeComment = mongoose.model('LikeComment',LikeCommentSchema)
 
+console.log(CommentService)
 
 module.exports.LikeCommentService = class LikeCommentService{
     static async addOneLikeOnComment(comment_id, user_id, nbOfLike, options, callback){
@@ -44,6 +45,7 @@ module.exports.LikeCommentService = class LikeCommentService{
                     if(e.code === 11000){
                         callback({msg:"vous avez déjà commentez ce lieu", type_error:"no-valid"})
                     }else{
+                        console.log(e)
                         callback({msg:"erreur lié à la base de donéee", type_error:"error-mongo"})
                     }
                 }

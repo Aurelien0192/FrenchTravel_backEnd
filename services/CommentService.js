@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const CommentSchema = require('../schemas/Comment').CommentSchema
 const PlaceService = require('./PlaceService').PlaceService
-const LikeCommentService = require("./LikeCommentService").LikeCommentService
+//const LikeCommentService = require("./LikeCommentService").LikeCommentService
 const _ = require('lodash')
 const LikeCommentSchema = require('../schemas/LikeComment').LikeCommentSchemas
 
@@ -235,8 +235,8 @@ module.exports.CommentServices = class CommentService{
             Comment.deleteMany({_id: comments_id}).then((value) => {
                 if (value && value.deletedCount !== 0){
                     LikeCommentService.deleteManyLikesComments(comments_id, function(err, value){
-                        if(err){
-                            callback({msg:"la suppression des images a rencontré un problème",type_error:"aborded", err})
+                        if(err && err.type_error !== "no-found"){
+                            callback({msg:"la suppression des likes a rencontré un problème",type_error:"aborded", err})
                         }
                     })
                     callback(null, value)

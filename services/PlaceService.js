@@ -342,8 +342,8 @@ module.exports.PlaceService =  class PlaceService{
                         }
                     }
                 ])
-            const images_id = (images.length>0 && images[0].images)? _.map(images[0].images,"_id") : []
-            const comments_id = (comments.length>0 && comments[0].comments)? _.map(comments[0].comments,"_id") : []
+            const images_id = (images.length>0 && images[0].images.length>0)? _.map(images[0].images,"_id") : []
+            const comments_id = (comments.length>0 && comments[0].comments.length>0)? _.map(comments[0].comments,"_id") : []
 
 
             if(images_id.length>0){
@@ -420,8 +420,8 @@ module.exports.PlaceService =  class PlaceService{
                         }
                     }
                 ])
-                const imagesIdForOnePlace = images.length>0 && images[0].images ? _.map(images[0].images,"_id") : []
-                const commentsIdForOnePlace = comments.length>0 && comments[0].comments? _map(comments[0].comments,"_id") :[]
+                const imagesIdForOnePlace = images.length>0 && images[0].images.length>0 ? _.map(images[0].images,"_id") : []
+                const commentsIdForOnePlace = comments.length>0 && comments[0].comments.length>0? _map(comments[0].comments,"_id") :[]
                 images_id = [...images_id, ...imagesIdForOnePlace]
                 comments_id = [...comments_id, ...commentsIdForOnePlace]
             }
@@ -441,7 +441,6 @@ module.exports.PlaceService =  class PlaceService{
                     }
                 })
             }
-
             Place.deleteMany({_id: places_id}).then((value) => {
                 if (value && value.deletedCount !== 0){
                     callback(null, value)

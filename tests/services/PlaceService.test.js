@@ -1,6 +1,9 @@
 const chai = require('chai') 
 const PlaceService = require("../../services/PlaceService").PlaceService;
 const ImageService = require("../../services/ImageService").ImageService;
+const UserService = require("../../services/UserService").UserService
+const CommentService = require("../../services/CommentService").CommentServices
+const LikeCommentService = require("../../services/LikeCommentService").LikeCommentService
 const { destination } = require('pino');
 let expect = chai.expect
 
@@ -253,10 +256,30 @@ const placeNothingGood = {
 
 const places = []
 let imagesTab = []
+let user = {}
+const comments = []
+const likes = []
+
+describe('create user for test',() => {
+    const goodUser ={
+        firstName : "Eric",
+        lastName : "Dupond",
+        userType:"professional",
+        username:"EricLaDébrouille",
+        password:"coucou",
+        email:"eric.dupond@gmail.com"
+    }
+    it("user creation",(done)=>{
+        UserService.addOneUser(goodUser, null, function(err, value){
+            user = {...value}
+            done()
+        })
+    })
+})
 
 describe("addOnePlace", () => {
     it("Correct Place. - S" ,(done) => {
-        PlaceService.addOnePlace(placeGood,"669ea20a3078f5dda16855f0", null, function (err, value) {
+        PlaceService.addOnePlace(placeGood,user._id, null, function (err, value) {
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('name')
             expect(value['name']).to.be.equal("Château du Doubs")
@@ -266,7 +289,7 @@ describe("addOnePlace", () => {
         })
     })
     it("Correct hotel. - S" ,(done) => {
-        PlaceService.addOnePlace(goodHotel,"669ea20a3078f5dda16855f0", null, function (err, value) {
+        PlaceService.addOnePlace(goodHotel,user._id, null, function (err, value) {
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('name')
             expect(value['name']).to.be.equal("Château du Doubs")
@@ -295,7 +318,7 @@ describe("addOnePlace", () => {
             path:"data\\images\\leCanyontadaaa2.jpeg",
             size:716175
         }]
-        ImageService.addManyImages(images, places[0]._id,"669ea20a3078f5dda16855f0", function(err, value){
+        ImageService.addManyImages(images, places[0]._id,user._id, function(err, value){
             imagesTab = [...value]
             done()
         })
@@ -321,14 +344,14 @@ describe("addOnePlace", () => {
             path:"data\\images\\leCanyontadaaa2.jpeg",
             size:716175
         }]
-        ImageService.addManyImages(images, places[1]._id,"669ea20a3078f5dda16855f0", function(err, value){
+        ImageService.addManyImages(images, places[1]._id,user._id, function(err, value){
             imagesTab = [...imagesTab, ...value]
             done()
         })
     })
 
     it("Place without Name - E", (done) => {
-        PlaceService.addOnePlace(PlaceWithoutname,"669ea20a3078f5dda16855f0", null, function(err, value){
+        PlaceService.addOnePlace(PlaceWithoutname,user._id, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('fields')
             expect(err['fields']).to.haveOwnProperty('name')
@@ -339,7 +362,7 @@ describe("addOnePlace", () => {
         })
     })
     it("Place missing Name - E", (done) => {
-        PlaceService.addOnePlace(PlaceMissingname,"669ea20a3078f5dda16855f0", null, function(err, value){
+        PlaceService.addOnePlace(PlaceMissingname,user._id, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('fields')
             expect(err['fields']).to.haveOwnProperty('name')
@@ -350,7 +373,7 @@ describe("addOnePlace", () => {
         })
     })
     it("place with wrong info sup - E", (done) => {
-        PlaceService.addOnePlace(placeWithWrongInfoSup,"669ea20a3078f5dda16855f0", null, function(err, value){
+        PlaceService.addOnePlace(placeWithWrongInfoSup,user._id, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('validator')
@@ -359,7 +382,7 @@ describe("addOnePlace", () => {
         })
     })
     it("place with unwanted property - S",(done) => {
-        PlaceService.addOnePlace(placeWithUnwantedProperty,"669ea20a3078f5dda16855f0", null, function(err, value){
+        PlaceService.addOnePlace(placeWithUnwantedProperty,user._id, null, function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('name')
             expect(value).to.not.have.property("ElleEstOuLaPoulette")
@@ -388,13 +411,13 @@ describe("addOnePlace", () => {
             path:"data\\images\\leCanyontadaaa2.jpeg",
             size:716175
         }]
-        ImageService.addManyImages(images, places[2]._id,"669ea20a3078f5dda16855f0", function(err, value){
+        ImageService.addManyImages(images, places[2]._id,user._id, function(err, value){
             imagesTab = [...imagesTab, ...value]
             done()
         })
     })
     it("place with wrong price - E",(done) => {
-        PlaceService.addOnePlace(restaurantWithWrongPrices,"669ea20a3078f5dda16855f0", null, function(err, value){
+        PlaceService.addOnePlace(restaurantWithWrongPrices,user._id, null, function(err, value){
             expect(err).to.be.an("object")
             expect(err).to.haveOwnProperty('type_error')
             expect(err["type_error"]).to.be.equal('no-valid')
@@ -403,7 +426,7 @@ describe("addOnePlace", () => {
         })
     })
     it("Restaurant with string price - E",(done) => {
-        PlaceService.addOnePlace(PlaceWithstringPrice,"669ea20a3078f5dda16855f0", null, function(err, value){
+        PlaceService.addOnePlace(PlaceWithstringPrice,user._id, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('validator')
@@ -412,7 +435,7 @@ describe("addOnePlace", () => {
         })
     })
     it("Restaurant with null price - E",(done) => {
-        PlaceService.addOnePlace(PlaceWithNullPrice,"669ea20a3078f5dda16855f0", null, function(err, value){
+        PlaceService.addOnePlace(PlaceWithNullPrice,user._id, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('validator')
@@ -424,7 +447,7 @@ describe("addOnePlace", () => {
         })
     })
     it("Restaurant with three price - E",(done) => {
-        PlaceService.addOnePlace(PlaceWithThreePrices,"669ea20a3078f5dda16855f0", null, function(err, value){
+        PlaceService.addOnePlace(PlaceWithThreePrices,user._id, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('validator')
@@ -436,7 +459,7 @@ describe("addOnePlace", () => {
         })
     })
     it("Place with uncorrect type - E",(done) => {
-        PlaceService.addOnePlace(placeWithUncorrectType,"669ea20a3078f5dda16855f0", null, function(err, value){
+        PlaceService.addOnePlace(placeWithUncorrectType,user._id, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('validator')
@@ -445,7 +468,7 @@ describe("addOnePlace", () => {
         })
     })
     it("Place with many error - E",(done) => {
-        PlaceService.addOnePlace(placeNothingGood,"669ea20a3078f5dda16855f0", null, function(err, value){
+        PlaceService.addOnePlace(placeNothingGood,user._id, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('validator')
@@ -454,7 +477,7 @@ describe("addOnePlace", () => {
         })
     })
     it("Place without object - E",(done) => {
-        PlaceService.addOnePlace(null, null,"669ea20a3078f5dda16855f0", function(err, value){
+        PlaceService.addOnePlace(null, null,user._id, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('no-valid')
@@ -624,7 +647,7 @@ describe("deleteOnePlace",() => {
         })
     })
     it("delete on place with correct ID but not exist - E",(done) => {
-        PlaceService.deleteOnePlace("669ea20a3078f5dda16855f0", null, function(err, value){
+        PlaceService.deleteOnePlace(user._id, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('no-found')
@@ -658,7 +681,7 @@ describe("deleteOnePlace",() => {
 
 describe("deleteManyPlaces",()=>{
     it("delete many places with not array - E",(done)=>{
-        PlaceService.deleteManyPlaces("669ea20a3078f5dda16855f0", null, function(err, value){
+        PlaceService.deleteManyPlaces(user._id, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal("no-valid")
@@ -666,7 +689,7 @@ describe("deleteManyPlaces",()=>{
         })
     })
     it("delete many places with correct ID but not exist - E",(done)=>{
-        PlaceService.deleteManyPlaces(["669ea20a3078f5dda16855f0","66a0cee18af9a80e789f14cc"], null, function(err, value){
+        PlaceService.deleteManyPlaces([user._id,"66a0cee18af9a80e789f14cc"], null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal("no-found")
@@ -727,5 +750,12 @@ describe("deleteManyPlaces",()=>{
             expect(err['type_error']).to.be.equal('no-found')
         })
         done()
+    })
+})
+describe("delete user",() => {
+    it("delete",(done)=>{
+        UserService.deleteOneUser(user._id, null, function(err, value){
+            done()
+        })
     })
 })
