@@ -324,7 +324,27 @@ module.exports.PlaceService =  class PlaceService{
                     }
                 }
             ]);
+            const comments = await Place.aggregate([{
+                    $match: {_id: new mongoose.Types.ObjectId(places_id[i])} 
+                    },
+                    {
+                        $lookup: {
+                            from: "comments",
+                            localField: "_id",
+                            foreignField: "place_id",
+                            as: 'comments'
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            comments: 1
+                        }
+                    }
+                ])
             const images_id = (images.length>0 && images[0].images)? _.map(images[0].images,"_id") : []
+            const comments_id = (comments.length>0 && comments[0].comments)? _.map(comments[0].comments,"_id") : []
+
 
             if(images_id.length>0){
                 await ImageService.deleteManyImages(images_id, function(err, value){
@@ -332,7 +352,14 @@ module.exports.PlaceService =  class PlaceService{
                         return callback({msg:"la suppression des images a rencontré un problème",type_error:"aborded", err})
                     }
                 })
-            }   
+            } 
+            if(comments_id.length>0){
+                await CommentServices.deleteManyComments(comments_id, function(err, value){
+                    if (err){
+                        return callback({msg:"la suppression des commentaires a rencontré un problème",type_error:"aborded", err})
+                    }
+                })
+            }  
             Place.findByIdAndDelete(place_id).then((value) => {
                 try{
                     if(value){
