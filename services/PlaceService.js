@@ -1,5 +1,6 @@
 const PlaceSchema = require ("../schemas/Place").PlaceSchema
 const ImageService = require("../services/ImageService").ImageService
+const CommentServices  = require("./CommentService").CommentServices
 const { log } = require("async");
 const _ = require('lodash')
 const mongoose = require('mongoose');
@@ -354,6 +355,7 @@ module.exports.PlaceService =  class PlaceService{
         if (places_id && Array.isArray(places_id) && places_id.length>0  && places_id.filter((e) => { return mongoose.isValidObjectId(e) }).length == places_id.length){
             places_id = places_id.map((place) => { return new mongoose.Types.ObjectId(place) })
             let images_id = []
+            let comments_id = []
             for(let i=0; i<places_id.length; i++){
                 const images = await Place.aggregate([{
                     $match: {_id: new mongoose.Types.ObjectId(places_id[i])} 
@@ -373,14 +375,42 @@ module.exports.PlaceService =  class PlaceService{
                         }
                     }
                 ])
+                const comments = await Place.aggregate([{
+                    $match: {_id: new mongoose.Types.ObjectId(places_id[i])} 
+                    },
+                    {
+                        $lookup: {
+                            from: "comments",
+                            localField: "_id",
+                            foreignField: "place_id",
+                            as: 'comments'
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            comments: 1
+                        }
+                    }
+                ])
                 const imagesIdForOnePlace = images.length>0 && images[0].images ? _.map(images[0].images,"_id") : []
+                const commentsIdForOnePlace = comments.length>0 && comments[0].comments? _map(comments[0].comments,"_id") :[]
                 images_id = [...images_id, ...imagesIdForOnePlace]
+                comments_id = [...comments_id, ...commentsIdForOnePlace]
             }
 
             if(images_id.length>0){
                 await ImageService.deleteManyImages(images_id, function(err, value){
                     if (err){
                         return callback({msg:"la suppression des images a rencontré un problème",type_error:"aborded", err})
+                    }
+                })
+            }
+
+            if(comments_id.length>0){
+                await CommentServices.deleteManyComments(comments_id, function(err, value){
+                    if (err){
+                        return callback({msg:"la suppression des commentaires a rencontré un problème",type_error:"aborded", err})
                     }
                 })
             }

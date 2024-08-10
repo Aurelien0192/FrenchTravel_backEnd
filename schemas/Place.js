@@ -162,4 +162,10 @@ PlaceSchema.virtual('images',{
     foreignField:'place'
 })
 
+PlaceSchema.virtual('comments',{
+    ref:'Comment',
+    localField : '_id',
+    foreignField:'place_id'
+})
+
 module.exports.PlaceSchema = PlaceSchema

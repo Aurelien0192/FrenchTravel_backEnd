@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const CommentSchema = require('../schemas/Comment').CommentSchema
 const PlaceService = require('./PlaceService').PlaceService
+const LikeCommentService = require("./LikeCommentService").LikeCommentService
 const _ = require('lodash')
 const LikeCommentSchema = require('../schemas/LikeComment').LikeCommentSchemas
 
@@ -225,6 +226,37 @@ module.exports.CommentServices = class CommentService{
             })
         }else{
             !update ? callback({msg: "propriété udpate inexistante", fields_with_error: [], fields:"", type_error: "no-valid"}) : callback({msg: "Id non conforme", type_error: "no-valid"})
+        }
+    }
+
+    static async deleteManyComments(comments_id, callback){
+        if (comments_id && Array.isArray(comments_id) && comments_id.length>0  && comments_id.filter((e) => { return mongoose.isValidObjectId(e) }).length == comments_id.length){
+            comments_id = comments_id.map((comment) => {return new mongoose.Types.ObjectId(comment)})
+            Comment.deleteMany({_id: comments_id}).then((value) => {
+                if (value && value.deletedCount !== 0){
+                    LikeCommentService.deleteManyLikesComments(comments_id, function(err, value){
+                        if(err){
+                            callback({msg:"la suppression des images a rencontré un problème",type_error:"aborded", err})
+                        }
+                    })
+                    callback(null, value)
+                }else{
+                    callback({msg: "Aucun likes trouvés", type_error: "no-found"})
+                }
+            }).catch((err) => {
+                callback({msg:"Erreur avec la base de donnée", type_error: "error-mongo"})
+            })
+        }
+        else if (comments_id && Array.isArray(comments_id) && comments_id.length > 0 && comments_id.filter((e) => { return mongoose.isValidObjectId(e) }).length != comments_id.length) {
+            callback({ msg: "Tableau non conforme plusieurs éléments ne sont pas des ObjectId.", type_error: 'no-valid', fields: comments_id.filter((e) => { return !mongoose.isValidObjectId(e) }) });
+        }
+        else if (comments_id && !Array.isArray(comments_id)) {
+            callback({ msg: "L'argement n'est pas un tableau.", type_error: 'no-valid' });
+
+        }
+        else {
+            
+            callback({ msg: "Tableau non conforme.", type_error: 'no-valid' });
         }
     }
 }
