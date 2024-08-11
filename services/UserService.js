@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 const UserSchema = require('../schemas/User').UserSchema
-const PlaceService = require("../services/PlaceService").PlaceService
 const ImageService = require("../services/ImageService").ImageService
 const _ = require('lodash')
 const bcrypt = require("bcryptjs")
@@ -215,26 +214,6 @@ module.exports.UserService = class UserService{
 
     static async deleteOneUser(user_id, options,callback) {
     if (user_id && mongoose.isValidObjectId(user_id)) {
-            const places = await User.aggregate([{
-                $match: {_id: new mongoose.Types.ObjectId(user_id)} 
-                },
-                {
-                    $lookup: {
-                        from: "places",
-                        localField: "_id",
-                        foreignField: "owner",
-                        as: 'places'
-                    }
-                },
-                {
-                    $project: {
-                        _id: 0,
-                        places: 1
-                    }
-                }
-            ]);
-            
-            const places_id = (places.length>0 && places[0].places)? _.map(places[0].places,"_id") : []
 
             const images = await User.aggregate([{
                 $match: {_id: new mongoose.Types.ObjectId(user_id)} 
@@ -256,13 +235,7 @@ module.exports.UserService = class UserService{
             ]);
 
             const images_id = (images.length>0 && images[0].images)? _.map(images[0].images,"_id") : []
-            if(places_id.length>0){
-                await PlaceService.deleteManyPlaces(places_id,null, function(err, value){
-                    if(err){
-                        return callback({msg:"la suppression des lieux n'a pas fonctionné", type_error:"aborded", err})
-                    }
-                })
-            }
+
             if(images_id.length>0){
                 await ImageService.deleteManyImages(images_id, function(err, value){
                     if (err){
@@ -272,8 +245,8 @@ module.exports.UserService = class UserService{
             }
 
             await User.findByIdAndDelete(user_id).then((value) => {
-                    try {
-                        if (value){
+                try {
+                    if (value){
                             callback(null, value.toObject())
                         }else{
                             callback({ msg: "Utilisateur non trouvé.", fields_with_error: [], fields:"", type_error: "no-found" });

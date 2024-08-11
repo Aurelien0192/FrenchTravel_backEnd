@@ -85,11 +85,11 @@ module.exports.UserControllers = class UserControllers{
 
 
 
-    static deleteOneUser(req, res){
+    static deleteOneUser(req, res, next){
         const opts = null
         UserService.deleteOneUser(req.params.id, opts, function(err, value){
             req.log.info("Suppression d'un utilisateur")
-            responseOfServer(err, value, req, res, false)
+            responseOfServer(err, value, req, res, false, next)
         })
     }
 }

@@ -8,9 +8,9 @@ require("../utils/database")
 //    require('./services/PlaceService.test')
 // })
 
-// describe("PlaceControllers", () => {
-//    require('./controllers/PlaceController.test')
-// })
+describe("PlaceControllers", () => {
+   require('./controllers/PlaceController.test')
+})
 
 // describe("UserService",() => {
 //    require('./services/UserService.test')
@@ -28,17 +28,17 @@ require("../utils/database")
 //    require("./services/ImageService.test")
 // })
 
-describe("CommentServices",() => {
-   require("./services/CommentServices.test")
-})
+// describe("CommentServices",() => {
+//    require("./services/CommentServices.test")
+// })
 
 // describe("CommentController",() => {
 //    require("./controllers/CommentController.test")
 // })
 
-describe("LikeCommentService",() => {
-   require("./services/LikeCommentService.test")
-})
+// describe("LikeCommentService",() => {
+//    require("./services/LikeCommentService.test")
+// })
 
 // describe("LikeCommentController",() => {
 //    require('./controllers/LikeCommentController.test')

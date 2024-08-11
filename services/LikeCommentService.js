@@ -6,8 +6,6 @@ const LikeCommentSchema = require('../schemas/LikeComment').LikeCommentSchemas
 
 const LikeComment = mongoose.model('LikeComment',LikeCommentSchema)
 
-console.log(CommentService)
-
 module.exports.LikeCommentService = class LikeCommentService{
     static async addOneLikeOnComment(comment_id, user_id, nbOfLike, options, callback){
         if(comment_id && mongoose.isValidObjectId(comment_id) && user_id && mongoose.isValidObjectId(user_id)){

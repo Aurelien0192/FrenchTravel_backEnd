@@ -1,6 +1,5 @@
 const PlaceSchema = require ("../schemas/Place").PlaceSchema
 const ImageService = require("../services/ImageService").ImageService
-const CommentServices  = require("./CommentService").CommentServices
 const { log } = require("async");
 const _ = require('lodash')
 const mongoose = require('mongoose');
@@ -324,27 +323,8 @@ module.exports.PlaceService =  class PlaceService{
                     }
                 }
             ]);
-            const comments = await Place.aggregate([{
-                    $match: {_id: new mongoose.Types.ObjectId(places_id[i])} 
-                    },
-                    {
-                        $lookup: {
-                            from: "comments",
-                            localField: "_id",
-                            foreignField: "place_id",
-                            as: 'comments'
-                        }
-                    },
-                    {
-                        $project: {
-                            _id: 0,
-                            comments: 1
-                        }
-                    }
-                ])
+        
             const images_id = (images.length>0 && images[0].images.length>0)? _.map(images[0].images,"_id") : []
-            const comments_id = (comments.length>0 && comments[0].comments.length>0)? _.map(comments[0].comments,"_id") : []
-
 
             if(images_id.length>0){
                 await ImageService.deleteManyImages(images_id, function(err, value){
@@ -353,13 +333,7 @@ module.exports.PlaceService =  class PlaceService{
                     }
                 })
             } 
-            if(comments_id.length>0){
-                await CommentServices.deleteManyComments(comments_id, function(err, value){
-                    if (err){
-                        return callback({msg:"la suppression des commentaires a rencontré un problème",type_error:"aborded", err})
-                    }
-                })
-            }  
+
             Place.findByIdAndDelete(place_id).then((value) => {
                 try{
                     if(value){
@@ -402,28 +376,9 @@ module.exports.PlaceService =  class PlaceService{
                         }
                     }
                 ])
-                const comments = await Place.aggregate([{
-                    $match: {_id: new mongoose.Types.ObjectId(places_id[i])} 
-                    },
-                    {
-                        $lookup: {
-                            from: "comments",
-                            localField: "_id",
-                            foreignField: "place_id",
-                            as: 'comments'
-                        }
-                    },
-                    {
-                        $project: {
-                            _id: 0,
-                            comments: 1
-                        }
-                    }
-                ])
+
                 const imagesIdForOnePlace = images.length>0 && images[0].images.length>0 ? _.map(images[0].images,"_id") : []
-                const commentsIdForOnePlace = comments.length>0 && comments[0].comments.length>0? _map(comments[0].comments,"_id") :[]
                 images_id = [...images_id, ...imagesIdForOnePlace]
-                comments_id = [...comments_id, ...commentsIdForOnePlace]
             }
 
             if(images_id.length>0){
@@ -434,13 +389,6 @@ module.exports.PlaceService =  class PlaceService{
                 })
             }
 
-            if(comments_id.length>0){
-                await CommentServices.deleteManyComments(comments_id, function(err, value){
-                    if (err){
-                        return callback({msg:"la suppression des commentaires a rencontré un problème",type_error:"aborded", err})
-                    }
-                })
-            }
             Place.deleteMany({_id: places_id}).then((value) => {
                 if (value && value.deletedCount !== 0){
                     callback(null, value)

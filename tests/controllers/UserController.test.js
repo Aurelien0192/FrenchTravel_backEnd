@@ -8,6 +8,9 @@ const passport = require('passport')
 chai.use(chaiHttp)
 
 const users = []
+let places = []
+let comments = []
+let like = {}
 const token = []
 
 describe("POST - /User",()=>{
@@ -15,7 +18,7 @@ describe("POST - /User",()=>{
         chai.request(server).post('/user').send({
             firstName : "Eric",
             lastName : "Dupond",
-            userType:"user",
+            userType:"professional",
             username:"EricLaDébrouille",
             password:"coucou",
             email:"eric.dupond@gmail.com"
@@ -32,6 +35,82 @@ describe("POST - /User",()=>{
         }).end((err, res) => {
             res.should.has.status(200)
             token.push(res.body.token)
+            done()
+        })
+    })
+    it("create a good place",(done) => {
+        const goodHotel = {
+            name: "Château du Doubs",
+            describe : "Super chateau dans le centre du Doubs",
+            categorie : "hotel",
+            moreInfo:{
+                services:"ascensceur"
+            },
+            street: "2 rue du Moulin Parnet",
+            city: "Pontarlier",
+            codePostal : "25300",
+            country: "France",
+            county: "Doubs",
+            latCoordinate: 46.907258,
+            lonCoordinate:6.3537263
+        }
+        chai.request(server).post('/place').send(goodHotel).auth(token[0],{type: 'bearer'}).end((err, res)=>{
+            res.should.has.status(201)
+            places.push(res.body)
+            done()
+        })
+    })
+    it("create another good place",(done) => {
+        const placeWithUnwantedProperty = {
+            name: "les tortues",
+            describe : "Super chateau dans le centre du Doubs",
+            categorie : "restaurant",
+            moreInfo:{
+                cook: "lundi : 9h - 18h",
+                price:[10,25]
+            },
+            street: "2 Pont de la République",
+            city: "Besançon",
+            codePostal : "25000",
+            country: "France",
+            county: "Doubs",
+            latCoordinate: 47.2407913,
+            lonCoordinate: 6.0280113,
+            ElleEstOuLaPoulette: "Kammelot"
+        }
+        chai.request(server).post('/place').send(placeWithUnwantedProperty).auth(token[0],{type: 'bearer'}).end((err, res)=>{
+            res.should.has.status(201)
+            places.push(res.body)
+            done()
+        })
+    })
+    it("create a good comment",(done) => {
+        const goodComment = {
+            comment:"superbe après-midi dans ce lieu",
+            note:5,
+            dateVisited: new Date()
+        }
+        chai.request(server).post('/comment').query({place_id : places[1]._id}).auth(token[0],{type: 'bearer'}).send(goodComment).end((err, res) => {
+            res.should.has.status(201)
+            comments.push(res.body)
+            done()
+        })
+    })
+    it("create another good comment - S",(done) => {
+        const goodComment = {
+            comment:"superbe après-midi dans ce lieu",
+            note:5,
+            dateVisited: new Date()
+        }
+        chai.request(server).post('/comment').query({place_id : places[0]._id}).auth(token[0],{type: 'bearer'}).send(goodComment).end((err, res) => {
+            res.should.has.status(201)
+            comments.push(res.body)
+            done()
+        })
+    })
+    it("add a like to a comment - S",(done)=>{
+        chai.request(server).post("/like").query({comment_id:comments[0]._id}).auth(token[0],{type: 'bearer'}).end((err, res) => {
+            res.should.has.status(201)
             done()
         })
     })

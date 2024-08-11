@@ -1,7 +1,6 @@
 const mongoose = require('mongoose')
 const CommentSchema = require('../schemas/Comment').CommentSchema
 const PlaceService = require('./PlaceService').PlaceService
-//const LikeCommentService = require("./LikeCommentService").LikeCommentService
 const _ = require('lodash')
 const LikeCommentSchema = require('../schemas/LikeComment').LikeCommentSchemas
 
@@ -11,7 +10,6 @@ CommentSchema.set('toJSON',{virtuals:true})
 CommentSchema.set('toObject',{virtuals:true})
 
 const Comment = mongoose.model('Comment',CommentSchema)
-
 
 module.exports.CommentServices = class CommentService{
 
@@ -135,14 +133,6 @@ module.exports.CommentServices = class CommentService{
                 }
             }
             
-            if(fieldsToSearch.includes('place_id')){
-                if(mongoose.isValidObjectId(filter.place_id)){
-                    filter.place_id = new mongoose.Types.ObjectId(filter.place_id)
-                }else{
-                    return callback({msg:"place_id is not a valid id",type_error:"no-valid"})
-                }
-            }
-            
             if (Number.isNaN(page) || Number.isNaN(limit)){
                 
                 callback ({msg: `format de ${Number.isNaN(page) ? "page" : "limit"} est incorrect`, type_error:"no-valid"})
@@ -233,16 +223,7 @@ module.exports.CommentServices = class CommentService{
         if (comments_id && Array.isArray(comments_id) && comments_id.length>0  && comments_id.filter((e) => { return mongoose.isValidObjectId(e) }).length == comments_id.length){
             comments_id = comments_id.map((comment) => {return new mongoose.Types.ObjectId(comment)})
             Comment.deleteMany({_id: comments_id}).then((value) => {
-                if (value && value.deletedCount !== 0){
-                    LikeCommentService.deleteManyLikesComments(comments_id, function(err, value){
-                        if(err && err.type_error !== "no-found"){
-                            callback({msg:"la suppression des likes a rencontré un problème",type_error:"aborded", err})
-                        }
-                    })
-                    callback(null, value)
-                }else{
-                    callback({msg: "Aucun likes trouvés", type_error: "no-found"})
-                }
+                callback(null, value)
             }).catch((err) => {
                 callback({msg:"Erreur avec la base de donnée", type_error: "error-mongo"})
             })

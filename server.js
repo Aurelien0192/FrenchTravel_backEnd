@@ -46,6 +46,7 @@ const LikeCommentController = require('./controllers/LikeCommentController').Lik
 // Import des middlewares
 const controleOwner = require('./middlewares/controleOwner')
 const controlePlaceExist = require('./middlewares/controlePlaceExist').controlePlaceExist
+const deleteDependency = require('./middlewares/deleteDependency').deleteDependency
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -66,7 +67,7 @@ app.post('/user', database.controlsBDD, UserControllers.addOneUser)
 app.get('/user/:id', database.controlsBDD, passport.authenticate('jwt',{session:false}),UserControllers.findOneUserById)
 app.put('/user/:id', database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwner,UserControllers.updateOneUser)
 app.put('/profilePhoto/user', database.controlsBDD,passport.authenticate('jwt',{session:false}),ImageController.deleteOneImage,multerOneImage,ImageController.addOneImage,UserControllers.updateUserProfilePhoto)
-app.delete('/user/:id', database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwner,UserControllers.deleteOneUser)
+app.delete('/user/:id', database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwner,UserControllers.deleteOneUser, deleteDependency.deleteAttachedDocumentsOfUser)
 
 //routes for Place
 
@@ -76,8 +77,8 @@ app.get('/place/:id',database.controlsBDD,PlaceControllers.FindOnePlaceById)
 app.get('/places', database.controlsBDD,PlaceControllers.findManyPlaces)
 app.get('/places/random',database.controlsBDD,PlaceControllers.findManyPlacesRandom)
 app.get('/places/suggestions',database.controlsBDD,PlaceControllers.findPlacesNear)
-app.delete('/place/:id', database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwnerOfPlace,PlaceControllers.deleteOnePlace)
-app.delete('/places', database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwnerOfPlaces,PlaceControllers.deleteManyPlaces)
+app.delete('/place/:id', database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwnerOfPlace,PlaceControllers.deleteOnePlace,deleteDependency.deleteAttachedDocumentsOfPlaces)
+app.delete('/places', database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwnerOfPlaces,PlaceControllers.deleteManyPlaces,deleteDependency.deleteAttachedDocumentsOfPlaces)
 
 //routes for api call
     //routes for geocodes
