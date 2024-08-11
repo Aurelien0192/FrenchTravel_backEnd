@@ -7,7 +7,7 @@ module.exports.deleteDependency = class DeleteDependency{
     static deleteAttachedCommentsOfUser(req, res){
         let error = "Votre profil a bien été supprimé mais"
         error = error, deleteAttachedDocumentsOfUser(req.params._id)
-        if(error !== "Votre établissement a bien été supprimé mais"){
+        if(error !== "Votre profil a bien été supprimé mais"){
             res.status(500).send({err:error})
         }else{  
             res.status(200).send({msg: "la suppression de votre établissement c'est déroulée avec succès"})
@@ -28,7 +28,6 @@ module.exports.deleteDependency = class DeleteDependency{
         let error = "Votre profil a bien été supprimé mais"
         const errorsFromOtherServices = []
         PlaceService.findManyPlaces(null, null, {user_id:req.params.id},null,function(err, value){
-            console.log(value)
             if(err && err.type_error !== "no-found"){
                 error = error, "une erreur c'est produite lors de la recherche de vos établissements"
             }

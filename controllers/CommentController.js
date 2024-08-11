@@ -6,7 +6,6 @@ const _ = require('lodash')
 module.exports.CommentController = class CommentController{
 
     static addOneComment(req, res){
-        console.log("ok")
          req.log.info("Ajout d'un commentaire par un utilisateur")
         CommentServices.findManyComments(null, null, {place_id: req.query.place_id}, null, null, function(err, value){
             if(err && err.type_error === "no-valid"){
@@ -20,6 +19,12 @@ module.exports.CommentController = class CommentController{
                     responseOfServer(err, value, req, res, true)
                 })
             }
+        })
+    }
+
+    static findOneCommentById(req, res){
+        CommentServices.findOneCommentById(req.params.id, null, function(err, value){
+            responseOfServer(err, value, req, res, false)
         })
     }
 

@@ -82,7 +82,7 @@ module.exports.PlaceControllers = class PlaceControllers {
     static async deleteManyPlaces(req, res, next){
         req.log.info("Supprimer plusieurs lieux")
         PlaceService.deleteManyPlaces(req.query.ids, null, function(err, value){
-            responseOfServer(err, value, req, res, false)
+            responseOfServer(err, value, req, res, false, next)
         })
     }
 

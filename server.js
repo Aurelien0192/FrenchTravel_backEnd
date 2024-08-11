@@ -67,7 +67,7 @@ app.post('/user', database.controlsBDD, UserControllers.addOneUser)
 app.get('/user/:id', database.controlsBDD, passport.authenticate('jwt',{session:false}),UserControllers.findOneUserById)
 app.put('/user/:id', database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwner,UserControllers.updateOneUser)
 app.put('/profilePhoto/user', database.controlsBDD,passport.authenticate('jwt',{session:false}),ImageController.deleteOneImage,multerOneImage,ImageController.addOneImage,UserControllers.updateUserProfilePhoto)
-app.delete('/user/:id', database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwner,UserControllers.deleteOneUser, deleteDependency.deleteAttachedDocumentsOfUser)
+app.delete('/user/:id', database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwner,UserControllers.deleteOneUser,deleteDependency.deleteAttachedCommentsOfUser)
 
 //routes for Place
 
@@ -95,6 +95,7 @@ app.delete('/image/:id',database.controlsBDD,passport.authenticate('jwt',{sessio
 //routes postComment
 
 app.post('/comment',database.controlsBDD,passport.authenticate('jwt',{session:false}),controlePlaceExist,CommentController.addOneComment)
+app.get('comment/:id',database.controlsBDD, CommentController.findOneCommentById)
 app.get('/comments',database.controlsBDD, CommentController.findManyComments)
 
 //routes likeComment
