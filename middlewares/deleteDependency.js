@@ -4,15 +4,6 @@ const PlaceService = require("../services/PlaceService").PlaceService
 const _ = require("lodash")
 
 module.exports.deleteDependency = class DeleteDependency{
-    static deleteAttachedCommentsOfUser(req, res){
-        let error = "Votre profil a bien été supprimé mais"
-        error = error, deleteAttachedDocumentsOfUser(req.params._id)
-        if(error !== "Votre profil a bien été supprimé mais"){
-            res.status(500).send({err:error})
-        }else{  
-            res.status(200).send({msg: "la suppression de votre établissement c'est déroulée avec succès"})
-        }  
-    }
 
     static deleteAttachedDocumentsOfPlaces(req, res){
     let error = "Votre établissement a bien été supprimé mais"

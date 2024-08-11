@@ -61,6 +61,27 @@ module.exports.LikeCommentService = class LikeCommentService{
         }
     }
 
+    static async findOneLikeCommentById(likeComment_id, options, callback) {
+        if(likeComment_id && mongoose.isValidObjectId(likeComment_id)){
+            LikeComment.findById(likeComment_id).then((value) => {
+                try{
+                    if (value){
+                        callback(null, value.toObject())
+                    }else{
+                        callback({msg:"Aucun like trouvée", fields_with_error: [], fields:"", type_error: "no-found"})
+                    }
+                }catch(e){
+                    console.log(e)
+                    callback({msg: "Erreur avec la base de donnée", fields_with_error: [], fields:"", type_error:"error-mongo"})
+                }
+            }).catch((err) => {
+                callback(err)
+            })
+        }else{
+            callback({msg: "Id non conforme", fields_with_error: [], fields:"", type_error: "no-valid"})
+        }
+    }
+
     static async deleteOneLikeComment(comment_id, user_id, nbOfLike ,options, callback){
         if(user_id && mongoose.isValidObjectId(user_id)){
             const userId = new mongoose.Types.ObjectId(user_id)

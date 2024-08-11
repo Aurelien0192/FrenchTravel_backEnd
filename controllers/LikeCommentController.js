@@ -22,6 +22,7 @@ module.exports.LikeCommentController = class LikeCommentController{
             }
         })
     }
+
     static deleteOneLikeOnComment(req, res){
         CommentServices.findOneCommentById(req.params.id, null, function(err, value){
             if(err && (err.type_error === "no-valid" || err.type_error === "validator" || err.type_error === "duplicate")){

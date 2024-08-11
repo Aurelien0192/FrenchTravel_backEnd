@@ -4,13 +4,14 @@ const should = chai.should()
 const expect = chai.expect
 const server = require('./../../server')
 const passport = require('passport')
+const LikeCommentService = require("../../services/LikeCommentService").LikeCommentService
 
 chai.use(chaiHttp)
 
 const users = []
 let places = []
 let comments = []
-let like = {}
+const like = []
 const token = []
 
 describe("POST - /User",()=>{
@@ -90,7 +91,7 @@ describe("POST - /User",()=>{
             note:5,
             dateVisited: new Date()
         }
-        chai.request(server).post('/comment').query({place_id : places[1]._id}).auth(token[0],{type: 'bearer'}).send(goodComment).end((err, res) => {
+        chai.request(server).post('/comment').query({place_id : places[0]._id}).auth(token[0],{type: 'bearer'}).send(goodComment).end((err, res) => {
             res.should.has.status(201)
             comments.push(res.body)
             done()
@@ -102,15 +103,23 @@ describe("POST - /User",()=>{
             note:5,
             dateVisited: new Date()
         }
-        chai.request(server).post('/comment').query({place_id : places[0]._id}).auth(token[0],{type: 'bearer'}).send(goodComment).end((err, res) => {
+        chai.request(server).post('/comment').query({place_id : places[1]._id}).auth(token[0],{type: 'bearer'}).send(goodComment).end((err, res) => {
             res.should.has.status(201)
             comments.push(res.body)
             done()
         })
     })
-    it("add a like to a comment - S",(done)=>{
+    it("add a like to a comment one - S",(done)=>{
         chai.request(server).post("/like").query({comment_id:comments[0]._id}).auth(token[0],{type: 'bearer'}).end((err, res) => {
             res.should.has.status(201)
+            like.push(res.body)
+            done()
+        })
+    })
+    it("add a like to a comment two - S",(done)=>{
+        chai.request(server).post("/like").query({comment_id:comments[1]._id}).auth(token[0],{type: 'bearer'}).end((err, res) => {
+            res.should.has.status(201)
+            like.push(res.body)
             done()
         })
     })
@@ -333,6 +342,34 @@ describe("/DELETE -/user:id",()=>{
         chai.request(server).delete(`/user/${users[0]._id}`).auth(token[0],{type: 'bearer'}).end((err,res)=>{
             res.should.have.status(200)
             users.splice(0,1)
+            done()
+        })
+    })
+    it('check comment one is deleted - S',(done)=>{
+        chai.request(server).get(`/comment/${comments[0]._id}`).end((err, res)=>{
+            res.should.have.status(404)
+            done()
+        })
+    })
+    it('check comment two is deleted - S',(done)=>{
+        chai.request(server).get(`/comment/${comments[1]._id}`).end((err, res)=>{
+            res.should.have.status(404)
+            done()
+        })
+    })
+    it('check like first comment is deleted - S',(done) =>{
+        LikeCommentService.findOneLikeCommentById(like[0]._id, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal("no-found")
+            done()
+        })
+    })
+    it('check like second comment is deleted - S',(done) =>{
+        LikeCommentService.findOneLikeCommentById(like[1]._id, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal("no-found")
             done()
         })
     })

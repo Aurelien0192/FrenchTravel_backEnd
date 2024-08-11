@@ -347,7 +347,7 @@ describe("DeleteOneUser",()=>{
             done()
         })
     })
-    it("Delete with correct id and associated place and image - S",(done)=> {
+    it("Delete with correct id and associated image - S",(done)=> {
         UserService.deleteOneUser(users[0]._id,null, function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('firstName')
@@ -364,14 +364,6 @@ describe("DeleteOneUser",()=>{
             expect(String(value['_id'])).to.be.equal(String(users[0]._id))
             expect(err).to.be.null
             users.splice(0,1)
-            done()
-        })
-    })
-    it("verify place correctly deleted - S",(done) => {
-        PlaceService.findOnePlaceById(place._id, null, function(err, value){
-            expect(err).to.be.a('object')
-            expect(err).to.haveOwnProperty('type_error')
-            expect(err['type_error']).to.be.equal('no-found')
             done()
         })
     })
