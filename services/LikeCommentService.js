@@ -1,6 +1,8 @@
 const mongoose = require('mongoose')
 const CommentService = require('./CommentService').CommentServices
+const ErrorGenerator = require('../utils/errorGenerator').errorGenerator
 const _ = require('lodash')
+const { errorGenerator } = require('../utils/errorGenerator')
 
 const LikeCommentSchema = require('../schemas/LikeComment').LikeCommentSchemas
 
@@ -15,20 +17,7 @@ module.exports.LikeCommentService = class LikeCommentService{
             })
             let errors = newLike.validateSync()
             if(errors){
-                errors = errors['errors']
-                const text = Object.keys(errors).map((e) => {
-                    return !errors[e].stringValue? errors[e]['properties']['message'] : `type ${errors[e]['valueType']} is not allowed in path ${errors[e]['path']}`
-                }).join (' ')
-                const fields = _.transform(Object.keys(errors), function (result, value) {
-                    errors[value].properties ? result[value] = errors[value]['properties']['message'] : result[value] = ""
-                },{})
-                let fields_with_error = Object.keys(errors)                    
-                const err = {
-                    msg: text,
-                    fields_with_error: fields_with_error,
-                    fields: fields,
-                    type_error : "validator"
-                }
+                const err = ErrorGenerator.generateErrorSchemaValidator(errors)
                 callback(err)
             }else{
                 try{
@@ -49,15 +38,7 @@ module.exports.LikeCommentService = class LikeCommentService{
                 }
             }
         }else{
-            if(!comment_id){
-                callback({msg: "comment ID is missing", type_error:"no-valid"})
-            }else if(!mongoose.isValidObjectId(comment_id)){
-                callback({msg: "comment ID is uncorrect", type_error:"no-valid"})
-            }else if(!user_id){
-                callback({msg: "user ID is missing", type_error:"no-valid"})
-            }else if(!mongoose.isValidObjectId(user_id)){
-                callback({msg: "user ID is uncorrect", type_error:"no-valid"})
-            }
+            callback(errorGenerator.controlIntegrityofID({comment_id, user_id}))
         }
     }
 
