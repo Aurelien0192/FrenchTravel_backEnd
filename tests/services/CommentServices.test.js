@@ -55,6 +55,7 @@ describe("AddOneComment",() => {
             dateVisited: new Date()
         }
         CommentService.addOneComment(user._id,place._id,goodComment, null, function(err, value){
+            console.log(err, value)
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty("note")
             expect(value["note"]).to.be.equal(5)

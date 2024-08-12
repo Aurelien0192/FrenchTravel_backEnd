@@ -1,3 +1,4 @@
+const { response } = require('express')
 const mongoose = require('mongoose')
 
 const CommentSchema = mongoose.Schema({
@@ -16,10 +17,14 @@ const CommentSchema = mongoose.Schema({
         required: true,
         index:true
     },
-    like:{
+   like:{
         type: Number,
         required:true,
         default:0
+    },
+    response:{
+        type: mongoose.Types.ObjectId,
+        ref:"Comment"
     },
     note:{
         type: Number,
