@@ -1,7 +1,9 @@
 const mongoose = require('mongoose')
 const CommentSchema = require('../schemas/Comment').CommentSchema
 const PlaceService = require('./PlaceService').PlaceService
+const ErrorGenerator = require('../utils/errorGenerator').errorGenerator
 const _ = require('lodash')
+const { errorGenerator } = require('../utils/errorGenerator')
 const LikeCommentSchema = require('../schemas/LikeComment').LikeCommentSchemas
 
 const LikeComment = mongoose.model('LikeComment',LikeCommentSchema)
@@ -24,22 +26,7 @@ module.exports.CommentServices = class CommentService{
                 const notation = comment.notation
                 let errors = newComment.validateSync()
                 if(errors){
-                    errors = errors['errors']
-                    const text = Object.keys(errors).map((e) => {
-                        return !errors[e].stringValue? errors[e]['properties']['message'] : `type ${errors[e]['valueType']} is not allowed in path ${errors[e]['path']}`
-                    }).join (' ')
-
-                    const fields = _.transform(Object.keys(errors), function (result, value) {
-                        errors[value].properties ? result[value] = errors[value]['properties']['message'] : result[value] = ""
-                    },{})
-                    let fields_with_error = Object.keys(errors)
-
-                    const err = {
-                        msg: text,
-                        fields_with_error: fields_with_error,
-                        fields: fields,
-                        type_error : "validator"
-                    }
+                    const err = ErrorGenerator.generateErrorSchemaValidator(errors)
                     callback(err)
                 }else{
                     newComment.notation = 0
@@ -61,15 +48,10 @@ module.exports.CommentServices = class CommentService{
                 }
                 
             }else{
-                if(!user_id){
-                    callback({msg:"user_id is missing",type_error:"no-valid"})
-                }else if(!mongoose.isValidObjectId(user_id)){
-                    callback({msg:"user_id is uncorrect",type_error:"no-valid"})
-                }else if(!place_id){
-                    callback({msg:"place_id is missing",type_error:"no-valid"})
-                }else if(!mongoose.isValidObjectId(place_id)){
-                    callback({msg:"place_id is uncorrect",type_error:"no-valid"})
+                if(comment){
+                        callback(ErrorGenerator.controlIntegrityofID({user_id, place_id}))
                 }else{
+                    console.log("ok")
                     callback({
                         msg:"comment is missing",
                         fields_with_error: ["comment"],
@@ -94,22 +76,7 @@ module.exports.CommentServices = class CommentService{
                 const notation = comment.notation
                 let errors = newComment.validateSync()
                 if(errors){
-                    errors = errors['errors']
-                    const text = Object.keys(errors).map((e) => {
-                        return !errors[e].stringValue? errors[e]['properties']['message'] : `type ${errors[e]['valueType']} is not allowed in path ${errors[e]['path']}`
-                    }).join (' ')
-
-                    const fields = _.transform(Object.keys(errors), function (result, value) {
-                        errors[value].properties ? result[value] = errors[value]['properties']['message'] : result[value] = ""
-                    },{})
-                    let fields_with_error = Object.keys(errors)
-
-                    const err = {
-                        msg: text,
-                        fields_with_error: fields_with_error,
-                        fields: fields,
-                        type_error : "validator"
-                    }
+                    const err = ErrorGenerator.generateErrorSchemaValidator(errors)
                     callback(err)
                 }else{
                     newComment.notation = 0
@@ -127,14 +94,9 @@ module.exports.CommentServices = class CommentService{
                 }
                 
             }else{
-                if(!user_id){
-                    callback({msg:"user_id is missing",type_error:"no-valid"})
-                }else if(!mongoose.isValidObjectId(user_id)){
-                    callback({msg:"user_id is uncorrect",type_error:"no-valid"})
-                }else if(!place_id){
-                    callback({msg:"place_id is missing",type_error:"no-valid"})
-                }else if(!mongoose.isValidObjectId(place_id)){
-                    callback({msg:"place_id is uncorrect",type_error:"no-valid"})
+                consolr.log("ok")
+                if(comment){
+                    callback(ErrorGenerator.controlIntegrityofID({user_id, comment_id, place_id}))
                 }else{
                     callback({
                         msg:"comment is missing",
@@ -245,30 +207,12 @@ module.exports.CommentServices = class CommentService{
                 }
             }).catch((errors) =>{
                 if (errors.code === 11000) { // Erreur de duplicité
-                    var field = Object.keys(errors.keyPattern)[0];
-                    var err = {
-                        msg: `Duplicate key error: ${field} must be unique.`,
-                        fields_with_error: [field],
-                        fields: { [field]: `The ${field} is already taken.` },
-                        type_error: "duplicate"
-                    };
+                    const err = ErrorGenerator.generateErrorOfDuplicate(errors)
                     callback(err);
                 }else{
                     let err = {}
                     if(errors['errors']){
-                        errors = errors['errors']
-                        let text = Object.keys(errors).map((e) => {
-                            return errors[e]['properties']['message']
-                        }).join(' ')
-                        let fields = _.transform(Object.keys(errors), function (result, value) {
-                            result[value] = errors[value]['properties']['message'];
-                        }, {});
-                        err = {
-                            msg: text,
-                            fields_with_error: Object.keys(errors),
-                            fields: fields,
-                            type_error: "validator"
-                        }
+                        err = ErrorGenerator.generateErrorSchemaValidator(errors)
                     }else{
                         err ={
                             msg: `${errors.kind} not allowed in ${errors.path}`,
