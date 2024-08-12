@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const UserSchema = require('../schemas/User').UserSchema
 const ImageService = require("../services/ImageService").ImageService
+const ErrorGenerator = require("../utils/errorGenerator").errorGenerator
 const _ = require('lodash')
 const bcrypt = require("bcryptjs")
 const TokenUtils = require('./../utils/token')
@@ -38,20 +39,7 @@ module.exports.UserService = class UserService{
             const newUser = new User(user)
             let errors = newUser.validateSync()
             if(errors){
-                errors = errors['errors']
-                const text = Object.keys(errors).map((e) => {
-                    return errors[e]['properties']['message']
-                }).join(' ')
-                const fields = _.transform(Object.keys(errors),function (result, value){
-                    result[value] = errors[value]['properties']['message']
-                }, {})
-
-                const err= {
-                    msg: text,
-                    fields_with_error: Object.keys(errors),
-                    fields: fields,
-                    type_error: "validator"
-                }
+                const err = ErrorGenerator.generateErrorSchemaValidator(errors)
                 callback(err)
             }else{
                 await newUser.save()
@@ -59,13 +47,7 @@ module.exports.UserService = class UserService{
             }
         } catch (error) {
             if (error.code === 11000) { 
-                var field = Object.keys(error.keyValue)[0];
-                var err = {
-                    msg: `Duplicate key error: ${field} must be unique.`,
-                    fields_with_error: [field],
-                    fields: { [field]: `The ${field} is already taken.` },
-                    type_error: "duplicate"
-                };
+                const err = ErrorGenerator.generateErrorOfDuplicate(error)
                 callback(err);
             } else {
                 callback({msg: "Erreur avec la base de donnée", fields_with_error: [], fields:"", type_error:"error-mongo"})
@@ -165,28 +147,10 @@ module.exports.UserService = class UserService{
                 }
             }).catch((errors) =>{
                 if (errors.code === 11000) { // Erreur de duplicité
-                    var field = Object.keys(errors.keyPattern)[0];
-                    var err = {
-                        msg: `Duplicate key error: ${field} must be unique.`,
-                        fields_with_error: [field],
-                        fields: { [field]: `The ${field} is already taken.` },
-                        type_error: "duplicate"
-                    };
+                    const err = ErrorGenerator.generateErrorOfDuplicate(errors)
                     callback(err);
                 }else{
-                    errors = errors['errors']
-                    var text = Object.keys(errors).map((e) => {
-                        return errors[e]['properties']['message']
-                    }).join(' ')
-                    var fields = _.transform(Object.keys(errors), function (result, value) {
-                        result[value] = errors[value]['properties']['message'];
-                    }, {});
-                    var err = {
-                        msg: text,
-                        fields_with_error: Object.keys(errors),
-                        fields: fields,
-                        type_error: "validator"
-                    }
+                    const err = ErrorGenerator.generateErrorSchemaValidator(errors)
                     callback(err)
                 }
             })
