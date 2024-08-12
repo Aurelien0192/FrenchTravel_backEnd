@@ -10,7 +10,6 @@ module.exports.errorGenerator = class ErrorGenerator{
         const fields = _.transform(Object.keys(errors), function (result, value) {
             errors[value].properties ? result[value] = errors[value]['properties']['message'] : result[value] = ""
         },{})
-        console.log(fields)
         let fields_with_error = Object.keys(errors)
 
         const err = {
@@ -19,7 +18,6 @@ module.exports.errorGenerator = class ErrorGenerator{
             fields: fields,
             type_error : "validator"
         }
-        console.log(err)
         return err
     }
 

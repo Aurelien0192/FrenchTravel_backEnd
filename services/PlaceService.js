@@ -1,5 +1,6 @@
 const PlaceSchema = require ("../schemas/Place").PlaceSchema
 const ImageService = require("../services/ImageService").ImageService
+const ErrorGenerator = require('../utils/errorGenerator').errorGenerator
 const { log } = require("async");
 const _ = require('lodash')
 const mongoose = require('mongoose');
@@ -22,26 +23,13 @@ module.exports.PlaceService =  class PlaceService{
                 new_place.owner = user_id
                 let errors = new_place.validateSync()
                 if(errors){
-                    errors = errors['errors']
-                    const text = Object.keys(errors).map((e) => {
-                        return !errors[e].stringValue? errors[e]['properties']['message'] : `type ${errors[e]['valueType']} is not allowed in path ${errors[e]['path']}`
-                    }).join (' ')
-
-                    const fields = _.transform(Object.keys(errors), function (result, value) {
-                        errors[value].properties ? result[value] = errors[value]['properties']['message'] : result[value] = ""
-                    },{})
-                    let fields_with_error = Object.keys(errors)
-                    if(fields_with_error.includes("moreInfo.price")){
-                        fields_with_error[_.findIndex(fields_with_error,(e)=>{return e ==="moreInfo.price"})] = ["price1","price2"]
-                        fields_with_error= _.flatten(fields_with_error)
+                    let err = ErrorGenerator.generateErrorSchemaValidator(errors)
+                    console.log(err)
+                    if(err.fields_with_error.includes("moreInfo.price")){
+                        err.fields_with_error[_.findIndex(err.fields_with_error,(e)=>{return e ==="moreInfo.price"})] = ["price1","price2"]
+                        err.fields_with_error= _.flatten(err.fields_with_error)
                     }
-                    
-                    const err = {
-                        msg: text,
-                        fields_with_error: fields_with_error,
-                        fields: fields,
-                        type_error : "validator"
-                    }
+                    console.log(err)
                     callback(err)
                 }else{
                     if(new_place.categorie=== "restaurant" && new_place.moreInfo.price && new_place.moreInfo.price[1] < new_place.moreInfo.price[0]){
@@ -61,13 +49,7 @@ module.exports.PlaceService =  class PlaceService{
             }
         }catch(error){
             if(error.code = 11000){
-                const field= Object.keys(error.keyValue)[0]
-                const err = {
-                    msg: `Duplicate key error: ${field} must be unique.`,
-                    fields_with_error: [field],
-                    fields: { [field]: `The ${field} is already taken.` },
-                    type_error: "duplicate"
-                }
+                const err = ErrorGenerator.generateErrorOfDuplicate(error)
                 callback(err)
             }
             callback(error)
@@ -294,28 +276,10 @@ module.exports.PlaceService =  class PlaceService{
                 }
             }).catch((errors) =>{
                 if (errors.code === 11000) { // Erreur de duplicité
-                    var field = Object.keys(errors.keyPattern)[0];
-                    var err = {
-                        msg: `Duplicate key error: ${field} must be unique.`,
-                        fields_with_error: [field],
-                        fields: { [field]: `The ${field} is already taken.` },
-                        type_error: "duplicate"
-                    };
+                    const err = ErrorGenerator.generateErrorOfDuplicate(errors)
                     callback(err);
                 }else{
-                    errors = errors['errors']
-                    var text = Object.keys(errors).map((e) => {
-                        return errors[e]['properties']['message']
-                    }).join(' ')
-                    var fields = _.transform(Object.keys(errors), function (result, value) {
-                        result[value] = errors[value]['properties']['message'];
-                    }, {});
-                    var err = {
-                        msg: text,
-                        fields_with_error: Object.keys(errors),
-                        fields: fields,
-                        type_error: "validator"
-                    }
+                    const err = ErrorGenerator.generateErrorSchemaValidator(errors)
                     callback(err)
                 }
             })
