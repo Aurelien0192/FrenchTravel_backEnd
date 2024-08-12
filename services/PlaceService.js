@@ -164,31 +164,9 @@ module.exports.PlaceService =  class PlaceService{
         try{
             for (let y =0; y<categories.length;y++){
                 const queryMongo = {categorie:categories[y]}
-                const indexChoice =[]
-                const nbOfPlace = await Place.countDocuments(queryMongo)
-                if (nbOfPlace===0){
-                    return callback({
-                        msg: "Un problème c'est produit avec la base de données",
-                        type_error: "error-mongo"
-                    })
-                }else{
-                    for (let i = 0; i< (nbOfPlace<3? nbOfPlace : 3); i++){
-                        const indexRandom = _.random(0, nbOfPlace-1, false)
-                        if(_.indexOf(indexChoice,indexRandom) === -1){
-                            indexChoice.push(indexRandom)
-                        }else{
-                            i--
-                        }
-                    }
-                
-                    const results = await Place.find(queryMongo, null, {populate: {path:'images',perDocumentLimit:1},lean:true})
-                    const placesToSendInt = indexChoice.map((e) => {
-                        return results[e]
-                    })
-                    
-                    placesToSend = [...placesToSend, ...placesToSendInt]
-                }
-                    
+                    const results = await Place.find(queryMongo, null, {populate: {path:'images',perDocumentLimit:1},lean:true, sort: {notation:-1, numberOfNote:-1}, limit : 3})
+                    console.log(results)
+                    placesToSend = [...placesToSend, ...results]    
             }
             callback(null, placesToSend)
         }catch(e){
