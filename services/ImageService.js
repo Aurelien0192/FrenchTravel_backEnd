@@ -1,7 +1,9 @@
 const mongoose = require('mongoose')
+const ErrorGenerator = require('../utils/errorGenerator').errorGenerator
 const _ = require('lodash')
 const fs = require('fs')
 const path = require('path')
+const { errorGenerator } = require('../utils/errorGenerator')
 
 const ImageSchema = require('../schemas/Image').ImageSchema
 
@@ -9,56 +11,42 @@ const Image = mongoose.model('Image',ImageSchema)
 
 module.exports.ImageService = class ImageService{
     static async addOneImage(imageInfo, place_id, user_id, callback){
-        if(!mongoose.isValidObjectId(user_id)){
-            if(!user_id){
-                return callback({msg:"user_id is missing", type_error:"no-valid"})
-            }else{
-                return callback({msg:"user_id is uncorrect", type_error:"no-valid"})
-            } 
-        }
-        if(!mongoose.isValidObjectId(place_id) && place_id){
-            return callback({msg:"place_id is uncorrect", type_error:"no-valid"})  
-        }
-        try{
-            if(!imageInfo){
-                callback({msg: "no image get for upload", type_error: "no-valid"})
-            }else{
-                const path = imageInfo.path.split('\\').join('/')
-                const image = new Image()
-                image.name = imageInfo.filename
-                if(place_id){
-                    image.place = place_id
-                }
-                image.path = path
-                image.user_id = user_id
-                let errors = image.validateSync()
-                if(errors){
-                    errors = errors['errors']
-                    const text = Object.keys(errors).map((e) => {
-                        return !errors[e].stringValue? errors[e].properties.message : `type ${errors[e]['valueType']} is not allowed in path ${errors[e]['path']}`
-                    }).join (' ')
-                    const fields = _.transform(Object.keys(errors), function (result, value) {
-                        errors[value].properties ? result[value] = errors[value].properties.message : result[value] = ""
-                    },{})
-                    const err = {
-                        msg: text,
-                        fields_with_error: Object.keys(errors),
-                        fields: fields,
-                        type_error : "validator"
-                    }
-                    callback(err)
-
+        if((!place_id || mongoose.isValidObjectId(place_id)) && user_id && mongoose.isValidObjectId(user_id)){
+            try{
+                if(!imageInfo){
+                    callback({msg: "no image get for upload", type_error: "no-valid"})
                 }else{
-                    try{
-                        const data = await image.save()
-                        callback(null, data.toObject()) 
-                    }catch(e){
-                        callback(e)
+                    const path = imageInfo.path.split('\\').join('/')
+                    const image = new Image()
+                    image.name = imageInfo.filename
+                    if(place_id){
+                        image.place = place_id
+                    }
+                    image.path = path
+                    image.user_id = user_id
+                    let errors = image.validateSync()
+                    if(errors){
+                        const err = ErrorGenerator.generateErrorSchemaValidator(errors)
+                        callback(err)
+                        
+                    }else{
+                        try{
+                            const data = await image.save()
+                            callback(null, data.toObject()) 
+                        }catch(e){
+                            callback(e)
+                        }
                     }
                 }
+            }catch(err){
+                callback(err)
             }
-        }catch(err){
-            callback(err)
+        }else{
+            if(place_id && !mongoose.isValidObjectId(place_id)){
+                callback({msg: "place_id is uncorrect",type_error:"no-valid"})
+            }else{
+                callback(ErrorGenerator.controlIntegrityofID({user_id}))
+            }
         }
     }
 
@@ -67,63 +55,61 @@ module.exports.ImageService = class ImageService{
             imagesInfo = [imagesInfo]
         }
         const errors = []
-        if(!mongoose.isValidObjectId(user_id)){
-            if(!user_id){
-                return callback({msg:"user_id is missing", type_error:"no-valid"})
+        if((!place_id || mongoose.isValidObjectId(place_id)) && user_id && mongoose.isValidObjectId(user_id)){
+            if(!imagesInfo){
+                callback({msg: "no image get for upload", type_error: "no-valid"})
+                
             }else{
-                return callback({msg:"user_id is uncorrect", type_error:"no-valid"})
-            } 
-        }
-        if(!mongoose.isValidObjectId(place_id) && place_id){
-            return callback({msg:"place_id is uncorrect", type_error:"no-valid"})  
-        }
-        if(!imagesInfo){
-            callback({msg: "no image get for upload", type_error: "no-valid"})
-
-        }else{
-            const imageTab= []
-            
-            imagesInfo.forEach((imageInfo) => {
-                const path = imageInfo.path.split('\\').join('/')
-                const image = new Image()
-                image.name = imageInfo.filename
-                if(place_id){
-                    image.place = place_id
+                const imageTab= []
+                
+                imagesInfo.forEach((imageInfo) => {
+                    const path = imageInfo.path.split('\\').join('/')
+                    const image = new Image()
+                    image.name = imageInfo.filename
+                    if(place_id){
+                        image.place = place_id
+                    }
+                    image.user_id = user_id
+                    image.path = path
+                    imageTab.push(image)
+                });
+                for(let i =0; i < imagesInfo.length; i++ ){
+                    let error = imageTab[i].validateSync()
+                    if(error){
+                        error = error['errors']
+                        const text = Object.keys(error).map((e) => {
+                            error[e].properties.message
+                        }).join (' ')
+                        const fields = _.transform(Object.keys(error), function (result, value) {
+                            result[value] = error[value].properties.message
+                        },{})
+                        
+                        errors.push({
+                            msg: text,
+                            fields_with_error: Object.keys(errors),
+                            fields: fields,
+                            type_error : "validator"
+                        })
+                    }
                 }
-                image.user_id = user_id
-                image.path = path
-                imageTab.push(image)
-            });
-            for(let i =0; i < imagesInfo.length; i++ ){
-                let error = imageTab[i].validateSync()
-                if(error){
-                    error = error['errors']
-                    const text = Object.keys(error).map((e) => {
-                        error[e].properties.message
-                    }).join (' ')
-                    const fields = _.transform(Object.keys(error), function (result, value) {
-                        result[value] = error[value].properties.message
-                    },{})
-                    
-                    errors.push({
-                        msg: text,
-                        fields_with_error: Object.keys(errors),
-                        fields: fields,
-                        type_error : "validator"
-                    })
+                
+                if(errors.length > 0){
+                    callback(errors)
+                }else{
+                    try{
+                        const data = await Image.insertMany(imageTab,{ordered: false})
+                        callback(null, data) 
+                        
+                    }catch(err){
+                        callback(err)
+                    }
                 }
             }
-
-            if(errors.length > 0){
-                callback(errors)
+        }else{
+            if(place_id && !mongoose.isValidObjectId(place_id)){
+                callback({msg: "place_id is uncorrect",type_error:"no-valid"})
             }else{
-                try{
-                const data = await Image.insertMany(imageTab,{ordered: false})
-                    callback(null, data) 
-                
-                }catch(err){
-                    callback(err)
-                }
+                callback(ErrorGenerator.controlIntegrityofID({user_id}))
             }
         }
     }

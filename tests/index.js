@@ -24,13 +24,13 @@ require("../utils/database")
 //    require('./services/ApiLocationService.test')
 // ])
 
-// describe("ImageService",() => {
-//    require("./services/ImageService.test")
-// })
-
-describe("CommentServices",() => {
-   require("./services/CommentServices.test")
+describe("ImageService",() => {
+   require("./services/ImageService.test")
 })
+
+// describe("CommentServices",() => {
+//    require("./services/CommentServices.test")
+// })
 
 // describe("CommentController",() => {
 //    require("./controllers/CommentController.test")
