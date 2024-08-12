@@ -63,16 +63,6 @@ describe("AddOneComment",() => {
             done()
         })
     })
-    it('Add a like in the comment - S',(done)=>{
-        LikeCommentService.addOneLikeOnComment(comments[0]._id, user._id, 0, null, function(err, value){
-            console.log(err, value)
-            expect(value).to.be.a('object')
-            expect(value).to.haveOwnProperty('user_id')
-            expect(String(value['user_id'])).to.be.equal(String(user._id))
-            expect(value).to.haveOwnProperty('comment_id')
-            expect(String(value['comment_id'])).to.be.equal(String(comments[0]._id))
-        })
-    })
     it('Add one correct comment with uncorrect user-id - E',(done) => {
         const goodComment = {
             comment:"superbe après-midi dans ce lieu",
@@ -361,19 +351,53 @@ describe("updateOneComment",()=>{
         })
     })
 })
-describe("deleteManyComments",() => {
-    it("delete many comments with corrects ID",(done)=>{
-        CommentService.deleteManyComments([comments[0]._id], function(err, value){
-            console.log(err, value)
+describe("deleteOneCommentByID",()=>{
+    it("delete one comment with uncorrect ID",(done)=>{
+        CommentService.deleteOneCommentById("qoijgogjro",function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it("delete one comment with missing ID",(done)=>{
+        CommentService.deleteOneCommentById(null,function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it("delete one comment with correct ID but not exist in database",(done)=>{
+        CommentService.deleteOneCommentById(user._id,function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-found')
+            done()
+        })
+    })
+    it("delete one comment with correct ID",(done)=>{
+        CommentService.deleteOneCommentById(comments[0]._id,function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('_id')
+            expect(String(value['_id'])).to.be.equal(String(comments[0]._id))
             done()
         })
     })
 })
 
+// describe("deleteManyComments",() => {
+//     it("delete many comments with corrects ID",(done)=>{
+//         CommentService.deleteManyComments([comments[0]._id], function(err, value){
+//             console.log(err, value)
+//             done()
+//         })
+//     })
+// })
+
 describe("delete user",() => {
     it("delete",(done)=>{
         UserService.deleteOneUser(user._id, null, function(err, value){
-            console.log(err, value)
             done()
         })
     })

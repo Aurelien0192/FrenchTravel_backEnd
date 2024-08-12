@@ -219,6 +219,27 @@ module.exports.CommentServices = class CommentService{
         }
     }
 
+    static async deleteOneCommentById(comment_id, callback){
+        if(comment_id && mongoose.isValidObjectId(comment_id)){
+            comment_id = new mongoose.Types.ObjectId(comment_id)
+            Comment.findByIdAndDelete(comment_id).then((value) => {
+                if(value){
+                    callback(null, value.toObject())
+                }else{
+                    callback({msg:"Le commentaire à supprimé n'a pas été trouvé", type_error: "no-found"})
+                }
+            }).catch((err) => {
+                callback({msg:"une erreur interne est survenu",type_error:"error-mongo"})
+            })
+        }else{
+            if(!comment_id){
+                callback({msg:"L'ID est manquant", type_error:"no-valid"})
+            }else{
+                callback({msg:"l'id renseigné est invalide", type_error:"no-valid"})
+            }
+        }
+    }
+
     static async deleteManyComments(comments_id, callback){
         if (comments_id && Array.isArray(comments_id) && comments_id.length>0  && comments_id.filter((e) => { return mongoose.isValidObjectId(e) }).length == comments_id.length){
             comments_id = comments_id.map((comment) => {return new mongoose.Types.ObjectId(comment)})
