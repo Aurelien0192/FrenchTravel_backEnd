@@ -75,7 +75,21 @@ module.exports.PlaceService =  class PlaceService{
     }
 
     static findOnePlaceById = function (place_id, options, callback){
-        const opts = {populate : options && options.populate ? ['images']:[], lean:true}
+        const opts = {populate : options && options.populate ? ['images',{
+                        path:'comments',
+                        perDocumentLimit:1,
+                        options:{
+                            sort: {
+                                like : -1
+                            }
+                        },
+                        populate:{
+                            path: "user_id",
+                            populate:{
+                                path:"profilePhoto"
+                            }
+                        }
+                    }]:[], lean:true}
         if(place_id && mongoose.isValidObjectId(place_id)){
             Place.findById(place_id, null, opts).then((value) => {
                 try{
@@ -110,7 +124,21 @@ module.exports.PlaceService =  class PlaceService{
     }
 
     static findManyPlaces = async function (page, limit, q, options, callback){
-        const populate = options && options.populate? ["images"]:[]
+        const populate = options && options.populate? ["images",{
+                        path:'comments',
+                        perDocumentLimit:1,
+                        options:{
+                            sort: {
+                                like : -1
+                            }
+                        },
+                        populate:{
+                            path: "user_id",
+                            populate:{
+                                path:"profilePhoto"
+                            }
+                        }
+                    }]:[]
         page = !page ? 1 : page
         limit = !limit ? 7 : limit
         page = !Number.isNaN(page) ? Number(page): page
@@ -158,15 +186,30 @@ module.exports.PlaceService =  class PlaceService{
         }
     }
 
-    static findManyPlacesRandom = async function (callback){
+    static findThreePlacesPerCategoryWithBestNotation = async function (callback){
         const categories = ["activity","restaurant","hotel"]
         let placesToSend = []
         try{
             for (let y =0; y<categories.length;y++){
                 const queryMongo = {categorie:categories[y]}
-                    const results = await Place.find(queryMongo, null, {populate: {path:'images',perDocumentLimit:1},lean:true, sort: {notation:-1, numberOfNote:-1}, limit : 3})
-                    console.log(results)
-                    placesToSend = [...placesToSend, ...results]    
+                    const results = await Place.find(queryMongo, null, {populate: [{
+                        path:'images',perDocumentLimit:1
+                    },{
+                        path:'comments',
+                        perDocumentLimit:1,
+                        options:{
+                            sort: {
+                                like : -1
+                            }
+                        },
+                        populate:{
+                            path: "user_id",
+                            populate:{
+                                path:"profilePhoto"
+                            }
+                        }
+                    }],lean:true, sort: {notation:-1, numberOfNote:-1}, limit : 3})
+                    placesToSend = [...placesToSend, ...results]
             }
             callback(null, placesToSend)
         }catch(e){

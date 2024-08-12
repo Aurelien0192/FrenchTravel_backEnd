@@ -288,6 +288,21 @@ describe("addOnePlace", () => {
             done()
         })
     })
+    it("Add comment to correct Place - S",(done)=>{
+        const goodComment = {
+            comment:"superbe après-midi dans ce lieu",
+            note:5,
+            dateVisited: new Date()
+        }
+        CommentService.addOneComment(user._id,places[0]._id,goodComment, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty("note")
+            expect(value["note"]).to.be.equal(5)
+            expect(err).to.be.null
+            comments.push(value)
+            done()
+        })
+    })
     it("Correct hotel. - S" ,(done) => {
         PlaceService.addOnePlace(goodHotel,user._id, null, function (err, value) {
             expect(value).to.be.a('object')
@@ -588,8 +603,13 @@ describe('FindManyPlaces',() => {
 
 describe("findManyPlaceRandom",() => {
     it("find random place - S",(done)=> {
-        PlaceService.findManyPlacesRandom(function(err, value){
-            console.log(err, value)
+        PlaceService.findThreePlacesPerCategoryWithBestNotation(function(err, value){
+            value.forEach((e) => {
+                if(e.comments.length>0){
+                    console.log(e.comments)
+                }
+            })
+            
             // expect(value).to.be.an('array')
             // expect(value[0]).to.be.a('object')
             // expect(value[0]).to.haveOwnProperty('images')

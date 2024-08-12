@@ -31,9 +31,9 @@ module.exports.PlaceControllers = class PlaceControllers {
     }
 
 
-    static findManyPlacesRandom(req, res){
+    static findThreePlacesPerCategoryWithBestNotation(req, res){
         req.log.info("Trouver des lieux aléatoirement")
-        PlaceService.findManyPlacesRandom(function(err, value){
+        PlaceService.findThreePlacesPerCategoryWithBestNotation(function(err, value){
             responseOfServer(err, value, req, res, false)
         })
     }

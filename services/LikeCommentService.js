@@ -41,7 +41,7 @@ module.exports.LikeCommentService = class LikeCommentService{
                     callback(null, newLike.toObject())
                 } catch(e){
                     if(e.code === 11000){
-                        callback({msg:"vous avez déjà commentez ce lieu", type_error:"no-valid"})
+                        callback({msg:"vous avez déjà liké ce lieu", type_error:"no-valid"})
                     }else{
                         console.log(e)
                         callback({msg:"erreur lié à la base de donéee", type_error:"error-mongo"})
@@ -83,9 +83,9 @@ module.exports.LikeCommentService = class LikeCommentService{
     }
 
     static async deleteOneLikeComment(comment_id, user_id, nbOfLike ,options, callback){
-        if(user_id && mongoose.isValidObjectId(user_id)){
+        if(comment_id && mongoose.isValidObjectId(user_id)){
             const userId = new mongoose.Types.ObjectId(user_id)
-            await LikeComment.deleteOne({user_id:userId}, null, {lean:true}).then((value) => {
+            await LikeComment.deleteOne({comment_id:comment_id, user_id: user_id}, null, {lean:true}).then((value) => {
                 try {
                     if (value.deletedCount>0){
                         try{
@@ -99,7 +99,7 @@ module.exports.LikeCommentService = class LikeCommentService{
                            callback({msg:"erreur lié à la base de donéee", type_error:"error-mongo"}) 
                         }
                     }else{
-                        callback({ msg: "Utilisateur non trouvé.", fields_with_error: [], fields:"", type_error: "no-found" });
+                        callback({ msg: "Like non trouvé.", fields_with_error: [], fields:"", type_error: "no-found" });
                     }
                 }
                 catch (e) {  
