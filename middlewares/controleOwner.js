@@ -2,6 +2,7 @@ const { PlaceService } = require('../services/PlaceService')
 
 const UserService = require('../services/UserService').UserService
 const ImageService = require('../services/ImageService').ImageService
+const CommentService = require('../services/CommentService').CommentServices
 
 module.exports.controleOwner = (req, res, next) => {
     UserService.findOneUserById(req.params.id,null, function(err, value){
@@ -65,6 +66,29 @@ module.exports.controleOwnerOfPlaces = (req, res, next) => {
                 }
             })
             if(valid){
+                next()
+            }else{
+                res.statusCode = 401
+                res.send({msg:"vous n'êtes pas autorisé à modifier ce lieu", type_error:"authorization"})
+            }
+        }
+    })
+}
+
+module.exports.controleOwnerOfComment = (req, res, next) => {
+    CommentService.findOneCommentById(req.params.id, null, function(err, value){
+        req.log.info("contrôle autorisation suppression d'un commentaire")
+        if(err && (err.type_error === "no-valid")){
+            res.statusCode = 405
+            res.send(err)
+        }else if(err && err.type_error === "error-mongo"){
+            res.statusCode = 500
+            res.send(err)
+        }else if(err && err.type_error ==='no-found'){
+            res.statusCode = 404
+            res.send(err)
+        }else{
+            if(String(req.user._id) === String(value.user_id)){
                 next()
             }else{
                 res.statusCode = 401

@@ -48,4 +48,10 @@ module.exports.CommentController = class CommentController{
             responseOfServer(err, value, req, res, false)
         })
     }
+
+    static deleteOneCommentById(req, res, next){
+        CommentServices.deleteOneCommentById(req.params.id, function(err, value){
+            responseOfServer(err, value, req, res, false, next)
+        })
+    }
 }

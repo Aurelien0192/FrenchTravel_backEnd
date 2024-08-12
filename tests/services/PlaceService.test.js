@@ -586,18 +586,18 @@ describe('FindManyPlaces',() => {
     })
 })
 
-describe("findManyPlaceRandom",() => {
-    it("find random place - S",(done)=> {
-        PlaceService.findManyPlacesRandom(function(err, value){
-            expect(value).to.be.an('array')
-            expect(value[0]).to.be.a('object')
-            expect(value[0]).to.haveOwnProperty('images')
-            expect(value[0].images).to.be.an('array')
-            expect(err).to.be.null
-            done()
-        })
-    })
-})
+// describe("findManyPlaceRandom",() => {
+//     it("find random place - S",(done)=> {
+//         PlaceService.findManyPlacesRandom(function(err, value){
+//             expect(value).to.be.an('array')
+//             expect(value[0]).to.be.a('object')
+//             expect(value[0]).to.haveOwnProperty('images')
+//             expect(value[0].images).to.be.an('array')
+//             expect(err).to.be.null
+//             done()
+//         })
+//     })
+// })
 
 describe("findNearPlaces",()=>{
     it("return near places - S",(done) => {

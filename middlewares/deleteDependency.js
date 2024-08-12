@@ -49,6 +49,20 @@ module.exports.deleteDependency = class DeleteDependency{
             }
         })
     }
+
+    static deleteAttachedDocumentsOfComment(req, res){
+        let error = "Votre commentaire a bien été supprimé mais"
+        LikeCommentService.deleteManyLikesComments([req.params.id], function(err, value){
+            if(err && err.type_error !== "no_found"){
+                error = error, "une erreur c'est produite lors de la suppression des likes associées"
+            }
+            if(error !== "Votre commentaire a bien été supprimé mais"){
+                res.status(500).send({msg: error, error: errorsFromOtherServices, type_error:"Interne"})
+            }else{
+                res.status(200).send({msg: "la suppression de votre commentaire c'est déroulée avec succès"})
+            }
+        })
+    }
 }
 
 function deleteAttachedDocumentsOfPlaces(places_ids){
