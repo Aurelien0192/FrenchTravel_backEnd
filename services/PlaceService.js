@@ -124,21 +124,7 @@ module.exports.PlaceService =  class PlaceService{
     }
 
     static findManyPlaces = async function (page, limit, q, options, callback){
-        const populate = options && options.populate? ["images",{
-                        path:'comments',
-                        perDocumentLimit:1,
-                        options:{
-                            sort: {
-                                like : -1
-                            }
-                        },
-                        populate:{
-                            path: "user_id",
-                            populate:{
-                                path:"profilePhoto"
-                            }
-                        }
-                    }]:[]
+        
         page = !page ? 1 : page
         limit = !limit ? 7 : limit
         page = !Number.isNaN(page) ? Number(page): page
@@ -171,7 +157,21 @@ module.exports.PlaceService =  class PlaceService{
             Place.countDocuments(queryMongo).then((value) => {
                 if (value > 0){
                     const skip = ((page-1) * limit)
-                    Place.find(queryMongo, null, {skip:skip, limit:limit, populate: {path:'images',perDocumentLimit:1},lean:true}).then((results) => {
+                    Place.find(queryMongo, null, {skip:skip, limit:limit, populate: [{path:'images',perDocumentLimit:1},{
+                        path:'comments',
+                        perDocumentLimit:1,
+                        options:{
+                            sort: {
+                                like : -1
+                            }
+                        },
+                        populate:{
+                            path: "user_id",
+                            populate:{
+                                path:"profilePhoto"
+                            }
+                        }
+                    }],lean:true}).then((results) => {
                         callback(null, {
                             count : value,
                             results : results
