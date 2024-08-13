@@ -2,11 +2,15 @@ const chai = require('chai')
 const UserService = require("../../services/UserService").UserService
 const PlaceService = require("../../services/PlaceService").PlaceService
 const ImageService = require("../../services/ImageService").ImageService
+const CommentService = require("../../services/CommentService").CommentServices
+const LikeCommentService = require("../../services/LikeCommentService").LikeCommentService
 let expect = chai.expect
 
 const users =[]
 let place = {}
 let image = {}
+let comment = {}
+let like = {}
 
 describe("AddOneUser",()=> {
     
@@ -65,6 +69,35 @@ describe("AddOneUser",()=> {
             expect(String(value["user_id"])).to.be.equal(String(users[0]._id))
             image={...value}
             expect(err).to.be.null
+            done()
+        })
+    })
+    it('Add one correct comment - S',(done) => {
+        const goodComment = {
+            comment:"superbe après-midi dans ce lieu",
+            categorie:"hotel",
+            numberOfNote:0,
+            notation:0,
+            note:5,
+            dateVisited: new Date()
+        }
+        CommentService.addOneComment(users[0]._id,place._id,goodComment, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty("note")
+            expect(value["note"]).to.be.equal(5)
+            expect(err).to.be.null
+            comment = {...value}
+            done()
+        })
+    })
+    it(("add a like with correct user_id and comment_id - S"),(done)=>{
+        LikeCommentService.addOneLikeOnComment(comment._id,users[0]._id, 0, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('user_id')
+            expect(String(value['user_id'])).to.be.equal(String(users[0]._id))
+            expect(value).to.haveOwnProperty('comment_id')
+            expect(String(value['comment_id'])).to.be.equal(String(comment._id))
+            like = {...value}
             done()
         })
     })
@@ -369,6 +402,30 @@ describe("DeleteOneUser",()=>{
     })
     it("verify image correctly deleted - S",(done) => {
         ImageService.findOneImageById(image._id, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-found')
+            done()
+        })
+    })
+    it("verify place correctly delete - S",(done) =>{
+        PlaceService.findOnePlaceById(place._id, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-found')
+            done()
+        })
+    })
+    it("verify comment correctly delete - S",(done) =>{
+        CommentService.findOneCommentById(comment._id, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-found')
+            done()
+        })
+    })
+    it("verify like correctly delete - S",(done) =>{
+        LikeCommentService.findOneLikeCommentById(like._id, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('no-found')

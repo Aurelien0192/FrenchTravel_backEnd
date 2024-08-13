@@ -11,31 +11,36 @@ module.exports.dependencyService = class DependencyService{
             if(err && err.type_error !== "no-found"){
                 error = error, "une erreur c'est produite lors de la recherche de vos établissements"
             }
-            DependencyService.deleteAttachedDocumentsOfPlaces(_.map(value.results,"_id"),function (err){
-                if(err){
-                    error = error + err
+            PlaceService.deleteManyPlaces(_.map(value.results,"_id"),null, function(err){
+                if(err && err.type_error != "no-found"){
+                    error = error, "une erreur c'est produite lors de la suppression de vos établissements"
                 }
-                CommentServices.findManyComments(null, null, {user_id:user_id},null, null, function(err, value){
-                    if(err && err.type_error !== "no-found"){
-                        error = error,"une erreur c'est produite lors de la recherche des commentaires que vous avez postez"
+                DependencyService.deleteAttachedDocumentsOfPlaces(_.map(value.results,"_id"),function (err){
+                    if(err){
+                        error = error + err
                     }
-                    if(value && value.count>0){
-                        const comments_id = _.map(value.results,"_id")
-                        CommentServices.deleteManyComments(comments_id,function(err, value){
-                            if(err && err.type_error !== "no-found"){
-                                error = error, "une erreur c'est produite lors la suppression de vos commentaires"   
-                            }
-                            LikeCommentService.deleteManyLikesComments(comments_id,function(err, value){
-                                if(err && err.type_error !=="no-found"){
-                                    error = error, "une erreur c'est produite lors la suppression des likes liés à vos commentaires"   
+                    CommentServices.findManyComments(null, null, {user_id:user_id},null, null, function(err, value){
+                        if(err && err.type_error !== "no-found"){
+                            error = error,"une erreur c'est produite lors de la recherche des commentaires que vous avez postez"
+                        }
+                        if(value && value.count>0){
+                            const comments_id = _.map(value.results,"_id")
+                            CommentServices.deleteManyComments(comments_id,function(err, value){
+                                if(err && err.type_error !== "no-found"){
+                                    error = error, "une erreur c'est produite lors la suppression de vos commentaires"   
                                 }
-                                callback(error)
+                                LikeCommentService.deleteManyLikesComments(comments_id,function(err, value){
+                                    if(err && err.type_error !=="no-found"){
+                                        error = error, "une erreur c'est produite lors la suppression des likes liés à vos commentaires"   
+                                    }
+                                    callback(error)
+                                })
                             })
-                        })
-                    }else{
-                        callback()
-                    }
-                })   
+                        }else{
+                            callback()
+                        }
+                    })   
+                })
             })
         })
     }
