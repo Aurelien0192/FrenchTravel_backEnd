@@ -89,7 +89,7 @@ module.exports.UserControllers = class UserControllers{
         const opts = null
         UserService.deleteOneUser(req.params.id, opts, function(err, value){
             req.log.info("Suppression d'un utilisateur")
-            responseOfServer(err, value, req, res, false, next)
+            responseOfServer(err, value, req, res, false)
         })
     }
 }

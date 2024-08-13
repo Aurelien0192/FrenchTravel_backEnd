@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const UserSchema = require('../schemas/User').UserSchema
 const ImageService = require("../services/ImageService").ImageService
 const ErrorGenerator = require("../utils/errorGenerator").errorGenerator
+const DependencyService = require("../utils/dependencyServices").dependencyService
 const _ = require('lodash')
 const bcrypt = require("bcryptjs")
 const TokenUtils = require('./../utils/token')
@@ -178,7 +179,6 @@ module.exports.UserService = class UserService{
 
     static async deleteOneUser(user_id, options,callback) {
     if (user_id && mongoose.isValidObjectId(user_id)) {
-
             const images = await User.aggregate([{
                 $match: {_id: new mongoose.Types.ObjectId(user_id)} 
                 },
@@ -207,20 +207,25 @@ module.exports.UserService = class UserService{
                     }
                 })
             }
-
-            await User.findByIdAndDelete(user_id).then((value) => {
-                try {
-                    if (value){
-                            callback(null, value.toObject())
-                        }else{
-                            callback({ msg: "Utilisateur non trouvé.", fields_with_error: [], fields:"", type_error: "no-found" });
+            DependencyService.deleteAttachedDocumentsOfUser(user_id, function(err){      
+                if(err){
+                    return callback({msg:err, type_error:"aborded"})
+                }else{
+                    User.findByIdAndDelete(user_id).then((value) => {
+                        try {
+                            if (value){
+                                    callback(null, value.toObject())
+                                }else{
+                                    callback({ msg: "Utilisateur non trouvé.", fields_with_error: [], fields:"", type_error: "no-found" });
+                                }
                         }
+                        catch (e) {  
+                            callback(e)
+                        }
+                    }).catch((e) => {
+                        callback({ msg: "Impossible de chercher l'élément.", fields_with_error: [], fields:"", type_error: "error-mongo" });
+                    })
                 }
-                catch (e) {  
-                    callback(e)
-                }
-            }).catch((e) => {
-                callback({ msg: "Impossible de chercher l'élément.", fields_with_error: [], fields:"", type_error: "error-mongo" });
             })
     } else {
         callback({ msg: "Id invalide.", fields_with_error: [], fields:"", type_error: 'no-valid' })

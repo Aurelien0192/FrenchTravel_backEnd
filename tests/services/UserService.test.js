@@ -377,11 +377,21 @@ describe("DeleteOneUser",()=>{
     })
     it("Delete user with good id - S",(done)=>{
         UserService.deleteOneUser(users[0]._id, null, function(err, value){ 
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('_id')
+            expect(String(value['_id'])).to.be.equal(String(users[0]._id))
+            expect(err).to.be.null
+            users.splice(0,1)
             done()
         })  
     })
     it("Delete user with good id - S",(done)=>{
-        UserService.deleteOneUser(users[1]._id, null, function(err, value){ 
+        UserService.deleteOneUser(users[0]._id, null, function(err, value){ 
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('_id')
+            expect(String(value['_id'])).to.be.equal(String(users[0]._id))
+            expect(err).to.be.null
+            users.splice(0,1)
             done()
         })  
     })
