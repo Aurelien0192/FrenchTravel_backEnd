@@ -55,9 +55,9 @@ module.exports.CommentController = class CommentController{
         })
     }
 
-    static deleteOneCommentById(req, res, next){
+    static deleteOneCommentById(req, res){
         CommentServices.deleteOneCommentById(req.params.id, function(err, value){
-            responseOfServer(err, value, req, res, false, next)
+            responseOfServer(err, value, req, res, false)
         })
     }
 }

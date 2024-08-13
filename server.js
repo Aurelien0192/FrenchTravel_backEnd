@@ -98,7 +98,7 @@ app.post('/comment',database.controlsBDD,passport.authenticate('jwt',{session:fa
 app.post('/responseComment/:id',database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwnerOfPlaceToRespondAComment, CommentController.addOneResponseComment)
 app.get('/comment/:id',database.controlsBDD, CommentController.findOneCommentById)
 app.get('/comments',database.controlsBDD, CommentController.findManyComments)
-app.delete('/comment/:id',database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwnerOfComment,CommentController.deleteOneCommentById, deleteDependency.deleteAttachedDocumentsOfComment)
+app.delete('/comment/:id',database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwnerOfComment,CommentController.deleteOneCommentById)
 
 //routes likeComment
 

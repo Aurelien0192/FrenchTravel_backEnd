@@ -380,7 +380,6 @@ module.exports.PlaceService =  class PlaceService{
                     }
                 })
             }
-
             DependencyService.deleteAttachedDocumentsOfPlaces(places_id, function(err){
 
                 Place.deleteMany({_id: places_id}).then((value) => {

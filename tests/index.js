@@ -24,22 +24,22 @@ describe("UserController",() => {
 //    require('./services/ApiLocationService.test')
 // ])
 
-// describe("ImageService",() => {
-//    require("./services/ImageService.test")
-// })
+describe("ImageService",() => {
+   require("./services/ImageService.test")
+})
 
-// describe("CommentServices",() => {
-//    require("./services/CommentServices.test")
-// })
+describe("CommentServices",() => {
+   require("./services/CommentServices.test")
+})
 
-// describe("CommentController",() => {
-//    require("./controllers/CommentController.test")
-// })
+describe("CommentController",() => {
+   require("./controllers/CommentController.test")
+})
 
-// describe("LikeCommentService",() => {
-//    require("./services/LikeCommentService.test")
-// })
+describe("LikeCommentService",() => {
+   require("./services/LikeCommentService.test")
+})
 
-// describe("LikeCommentController",() => {
-//    require('./controllers/LikeCommentController.test')
-// })
+describe("LikeCommentController",() => {
+   require('./controllers/LikeCommentController.test')
+})

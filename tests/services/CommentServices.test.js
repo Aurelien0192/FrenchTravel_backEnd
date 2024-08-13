@@ -590,6 +590,7 @@ describe("deleteManyComments",() => {
 describe("delete user",() => {
     it("delete",(done)=>{
         UserService.deleteOneUser(user._id, null, function(err, value){
+            expect(value).to.be.a("object")
             done()
         })
     })

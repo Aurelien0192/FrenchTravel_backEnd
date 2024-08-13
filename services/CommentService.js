@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const CommentSchema = require('../schemas/Comment').CommentSchema
+const DependencyService = require('../utils/dependencyServices').dependencyService
 const ErrorGenerator = require('../utils/errorGenerator').errorGenerator
 const _ = require('lodash')
 const LikeCommentSchema = require('../schemas/LikeComment').LikeCommentSchemas
@@ -244,14 +245,21 @@ module.exports.CommentServices = class CommentService{
     static async deleteOneCommentById(comment_id, callback){
         if(comment_id && mongoose.isValidObjectId(comment_id)){
             comment_id = new mongoose.Types.ObjectId(comment_id)
-            Comment.findByIdAndDelete(comment_id).then((value) => {
-                if(value){
-                    callback(null, value.toObject())
+            DependencyService.deleteAttachedDocumentsOfComments(comment_id,function(err){
+                if(err){
+                     return callback({msg:err, type_error:"aborded"})
                 }else{
-                    callback({msg:"Le commentaire à supprimé n'a pas été trouvé", type_error: "no-found"})
+
+                    Comment.findByIdAndDelete(comment_id).then((value) => {
+                        if(value){
+                            callback(null, value.toObject())
+                        }else{
+                            callback({msg:"Le commentaire à supprimé n'a pas été trouvé", type_error: "no-found"})
+                        }
+                    }).catch((err) => {
+                        callback({msg:"une erreur interne est survenu",type_error:"error-mongo"})
+                    })
                 }
-            }).catch((err) => {
-                callback({msg:"une erreur interne est survenu",type_error:"error-mongo"})
             })
         }else{
             if(!comment_id){
