@@ -125,10 +125,10 @@ module.exports.CommentServices = class CommentService{
 
     static async findOneCommentById(comment_id, option, callback){
         if(comment_id && mongoose.isValidObjectId(comment_id)){
-            Comment.findById(comment_id, null, {populate:["response"]}).then((value) => {
+            Comment.findById(comment_id, null, {populate:["response"],lean:true}).then((value) => {
                 try{
                     if (value){
-                        callback(null, value.toObject())
+                        callback(null, value)
                     }else{
                         callback({msg: "Aucun commentaire trouvé", type_error: "no-found"})
                     }
@@ -164,7 +164,7 @@ module.exports.CommentServices = class CommentService{
         limit = !limit ? 0 : limit
         page = !Number.isNaN(page) ? Number(page): page
         limit = !Number.isNaN(limit) ? Number(limit): limit
-        if(filter){
+        if(filter && Object.keys(filter).length>0){
             filter.isResponse = {$ne: true}
             const fieldsToSearch = Object.keys(filter)
             if(fieldsToSearch.includes('user_id')){

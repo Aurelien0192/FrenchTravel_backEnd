@@ -93,6 +93,18 @@ describe("/POST - addOneComment",() => {
             done()
         })
     })
+    it("add correct comment to a good place with correct user add unwantedFiled - S",(done) => {
+        chai.request(server).post('/comment').auth(tokens[1],{type: 'bearer'}).query({place_id:place._id}).send({
+            comment:"superbe après-midi dans ce lieu",
+            note:4,
+            dateVisited: new Date(),
+            hello:"hello"
+        }).end((err, res)=>{
+            res.should.has.status(201)
+            comments.push(res.body)
+            done()
+        })
+    })
     it("add correct comment to a uncorrect ID place with correct user - E",(done) => {
         chai.request(server).post('/comment').auth(tokens[0],{type: 'bearer'}).query({place_id:"66b0658a72ec"}).send({
             comment:"superbe après-midi dans ce lieu",
@@ -163,6 +175,126 @@ describe("/POST - addOneComment",() => {
         })
     })
 })
+describe("POST - /responseComment/:id",()=>{
+    it("add correct response with good user but uncorrect id - E",(done)=>{
+        chai.request(server).post(`/responseComment/${"dfsdiogsrj"}`).auth(tokens[0],{type: 'bearer'}).send({
+            comment:"merci pour ce commentaire"
+        }).end((err, res)=>{
+            res.should.has.status(405)
+            done()
+        })
+    })
+    it("add response with comment empty response with good user - E",(done)=>{
+        chai.request(server).post(`/responseComment/${comments[0]._id}`).auth(tokens[0],{type: 'bearer'}).send({
+            comment:""
+        }).end((err, res)=>{
+            res.should.has.status(405)
+            done()
+        })
+    })
+    it("add response with missing body with good user - E",(done)=>{
+        chai.request(server).post(`/responseComment/${comments[0]._id}`).auth(tokens[0],{type: 'bearer'}).end((err, res)=>{
+            res.should.has.status(405)
+            done()
+        })
+    })
+    it("add correct response with good user - S",(done)=>{
+        chai.request(server).post(`/responseComment/${comments[0]._id}`).auth(tokens[0],{type: 'bearer'}).send({
+            comment:"merci pour ce commentaire"
+        }).end((err, res)=>{
+            res.should.has.status(201)
+            done()
+        })
+    })
+    it("add correct response with not authentifiate user - E",(done)=>{
+        chai.request(server).post(`/responseComment/${comments[0]._id}`).send({
+            comment:"merci pour ce commentaire"
+        }).end((err, res)=>{
+            res.should.has.status(401)
+            done()
+        })
+    })
+    it("respond another time in same comment - E",(done)=>{
+        chai.request(server).post(`/responseComment/${comments[0]._id}`).auth(tokens[0],{type: 'bearer'}).send({
+            comment:"merci pour ce commentaire"
+        }).end((err, res)=>{
+            res.should.has.status(401)
+            done()
+        })
+    })
+    it("unauthorized user try to response at one comment - E",(done)=>{
+        chai.request(server).post(`/responseComment/${comments[1]._id}`).auth(tokens[1],{type: 'bearer'}).send({
+            comment:"merci pour ce commentaire"
+        }).end((err, res)=>{
+            res.should.has.status(401)
+            done()
+        })
+    })
+})
+describe('GET - /comment/:id',()=>{
+    it("find comment with correct ID - S",(done)=>{
+        chai.request(server).get(`/comment/${comments[0]._id}`).end((err, res)=>{
+            res.should.has.status(200)
+            done()
+        })
+    })
+    it("find comment with uncorrect ID - E",(done)=>{
+        chai.request(server).get(`/comment/zefefze`).end((err, res)=>{
+            res.should.has.status(405)
+            done()
+        })
+    })
+    it("find comment with correct ID but not exist in database - E",(done)=>{
+        chai.request(server).get(`/comment/${user[0]._id}`).end((err, res)=>{
+            res.should.has.status(404)
+            done()
+        })
+    })
+    it("find comment with missing ID but not exist in database - E",(done)=>{
+        chai.request(server).get(`/comment/`).end((err, res)=>{
+            res.should.has.status(404)
+            done()
+        })
+    })
+})
+describe('GET - /comments',()=>{
+    it("find many comments with correct query associated place - S",(done)=>{
+        chai.request(server).get("/comments").query({page:1,limit:4,visitor_id:user[0]._id, place_id:place._id}).end((err, res)=>{
+            res.should.has.status(200)
+            done()
+        })
+    })
+    it("find many comments with correct query associated user - S",(done)=>{
+        chai.request(server).get("/comments").query({page:1,limit:4, user_id:user[0]._id}).end((err, res)=>{
+            res.should.has.status(200)
+            done()
+        })
+    })
+    it("find many comments with correct with uncorrect user id - E",(done)=>{
+        chai.request(server).get("/comments").query({page:1,limit:4, user_id:"grjeoigre"}).end((err, res)=>{
+            res.should.has.status(405)
+            done()
+        })
+    })
+    it("find many comments with correct with missing user id - E",(done)=>{
+        chai.request(server).get("/comments").query({page:1,limit:4, user_id:null}).end((err, res)=>{
+            res.should.has.status(405)
+            done()
+        })
+    })
+    it("find many comments with correct with missing query - S",(done)=>{
+        chai.request(server).get("/comments").end((err, res)=>{
+            res.should.has.status(405)
+            done()
+        })
+    })
+    it("find many comments with correct with correct user ID but missing in Database - E",(done)=>{
+        chai.request(server).get("/comments").query({page:1,limit:4, user_id:comments[0]._id}).end((err, res)=>{
+            res.should.has.status(200)
+            done()
+        })
+    })
+})
 describe("DELETE - /comment/:id",() => {
     it("delete one comment not authentifiate - E",(done)=>{
         chai.request(server).delete(`/comment/${comments[0]._id}`).end((err, res) =>{
@@ -196,6 +328,7 @@ describe("DELETE - /comment/:id",() => {
     })
     it("delete one comment with correct id and correct user - S",(done)=>{
         chai.request(server).delete(`/comment/${comments[0]._id}`).auth(tokens[0],{type: 'bearer'}).end((err, res) =>{
+            comments.splice(0,1)
             res.should.has.status(200)
             done()
         })

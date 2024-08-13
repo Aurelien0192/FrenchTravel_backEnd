@@ -2,15 +2,19 @@ const CommentServices = require("../services/CommentService").CommentServices
 const LikeCommentService = require("../services/LikeCommentService").LikeCommentService
 const PlaceService = require("../services/PlaceService").PlaceService
 const _ = require("lodash")
+const mongoose  = require("mongoose")
 
 module.exports.deleteDependency = class DeleteDependency{
 
-    static deleteAttachedDocumentsOfPlaces(req, res){
-    let error = "Votre établissement a bien été supprimé mais"
-        error = error, deleteAttachedDocumentsOfPlaces(req.query.ids? req.query.ids : req.params.id)
-        if(error !== "Votre établissement a bien été supprimé mais"){
+    static async deleteAttachedDocumentsOfPlaces(req, res){
+        let error = "Votre établissement a bien été supprimé mais"
+        const errorOfFunction = await deleteAttachedDocumentsOfPlaces(req.query.ids? req.query.ids : req.params.id)
+        error = error, errorOfFunction
+        console.log(error)
+        if(error !== "Votre établissement a bien été supprimé mais 1"){
             res.status(500).send({err:error})
         }else{  
+            console.log("ok")
             res.status(200).send({msg: "la suppression de votre établissement c'est déroulée avec succès"})
         }
     }
@@ -65,9 +69,12 @@ module.exports.deleteDependency = class DeleteDependency{
     }
 }
 
-function deleteAttachedDocumentsOfPlaces(places_ids){
+async function deleteAttachedDocumentsOfPlaces(places_ids){
+    if(mongoose.isValidObjectId(places_ids)){
+        places_ids = [new mongoose.Types.ObjectId(places_ids)]
+    }
     let error = ""
-    CommentServices.findManyComments(null, null, {place_id:places_ids},null, null, function(err, value){
+     CommentServices.findManyComments(null, null, {place_id:places_ids},null, null, function(err, value){
         if(err && err.type_error !== "no-found"){
             error = error,"une erreur c'est produite lors de la recherche des commentaires associés à votre établissement"
         }
@@ -84,7 +91,7 @@ function deleteAttachedDocumentsOfPlaces(places_ids){
                 }
             })
         }
-        return (error)
+        return ("1")
     })   
 }
 

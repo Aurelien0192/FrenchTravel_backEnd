@@ -24,7 +24,7 @@ describe('create user and place for test',() => {
             done()
         })
     })
-    it('place creation',()=>{
+    it('place creation',(done)=>{
         const goodHotel = {
             name: "Château du Doubs",
             describe : "Super chateau dans le centre du Doubs",
@@ -58,6 +58,7 @@ describe("AddOneComment",() => {
             dateVisited: new Date()
         }
         CommentService.addOneComment(user._id,place._id,goodComment, null, function(err, value){
+            //console.log(value)
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty("note")
             expect(value["note"]).to.be.equal(5)
@@ -287,10 +288,12 @@ describe("addOnResponseComment",() => {
             done()
         })
     })
-    it("add correct response to another comment - S",(done) => {
+    it("add correct response to comment - S",(done) => {
         CommentService.addOneResponseComment(comments[0]._id, user._id,{comment: "merci pour ce commentaire"},null, function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty("user_id")
+            expect(value).to.haveOwnProperty("isResponse")
+            expect(value["isResponse"]).to.be.equal(true)
             expect(String(value["user_id"])).to.be.equal(String(user._id))
             expect(err).to.be.null
             comments.push(value)

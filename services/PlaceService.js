@@ -24,12 +24,10 @@ module.exports.PlaceService =  class PlaceService{
                 let errors = new_place.validateSync()
                 if(errors){
                     let err = ErrorGenerator.generateErrorSchemaValidator(errors)
-                    console.log(err)
                     if(err.fields_with_error.includes("moreInfo.price")){
                         err.fields_with_error[_.findIndex(err.fields_with_error,(e)=>{return e ==="moreInfo.price"})] = ["price1","price2"]
                         err.fields_with_error= _.flatten(err.fields_with_error)
                     }
-                    console.log(err)
                     callback(err)
                 }else{
                     if(new_place.categorie=== "restaurant" && new_place.moreInfo.price && new_place.moreInfo.price[1] < new_place.moreInfo.price[0]){

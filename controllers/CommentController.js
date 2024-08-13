@@ -21,6 +21,11 @@ module.exports.CommentController = class CommentController{
             }
         })
     }
+    static addOneResponseComment(req, res){
+        CommentServices.addOneResponseComment(req.params.id, req.user._id, req.body, null, function(err, value){
+            responseOfServer(err, value, req, res, true)
+        })
+    }
 
     static findOneCommentById(req, res){
         CommentServices.findOneCommentById(req.params.id, null, function(err, value){
@@ -28,11 +33,6 @@ module.exports.CommentController = class CommentController{
         })
     }
 
-    static addOneResponseComment(req, res){
-        CommentServices.addOneResponseComment(req.params.id, req.user_id, req.body, null, function(err, value){
-            responseOfServer(err, value, req, res, false)
-        })
-    }
 
     static findManyComments(req, res){
         let options={}
