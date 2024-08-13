@@ -381,14 +381,21 @@ module.exports.PlaceService =  class PlaceService{
                 })
             }
 
-            Place.deleteMany({_id: places_id}).then((value) => {
-                if (value && value.deletedCount !== 0){
-                    callback(null, value)
-                }else{
-                    callback({msg: "Aucun lieu trouvé", type_error: "no-found"})
-                }
-            }).catch((err) => {
-                callback({msg:"Erreur avec la base de donnée", type_error: "error-mongo"})
+            DependencyService.deleteAttachedDocumentsOfPlaces(places_id, function(err){
+
+                Place.deleteMany({_id: places_id}).then((value) => {
+                    if(err){
+                        return callback({msg:err, type_error:"aborded"})
+                    }else{
+                        if (value && value.deletedCount !== 0){
+                            callback(null, value)
+                        }else{
+                            callback({msg: "Aucun lieu trouvé", type_error: "no-found"})
+                        }
+                    }
+                }).catch((err) => {
+                    callback({msg:"Erreur avec la base de donnée", type_error: "error-mongo"})
+                })
             })
         }
         else if (places_id && Array.isArray(places_id) && places_id.length > 0 && places_id.filter((e) => { return mongoose.isValidObjectId(e) }).length != places_id.length) {
