@@ -2,10 +2,12 @@ const chai = require('chai')
 const CommentService = require("../../services/CommentService").CommentServices
 const UserService = require('../../services/UserService').UserService
 const PlaceService = require('../../services/PlaceService').PlaceService
+const LikeCommentService = require('../../services/LikeCommentService').LikeCommentService
 let expect = chai.expect
 const _ = require('lodash')
 
 const comments = []
+let like = {}
 let user = {}
 let place = {}
 
@@ -58,7 +60,6 @@ describe("AddOneComment",() => {
             dateVisited: new Date()
         }
         CommentService.addOneComment(user._id,place._id,goodComment, null, function(err, value){
-            //console.log(value)
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty("note")
             expect(value["note"]).to.be.equal(5)
@@ -76,6 +77,17 @@ describe("AddOneComment",() => {
             expect(String(value["_id"])).to.be.equal(String(place._id))
             expect(value["numberOfNote"]).to.be.equal(1)
             expect(value["notation"]).to.be.equal(5)
+            done()
+        })
+    })
+    it(("add a like with correct user_id and place_id - S"),(done)=>{
+        LikeCommentService.addOneLikeOnComment(comments[0]._id,user._id, 0, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('user_id')
+            expect(String(value['user_id'])).to.be.equal(String(user._id))
+            expect(value).to.haveOwnProperty('comment_id')
+            expect(String(value['comment_id'])).to.be.equal(String(comments[0]._id))
+            like = {...value}
             done()
         })
     })
@@ -526,11 +538,19 @@ describe("deleteOneCommentByID",()=>{
             done()
         })
     })
-    it("delete one comment with correct ID - E",(done)=>{
+    it("delete one comment with correct ID - S",(done)=>{
         CommentService.deleteOneCommentById(comments[0]._id,function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('_id')
             expect(String(value['_id'])).to.be.equal(String(comments[0]._id))
+            done()
+        })
+    })
+    it("check like is correctly delete - S",(done)=>{
+        LikeCommentService.findOneLikeCommentById(like._id, null, function(err, value){
+            expect(err).to.be.a("object")
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err["type_error"]).to.be.equal("no-found")
             done()
         })
     })

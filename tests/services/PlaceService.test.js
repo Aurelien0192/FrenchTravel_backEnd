@@ -767,7 +767,6 @@ describe("deleteManyPlaces",()=>{
     })
     it("delete many places with correct ID - S",(done)=>{
         PlaceService.deleteManyPlaces(places.map((place)=>{return place._id}), null, function(err, value){
-            console.log(value)
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty("deletedCount")
             expect(value['deletedCount']).to.be.equal(2)
@@ -801,7 +800,10 @@ describe("deleteManyPlaces",()=>{
 describe("delete user",() => {
     it("delete",(done)=>{
         UserService.deleteOneUser(user._id, null, function(err, value){
-            console.log(err, value)
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('_id')
+            expect(String(value['_id'])).to.be.equal(String(user._id))
+            expect(err).to.be.null
             done()
         })
     })

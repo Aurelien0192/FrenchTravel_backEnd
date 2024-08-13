@@ -1,5 +1,6 @@
 const chai = require('chai')
 const chaiHttp = require('chai-http')
+const LikeCommentService = require('../../services/LikeCommentService').LikeCommentService
 const should = chai.should()
 const expect = chai.expect
 const server = require('./../../server')
@@ -10,6 +11,7 @@ const user = []
 let place = {}
 const tokens = []
 const comments = []
+let like = {}
 
 describe("post and login correct user",()=>{
     it("add one user for test - S",(done)=>{
@@ -93,7 +95,7 @@ describe("/POST - addOneComment",() => {
             done()
         })
     })
-    it("add correct comment to a good place with correct user add unwantedFiled - S",(done) => {
+    it("add correct comment to a good place with correct user add unwantedField - S",(done) => {
         chai.request(server).post('/comment').auth(tokens[1],{type: 'bearer'}).query({place_id:place._id}).send({
             comment:"superbe après-midi dans ce lieu",
             note:4,
@@ -102,6 +104,13 @@ describe("/POST - addOneComment",() => {
         }).end((err, res)=>{
             res.should.has.status(201)
             comments.push(res.body)
+            done()
+        })
+    })
+    it("add a like to the comment",(done)=>{
+        chai.request(server).post('/like').query({comment_id:comments[0].id}).auth(tokens[0],{type: 'bearer'}).end((err, res)=>{
+            res.should.has.status(201)
+            like = {...res.body}
             done()
         })
     })
@@ -330,6 +339,14 @@ describe("DELETE - /comment/:id",() => {
         chai.request(server).delete(`/comment/${comments[0]._id}`).auth(tokens[0],{type: 'bearer'}).end((err, res) =>{
             comments.splice(0,1)
             res.should.has.status(200)
+            done()
+        })
+    })
+    it("check like is correctly deleting - S",(done) =>{
+        LikeCommentService.findOneLikeCommentById(like._id,null, function(err, value){
+            expect(err).to.be.a("object")
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err["type_error"]).to.be.equal("no-found")
             done()
         })
     })
