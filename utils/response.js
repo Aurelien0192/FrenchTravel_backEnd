@@ -8,6 +8,9 @@ module.exports.responseOfServer = function (err, value, req, res, created, next)
     }else if(err && err.type_error ==='no-found'){
         res.statusCode = 404
         res.send(err)
+    }else if(err && err.type_error === "unauthorized"){
+        res.statusCode = 401
+        res.send(err)
     }else{
         if(next){
             next()    

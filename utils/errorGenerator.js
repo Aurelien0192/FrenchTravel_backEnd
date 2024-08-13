@@ -3,22 +3,30 @@ const _ = require('lodash')
 
 module.exports.errorGenerator = class ErrorGenerator{
     static generateErrorSchemaValidator(errors){
-        errors = errors['errors']
-        const text = Object.keys(errors).map((e) => {
-            return !errors[e].stringValue? errors[e]['properties']['message'] : `type ${errors[e]['valueType']} is not allowed in path ${errors[e]['path']}`
-        }).join (' ')
-        const fields = _.transform(Object.keys(errors), function (result, value) {
-            errors[value].properties ? result[value] = errors[value]['properties']['message'] : result[value] = ""
-        },{})
-        let fields_with_error = Object.keys(errors)
-
-        const err = {
-            msg: text,
-            fields_with_error: fields_with_error,
-            fields: fields,
-            type_error : "validator"
+        if(errors["errors"]){
+            errors = errors['errors']
+            const text = Object.keys(errors).map((e) => {
+                return !errors[e].stringValue? errors[e]['properties']['message'] : `type ${errors[e]['valueType']} is not allowed in path ${errors[e]['path']}`
+            }).join (' ')
+            const fields = _.transform(Object.keys(errors), function (result, value) {
+                errors[value].properties ? result[value] = errors[value]['properties']['message'] : result[value] = ""
+            },{})
+            let fields_with_error = Object.keys(errors)
+            
+            const err = {
+                msg: text,
+                fields_with_error: fields_with_error,
+                fields: fields,
+                type_error : "validator"
+            }
+            return err
+        }else{
+            const err = {
+                msg: `${errors.path} not a ${errors.kind}`,
+                type_error: "validator"
+            }
+            return err
         }
-        return err
     }
 
     static generateErrorOfDuplicate(errors){

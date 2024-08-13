@@ -30,28 +30,31 @@ module.exports.CommentServices = class CommentService{
                     callback(err)
                 }else{
                     newComment.notation = 0
-                    await newComment.save()
+                    let error = ""
                     try{
-                        PlaceService.updateOnePlace(place_id,{
+                        await PlaceService.updateOnePlace(place_id,{
                             categorie: categorie,
                             notation: (notation * numberOfNote + newComment.note)/(numberOfNote+1),
                             numberOfNote: numberOfNote + 1
                         },null, function(err,value){
                             if(err){
-                                callback({msg:"une erreur c'est produite lors de la mise à jour de la note du lieu", type_error:"interne"}, newComment.toObject())
+                                error = err
+                                return callback({firstmsg:"une erreur c'est produite lors de la mise à jour de la note du lieu", ...err})
                             }
                         })
                     }catch (e){
-                        callback(e)
+                        return callback(e)
                     }
-                    callback(null, newComment.toObject())
+                    if(!error){
+                        await newComment.save()
+                        callback(null, newComment.toObject())
+                    }
                 }
                 
             }else{
                 if(comment){
                         callback(ErrorGenerator.controlIntegrityofID({user_id, place_id}))
                 }else{
-                    console.log("ok")
                     callback({
                         msg:"comment is missing",
                         fields_with_error: ["comment"],
@@ -65,38 +68,47 @@ module.exports.CommentServices = class CommentService{
         }
     }
 
-    static async addOneResponseComment(comment_id, place_id, user_id, comment, options, callback){
+    static async addOneResponseComment(comment_id, user_id, comment, options, callback){
         try{
-            if(user_id && mongoose.isValidObjectId(user_id) && comment_id && mongoose.isValidObjectId(comment_id) && place_id && mongoose.isValidObjectId(place_id) && comment){
+            if(user_id && mongoose.isValidObjectId(user_id) && comment_id && mongoose.isValidObjectId(comment_id) && comment){
                 const newComment = new Comment(comment)
-                newComment.place_id = new mongoose.Types.ObjectId(place_id)
                 newComment.user_id = new mongoose.Types.ObjectId(user_id)
-                const categorie = comment.categorie
-                const numberOfNote = comment.numberOfNote
-                const notation = comment.notation
-                let errors = newComment.validateSync()
-                if(errors){
-                    const err = ErrorGenerator.generateErrorSchemaValidator(errors)
-                    callback(err)
-                }else{
-                    newComment.notation = 0
-                    const newResponse = await newComment.save()
-                    try{
-                        CommentService.updateOneComment(comment_id,{response:newResponse._id},null, function(err,value){
-                            if(err){
-                                callback({msg:"une erreur c'est produite lors de la liaison de votre réponse avec le commentaire de l'utilisateur", type_error:"error-mongo"}, newComment.toObject())
-                            }
-                        })
-                    }catch (e){
-                        callback(e)
+                try{
+                    const commentToResponse = await Comment.findById(comment_id)
+                    if(commentToResponse.response){
+                        return callback({msg:"vous ne pouvez répondre qu'une seule fois à un commentaire",type_error:"unauthorized"})
+                    }else{
+                        newComment.note = commentToResponse.note
+                        newComment.place_id = commentToResponse.place_id
+                        newComment.dateVisited = commentToResponse.dateVisited
+                        newComment.isResponse = true
                     }
-                    callback(null, newComment.toObject())
+                }catch(e){
+                    return callback({msg:"comment to respond is not found", type_error:"no-found"})
                 }
                 
-            }else{
-                consolr.log("ok")
+                    let errors = newComment.validateSync()
+                    if(errors){
+                        const err = ErrorGenerator.generateErrorSchemaValidator(errors)
+                        callback(err)
+                    }else{
+                        newComment.notation = 0
+                        const newResponse = await newComment.save()
+                        try{
+                            CommentService.updateOneComment(comment_id,{response:newResponse._id},null, function(err,value){
+                                if(err){
+                                    callback({msg:"une erreur c'est produite lors de la liaison de votre réponse avec le commentaire de l'utilisateur", type_error:"error-mongo"}, newComment.toObject())
+                                }
+                            })
+                        }catch (e){
+                            callback(e)
+                        }
+                        callback(null, newComment.toObject())
+                    }
+                    
+                }else{
                 if(comment){
-                    callback(ErrorGenerator.controlIntegrityofID({user_id, comment_id, place_id}))
+                    callback(ErrorGenerator.controlIntegrityofID({user_id, comment_id}))
                 }else{
                     callback({
                         msg:"comment is missing",
@@ -113,7 +125,7 @@ module.exports.CommentServices = class CommentService{
 
     static async findOneCommentById(comment_id, option, callback){
         if(comment_id && mongoose.isValidObjectId(comment_id)){
-            Comment.findById(comment_id).then((value) => {
+            Comment.findById(comment_id, null, {populate:["response"]}).then((value) => {
                 try{
                     if (value){
                         callback(null, value.toObject())
@@ -132,7 +144,9 @@ module.exports.CommentServices = class CommentService{
     }
 
     static async findManyComments(page, limit, filter, options, user_id, callback){
-        const populate = [{path:"likes",match:{user_id: user_id}}]
+        const populate = ["response",{path:"likes",match:{user_id: user_id}}]
+
+        
 
         if(options && options.populate && options.populate.includes("user_id")){ 
             populate.push({
@@ -151,7 +165,7 @@ module.exports.CommentServices = class CommentService{
         page = !Number.isNaN(page) ? Number(page): page
         limit = !Number.isNaN(limit) ? Number(limit): limit
         if(filter){
-
+            filter.isResponse = {$ne: true}
             const fieldsToSearch = Object.keys(filter)
             if(fieldsToSearch.includes('user_id')){
                 if(mongoose.isValidObjectId(filter.user_id)){
@@ -263,7 +277,7 @@ module.exports.CommentServices = class CommentService{
             callback({ msg: "Tableau non conforme plusieurs éléments ne sont pas des ObjectId.", type_error: 'no-valid', fields: comments_id.filter((e) => { return !mongoose.isValidObjectId(e) }) });
         }
         else if (comments_id && !Array.isArray(comments_id)) {
-            callback({ msg: "L'argement n'est pas un tableau.", type_error: 'no-valid' });
+            callback({ msg: "L'argument n'est pas un tableau.", type_error: 'no-valid' });
 
         }
         else {

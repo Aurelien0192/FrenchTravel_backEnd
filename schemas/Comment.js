@@ -12,6 +12,10 @@ const CommentSchema = mongoose.Schema({
         ref:"Place",
         required: true
     },
+    isResponse:{
+        type:Boolean,
+        default: false,
+    },
     comment:{
         type: String,
         required: true,
@@ -30,7 +34,8 @@ const CommentSchema = mongoose.Schema({
         type: Number,
         min:1,
         max:5,
-        required : true
+        required : true,
+        immutable : true
     },
     dateVisited:{
         type: Date,
