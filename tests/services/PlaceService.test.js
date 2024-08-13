@@ -767,6 +767,7 @@ describe("deleteManyPlaces",()=>{
     })
     it("delete many places with correct ID - S",(done)=>{
         PlaceService.deleteManyPlaces(places.map((place)=>{return place._id}), null, function(err, value){
+            console.log(value)
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty("deletedCount")
             expect(value['deletedCount']).to.be.equal(2)

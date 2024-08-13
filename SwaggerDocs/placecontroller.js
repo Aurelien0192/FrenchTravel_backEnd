@@ -65,8 +65,8 @@
  * @swagger
  * /places/random:
  *  get:
- *      summary: Get random places
- *      description: obtain randomly 3 places per category 
+ *      summary: Get 3 places per categories with best notation
+ *      description: obtain 3 places with bes notation and number of like per category 
  *      tags:
  *          - Place
  *      responses:
@@ -75,7 +75,14 @@
  *              content: 
  *                  application/json:
  *                      schema:
- *                          $ref : '#/components/schemas/Place'
+ *                          type: object
+ *                          properties:
+ *                              count:
+ *                                  type: number
+ *                              results:
+ *                                  type: array
+ *                                  items:
+ *                                      $ref : '#/components/schemas/Place'
  *          404:
  *              $ref: '#/components/responses/NotFound'
  *          405:
@@ -107,11 +114,18 @@
  *            description: longitude coordinate of the place
  *      responses:
  *          200:
- *              description: Get nearest place successfully.
+ *              description: get random places success.
  *              content: 
  *                  application/json:
  *                      schema:
- *                          $ref : '#/components/schemas/Place'
+ *                          type: object
+ *                          properties:
+ *                              count:
+ *                                  type: number
+ *                              results:
+ *                                  type: array
+ *                                  items:
+ *                                      $ref : '#/components/schemas/Place'
  *          404:
  *              $ref: '#/components/responses/NotFound'
  *          405:
@@ -124,7 +138,7 @@
  * @swagger
  * /places:
  *  get:
- *      summary: Find place with filters
+ *      summary: Find places with filters
  *      description: get places using filter (by notation, hotelcategorie, categorie, name, city and county )
  *      tags:
  *          - Place
@@ -150,11 +164,18 @@
  *            description: the number of element per page
  *      responses:
  *          200:
- *              description: Get places successfully.
+ *              description: get random places success.
  *              content: 
  *                  application/json:
  *                      schema:
- *                          $ref : '#/components/schemas/Place'
+ *                          type: object
+ *                          properties:
+ *                              count:
+ *                                  type: number
+ *                              results:
+ *                                  type: array
+ *                                  items:
+ *                                      $ref : '#/components/schemas/Place'
  *          404:
  *              $ref: '#/components/responses/NotFound'
  *          405:
@@ -228,6 +249,48 @@
  *                  application/json:
  *                      schema:
  *                          $ref : '#/components/schemas/Place'
+ *          403: 
+ *              description: Not Authorized
+ *          404:
+ *              $ref: '#/components/responses/NotFound'
+ *          405:
+ *              $ref: '#/components/responses/ValidationError'
+ *          500:
+ *              description : Internal server error
+ */
+
+/**
+* 
+ * @swagger
+ * /places:
+ *  delete:
+ *      summary: Deletes many places
+ *      description : delete many places by using ID, only owner of places can delete
+ *      security:
+ *          - bearerAuth: []
+ *      parameters:
+ *          - in: query
+ *            name: ids
+ *            schema:
+ *              type: array
+ *            required: true
+ *            description: array of places's id to delete
+ *            items:
+ *              type: string
+ *      tags:
+ *          - Place
+ *      responses:
+ *          200:
+ *              description: Places deleted successfully.
+ *              content: 
+ *                  application/json:
+ *                      schema:
+ *                          type : object
+ *                          properties:
+ *                              deletedCount:
+ *                                  type: number
+ *                              acknowledged:
+ *                                  type: boolean
  *          403: 
  *              description: Not Authorized
  *          404:

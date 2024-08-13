@@ -46,7 +46,6 @@ const LikeCommentController = require('./controllers/LikeCommentController').Lik
 // Import des middlewares
 const controleOwner = require('./middlewares/controleOwner')
 const controlePlaceExist = require('./middlewares/controlePlaceExist').controlePlaceExist
-const deleteDependency = require('./middlewares/deleteDependency').deleteDependency
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');

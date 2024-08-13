@@ -12,7 +12,11 @@ const LikeCommentSchemas = mongoose.Schema({
         required: true,
         index: true,
         ref:"Comment"
-    }
+    },
+    create_at:{
+        type:Date,
+        default:new Date()
+    },
 })
 
 LikeCommentSchemas.index({user_id: 1, comment_id: 1},{unique: true})

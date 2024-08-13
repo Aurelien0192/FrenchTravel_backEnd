@@ -276,7 +276,72 @@
                             "exemple": "coucou"
                         }
                     }
-                 }
+                },
+                "Comment":{
+                    "type":"object",
+                    "required" : ["user_id","place_id","comment","like","note","dateVisited"],
+                    "properties": {
+                        "user_id": {
+                            "type" : "string",
+                            "description":"id of user post the comment",
+                            "exemple": "66a75cbd8b18880971f52fe8"
+                        },
+                        "place_id": {
+                            "type":"string",
+                            "description":"id of place's user comment",
+                            "exemple":"66a75cbd8b18880971f52fe8"
+                        },
+                        "isResponse":{
+                            "type":"boolean",
+                            "description":"if the comment is a response of professional to the user's comment",
+                            "exemple":"true"
+                        },
+                        "comment":{
+                            "type":"string",
+                            "description":"comment body of comment user",
+                            "exemple":"very good place to visited with my children"
+                        },
+                        "like":{
+                            "type":"number",
+                            "description":"number of like of other user to comment of one user",
+                            "default":0,
+                            "exemple":2
+                        },
+                        "dateVisited":{
+                            "type":"string",
+                            "description":"date when user visited the place",
+                            "exemple": "2024-01-01T00:00:00Z"
+                        },
+                        "create_at":{
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "Date when the comment was created",
+                            "exemple" :"2024-01-01T00:00:00Z"
+                        },
+                        "update_at":{
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "Date when the comment was update",
+                            "exemple" :"2024-01-01T00:00:00Z"
+                        }
+                    }
+                },
+                "LikeComment":{
+                    "type":"object",
+                    "required":["user_id","comment_id"],
+                    "properties":{
+                        "user_id":{
+                            "type":"string",
+                            "description":"id of comment user like",
+                            "exemple":"66a75cbd8b18880971f52fe8"
+                        },
+                        "comment_id":{
+                            "type":"string",
+                            "description":"user id of user who like the comment",
+                            "exemple":"66a75cbd8b18880971f52fe8"
+                        }
+                    }
+                }
             },"responses":{
                 "NotFound":{
                     "description":"Resource not found",

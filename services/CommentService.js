@@ -24,6 +24,7 @@ module.exports.CommentServices = class CommentService{
                 const categorie = comment.categorie
                 const numberOfNote = comment.numberOfNote
                 const notation = comment.notation
+                newComment.like = 0
                 let errors = newComment.validateSync()
                 if(errors){
                     const err = ErrorGenerator.generateErrorSchemaValidator(errors)
@@ -35,7 +36,8 @@ module.exports.CommentServices = class CommentService{
                         await PlaceService.updateOnePlace(place_id,{
                             categorie: categorie,
                             notation: (notation * numberOfNote + newComment.note)/(numberOfNote+1),
-                            numberOfNote: numberOfNote + 1
+                            numberOfNote: numberOfNote + 1,
+                            FromCommentService: true
                         },null, function(err,value){
                             if(err){
                                 error = err

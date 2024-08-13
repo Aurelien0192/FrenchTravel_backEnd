@@ -40,6 +40,7 @@ module.exports.PlaceService =  class PlaceService{
                         })
                     }else{
                         new_place.notation = 0
+                        new_place.numberOfNote = 0
                         await new_place.save()
                         callback(null, new_place.toObject())
                     }
@@ -260,6 +261,12 @@ module.exports.PlaceService =  class PlaceService{
     }
 
     static updateOnePlace = async function(place_id, update, options, callback){
+        if(!update.FromCommentService && update.numberOfNote){
+            delete update.numberOfNote
+        }
+        if(!update.FromCommentService && update.notation){
+            delete update.notation
+        }
         if(place_id && mongoose.isValidObjectId(place_id) && update){
             update.categorie = String(update.categorie)
             update.update_at = new Date()
