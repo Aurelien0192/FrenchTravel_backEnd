@@ -98,6 +98,43 @@ module.exports.controleOwnerOfComment = (req, res, next) => {
     })
 }
 
+module.exports.controleOwnerOfPlaceToRespondAComment = (req, res, next) => {
+    req.log.info("contrôle autorisation réponse à un commentaire")
+    CommentService.findOneCommentById(req.params.id, null, function(err, comment){
+        if(err && (err.type_error === "no-valid")){
+            res.statusCode = 405
+            res.send(err)
+        }else if(err && err.type_error === "error-mongo"){
+            res.statusCode = 500
+            res.send(err)
+        }else if(err && err.type_error ==='no-found'){
+            res.statusCode = 404
+            res.send(err)
+        }else{
+            PlaceService.findOnePlaceById(comment.place_id,null, function(err, place){
+                if(err && (err.type_error === "no-valid")){
+                    res.statusCode = 405
+                    res.send(err)
+                }else if(err && err.type_error === "error-mongo"){
+                    res.statusCode = 500
+                    res.send(err)
+                }else if(err && err.type_error ==='no-found'){
+                    res.statusCode = 404
+                    res.send(err)
+                }else{
+                    if(String(place.owner) !== String(req.user._id)){
+                        res.statusCode = 401
+                        res.send({msg:"vous n'êtes pas autorisé à répondre à ce commentaire", type_error:"authorization"})
+                    }else{
+                        next()
+                    }
+                }
+            })
+        }
+    })
+
+}
+
 module.exports.controleOwnerOfImage = (req, res, next) => {
     UserService.findOneUserById(req.user._id, null, function(err, user){
         req.log.info("recherche d'un utilisateur")

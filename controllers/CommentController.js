@@ -28,6 +28,12 @@ module.exports.CommentController = class CommentController{
         })
     }
 
+    static addOneResponseComment(req, res){
+        CommentServices.addOneResponseComment(req.params.id, req.user_id, req.body, null, function(err, value){
+            responseOfServer(err, value, req, res, false)
+        })
+    }
+
     static findManyComments(req, res){
         let options={}
         req.log.info("Rechercher des commentaires")
