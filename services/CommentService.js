@@ -1,9 +1,7 @@
 const mongoose = require('mongoose')
 const CommentSchema = require('../schemas/Comment').CommentSchema
-const PlaceService = require('./PlaceService').PlaceService
 const ErrorGenerator = require('../utils/errorGenerator').errorGenerator
 const _ = require('lodash')
-const { errorGenerator } = require('../utils/errorGenerator')
 const LikeCommentSchema = require('../schemas/LikeComment').LikeCommentSchemas
 
 const LikeComment = mongoose.model('LikeComment',LikeCommentSchema)
@@ -16,6 +14,7 @@ const Comment = mongoose.model('Comment',CommentSchema)
 module.exports.CommentServices = class CommentService{
 
     static async addOneComment(user_id, place_id, comment, options, callback){
+        const PlaceService = require('./PlaceService').PlaceService
         try{
             if(user_id && mongoose.isValidObjectId(user_id) && place_id && mongoose.isValidObjectId(place_id) && comment){
                 const newComment = new Comment(comment)
@@ -174,7 +173,6 @@ module.exports.CommentServices = class CommentService{
                     return callback({msg:"user_id is not a valid id",type_error:"no-valid"})
                 }
             }
-            
             if (Number.isNaN(page) || Number.isNaN(limit)){
                 
                 callback ({msg: `format de ${Number.isNaN(page) ? "page" : "limit"} est incorrect`, type_error:"no-valid"})

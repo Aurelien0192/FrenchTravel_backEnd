@@ -546,7 +546,6 @@ describe("DELETE - /place",()=>{
     })
     it("delete one place success - S", (done) => {
         chai.request(server).delete(`/place/${places[0]._id}`).auth(tokens[0],{type: 'bearer'}).end((err,res) =>{
-            console.log(res.body)
             places.splice(0,1)
             res.should.has.status(200)
             done()
@@ -554,7 +553,6 @@ describe("DELETE - /place",()=>{
     }) 
     it("check comment is deleting - S", (done) => {
         chai.request(server).get(`/comment/${comments[0]._id}`).end((err, res) => {
-            console.log(res.body)
             res.should.has.status(404)
             comments.splice(0,1)
             done()

@@ -76,13 +76,13 @@ module.exports.PlaceControllers = class PlaceControllers {
     static async deleteOnePlace(req, res, next){
         req.log.info("Supprimer un lieu")
         PlaceService.deleteOnePlace(req.params.id, null, function(err, value){
-            responseOfServer(err, value, req, res, false, next)
+            responseOfServer(err, value, req, res, false)
         })
     }
     static async deleteManyPlaces(req, res, next){
         req.log.info("Supprimer plusieurs lieux")
         PlaceService.deleteManyPlaces(req.query.ids, null, function(err, value){
-            responseOfServer(err, value, req, res, false, next)
+            responseOfServer(err, value, req, res, false)
         })
     }
 

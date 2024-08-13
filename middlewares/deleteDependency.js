@@ -10,11 +10,9 @@ module.exports.deleteDependency = class DeleteDependency{
         let error = "Votre établissement a bien été supprimé mais"
         const errorOfFunction = await deleteAttachedDocumentsOfPlaces(req.query.ids? req.query.ids : req.params.id)
         error = error, errorOfFunction
-        console.log(error)
         if(error !== "Votre établissement a bien été supprimé mais 1"){
             res.status(500).send({err:error})
         }else{  
-            console.log("ok")
             res.status(200).send({msg: "la suppression de votre établissement c'est déroulée avec succès"})
         }
     }

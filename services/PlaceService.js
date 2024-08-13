@@ -1,6 +1,7 @@
 const PlaceSchema = require ("../schemas/Place").PlaceSchema
 const ImageService = require("../services/ImageService").ImageService
 const ErrorGenerator = require('../utils/errorGenerator').errorGenerator
+const DependencyService = require('../utils/dependencyServices').dependencyService
 const { log } = require("async");
 const _ = require('lodash')
 const mongoose = require('mongoose');
@@ -289,6 +290,7 @@ module.exports.PlaceService =  class PlaceService{
 
     static async deleteOnePlace(place_id, options, callback){
         if (place_id && mongoose.isValidObjectId(place_id)){
+            place_id = new mongoose.Types.ObjectId(place_id)
             const images = await Place.aggregate([{
                 $match: {_id: new mongoose.Types.ObjectId(place_id)} 
                 },
@@ -317,23 +319,29 @@ module.exports.PlaceService =  class PlaceService{
                     }
                 })
             } 
-
-            Place.findByIdAndDelete(place_id).then((value) => {
-                try{
-                    if(value){
-                        callback(null, value.toObject())
-                    }else{
-                        callback({ msg: "Place non trouvée", type_error: "no-found" })
-                    }
-                }catch(e){
-                    callback(e)
+            
+            DependencyService.deleteAttachedDocumentsOfPlaces([place_id], function(err){      
+                if(err){
+                    return callback({msg:err, type_error:"aborded"})
+                }else{
+                    Place.findByIdAndDelete(place_id).then((value) => {
+                        try{
+                            if(value){
+                                callback(null, value.toObject())
+                            }else{
+                                callback({ msg: "Place non trouvée", type_error: "no-found" })
+                            }
+                        }catch(e){
+                            callback(e)
+                        }
+                    }).catch((e) => {
+                        callback({ msg: "Impossible de chercher l'élément.", type_error: "error-mongo" });
+                    })
                 }
-            }).catch((e) => {
-                callback({ msg: "Impossible de chercher l'élément.", type_error: "error-mongo" });
             })
-        }else{
-            callback({msg:"ID incorrecte", type_error:"no-valid"})
-        }
+            }else{
+                callback({msg:"ID incorrecte", type_error:"no-valid"})
+            }
     }
 
     static async deleteManyPlaces(places_id, options, callback){

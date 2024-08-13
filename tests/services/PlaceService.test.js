@@ -291,6 +291,9 @@ describe("addOnePlace", () => {
     it("Add comment to correct Place - S",(done)=>{
         const goodComment = {
             comment:"superbe après-midi dans ce lieu",
+            categorie:"hotel",
+            numberOfNote:0,
+            notation:0,
             note:5,
             dateVisited: new Date()
         }
@@ -300,6 +303,17 @@ describe("addOnePlace", () => {
             expect(value["note"]).to.be.equal(5)
             expect(err).to.be.null
             comments.push(value)
+            done()
+        })
+    })
+    it("Add like to a correct comment",(done)=>{
+        LikeCommentService.addOneLikeOnComment(comments[0]._id,user._id, 0,null,function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty("comment_id")
+            expect(value).to.haveOwnProperty("user_id")
+            expect(String(value["comment_id"])).to.be.equal(String(comments[0]._id))
+            expect(String(value["user_id"])).to.be.equal(String(user._id))
+            likes.push(value)
             done()
         })
     })
@@ -603,13 +617,7 @@ describe('FindManyPlaces',() => {
 
 describe("findManyPlaceRandom",() => {
     it("find random place - S",(done)=> {
-        PlaceService.findThreePlacesPerCategoryWithBestNotation(function(err, value){
-            value.forEach((e) => {
-                if(e.comments.length>0){
-                    console.log(e.comments)
-                }
-            })
-            
+        PlaceService.findThreePlacesPerCategoryWithBestNotation(function(err, value){            
             // expect(value).to.be.an('array')
             // expect(value[0]).to.be.a('object')
             // expect(value[0]).to.haveOwnProperty('images')
@@ -681,6 +689,22 @@ describe("deleteOnePlace",() => {
             expect(value).to.haveOwnProperty('_id')
             expect(String(value['_id'])).to.be.equal(String(places[0]._id))
             places.splice(0,1)
+            done()
+        })
+    })
+    it("check comment is deleting - S",(done) => {
+        CommentService.findOneCommentById(comments[0]._id,null, function(err, value){
+            expect(err).to.be.a("object")
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err["type_error"]).to.be.equal("no-found")
+            done()
+        })
+    })
+    it("check like of comment is deleting - S",(done)=>{
+        LikeCommentService.findOneLikeCommentById(likes[0]._id,null, function(err, value){
+            expect(err).to.be.a("object")
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err["type_error"]).to.be.equal("no-found")
             done()
         })
     })
