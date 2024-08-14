@@ -48,7 +48,7 @@ module.exports.ImageController = class ImageController{
         if(req.url === "/profilePhoto/user"){
             req.user.profilePhoto? req.params.id = req.user.profilePhoto._id : next()
         }
-        if(String(req.params.id) === "66b10cef9e16844449b99acb"){
+        if(String(req.params.id) === "66bcb4061788521df4dd381f"){
             next()
         }else{
             req.log.info("delete one image in Database")
