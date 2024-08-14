@@ -8,6 +8,7 @@ const PlaceSchema = mongoose.Schema({
     owner : {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
+        immutable: true,
         required : true
     },
     categorie : {

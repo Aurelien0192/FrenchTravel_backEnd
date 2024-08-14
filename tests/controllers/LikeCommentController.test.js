@@ -6,10 +6,10 @@ const server = require('./../../server')
 
 chai.use(chaiHttp)
 
-let user = {}
+const users = []
 let place = {}
 let comment = {}
-let token = ""
+const tokens = []
 
 describe("create good user, login, place and comment for test",()=>{
     it("create good user",(done) => {
@@ -23,17 +23,42 @@ describe("create good user, login, place and comment for test",()=>{
         }
         chai.request(server).post('/user').send(goodUser).end((err, res) => {
             res.should.has.status(201)
-            user = {...res.body}
+            users.push(res.body)
             done()
         })
     })
     it("login correct user",(done)=>{
         chai.request(server).post('/login').send({
-            username:user.username,
+            username:users[0].username,
             password:"coucou"
         }).end((err,res)=>{
             res.should.has.status(200)
-            token = res.body.token
+            tokens.push(res.body.token)
+            done()
+        })
+    })
+    it("create another good user",(done) => {
+            const goodUser ={
+            firstName : "Eric",
+            lastName : "Dupond",
+            userType:"professional",
+            username:"EricLeFake",
+            password:"coucou",
+            email:"eric.fake@gmail.com"
+        }
+        chai.request(server).post('/user').send(goodUser).end((err, res) => {
+            res.should.has.status(201)
+            users.push(res.body)
+            done()
+        })
+    })
+    it("login correct user",(done)=>{
+        chai.request(server).post('/login').send({
+            username:users[1].username,
+            password:"coucou"
+        }).end((err,res)=>{
+            res.should.has.status(200)
+            tokens.push(res.body.token)
             done()
         })
     })
@@ -53,7 +78,7 @@ describe("create good user, login, place and comment for test",()=>{
             latCoordinate: 46.907258,
             lonCoordinate:6.3537263
         }
-        chai.request(server).post('/place').send(goodHotel).auth(token,{type: 'bearer'}).end((err, res)=>{
+        chai.request(server).post('/place').send(goodHotel).auth(tokens[0],{type: 'bearer'}).end((err, res)=>{
             res.should.has.status(201)
             place = {...res.body}
             done()
@@ -65,7 +90,7 @@ describe("create good user, login, place and comment for test",()=>{
             note:5,
             dateVisited: new Date()
         }
-        chai.request(server).post('/comment').query({place_id : place._id}).auth(token,{type: 'bearer'}).send(goodComment).end((err, res) => {
+        chai.request(server).post('/comment').query({place_id : place._id}).auth(tokens[0],{type: 'bearer'}).send(goodComment).end((err, res) => {
             res.should.has.status(201)
             comment = {...res.body}
             done()
@@ -75,13 +100,13 @@ describe("create good user, login, place and comment for test",()=>{
 
 describe('POST - /like',() => {
     it("add a like to a comment - S",(done)=>{
-        chai.request(server).post("/like").query({comment_id:comment._id}).auth(token,{type: 'bearer'}).end((err, res) => {
+        chai.request(server).post("/like").query({comment_id:comment._id}).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
             res.should.has.status(201)
             done()
         })
     })
     it("add a like to a comment but user has already liked - E",(done)=>{
-        chai.request(server).post("/like").query({comment_id:comment._id}).auth(token,{type: 'bearer'}).end((err, res) => {
+        chai.request(server).post("/like").query({comment_id:comment._id}).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
             res.should.has.status(405)
             done()
         })
@@ -93,19 +118,19 @@ describe('POST - /like',() => {
         })
     })
     it("add a like to a comment but comment id uncorrect - E",(done)=>{
-        chai.request(server).post("/like").query({comment_id:"vkopqre"}).auth(token,{type: 'bearer'}).end((err, res) => {
+        chai.request(server).post("/like").query({comment_id:"vkopqre"}).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
             res.should.has.status(405)
             done()
         })
     })
     it("add a like to a comment but comment id missing - E",(done)=>{
-        chai.request(server).post("/like").query({comment_id:null}).auth(token,{type: 'bearer'}).end((err, res) => {
+        chai.request(server).post("/like").query({comment_id:null}).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
             res.should.has.status(405)
             done()
         })
     })
     it("add a like to a comment but missing query - E",(done)=>{
-        chai.request(server).post("/like").auth(token,{type: 'bearer'}).end((err, res) => {
+        chai.request(server).post("/like").auth(tokens[0],{type: 'bearer'}).end((err, res) => {
             res.should.has.status(405)
             done()
         })
@@ -118,20 +143,26 @@ describe('Delete - /like',() => {
             done()
         })
     })
+    it("delete a like user never like the comment - E",(done)=>{
+        chai.request(server).delete(`/like/${comment._id}`).auth(tokens[1],{type: 'bearer'}).end((err, res) => {
+            res.should.has.status(404)
+            done()
+        })
+    })
     it("delete a like to a comment but comment id uncorrect - E",(done)=>{
-        chai.request(server).delete("/like/feklero").auth(token,{type: 'bearer'}).end((err, res) => {
+        chai.request(server).delete("/like/feklero").auth(tokens[0],{type: 'bearer'}).end((err, res) => {
             res.should.has.status(405)
             done()
         })
     })
     it("delete a like to a comment but comment id missing - E",(done)=>{
-        chai.request(server).delete("/like/").auth(token,{type: 'bearer'}).end((err, res) => {
+        chai.request(server).delete("/like/").auth(tokens[0],{type: 'bearer'}).end((err, res) => {
             res.should.has.status(404)
             done()
         })
     })
     it("delete a like to a comment - S",(done)=>{
-        chai.request(server).delete(`/like/${comment._id}`).auth(token,{type: 'bearer'}).end((err, res) => {
+        chai.request(server).delete(`/like/${comment._id}`).auth(tokens[0],{type: 'bearer'}).end((err, res) => {
             res.should.has.status(200)
             done()
         })
@@ -140,7 +171,13 @@ describe('Delete - /like',() => {
 
 describe("deleteTheUser",() => {
     it("delete user - S",(done) => {
-        chai.request(server).delete(`/user/${user._id}`).auth(token,{type: 'bearer'}).end((err, res) =>{
+        chai.request(server).delete(`/user/${users[0]._id}`).auth(tokens[0],{type: 'bearer'}).end((err, res) =>{
+            res.should.has.status(200)
+            done()
+        })
+    })
+    it("delete user - S",(done) => {
+        chai.request(server).delete(`/user/${users[1]._id}`).auth(tokens[1],{type: 'bearer'}).end((err, res) =>{
             res.should.has.status(200)
             done()
         })

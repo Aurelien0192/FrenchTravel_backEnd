@@ -93,7 +93,7 @@ module.exports.PlaceService =  class PlaceService{
 
     static findManyPlacesById = function (places_id, options, callback){
         if(places_id && Array.isArray(places_id) && places_id.length>0  && places_id.filter((e) => { return mongoose.isValidObjectId(e) }).length == places_id.length){
-            Place.find({_id:{$in : places_id}}).then((results) => {
+            Place.find({_id:{$in : places_id}},null,{lean: true}).then((results) => {
                 if(results.length >0){
                     callback(null, results)
                 }else{
@@ -261,23 +261,25 @@ module.exports.PlaceService =  class PlaceService{
     }
 
     static updateOnePlace = async function(place_id, update, options, callback){
-        if(!update.FromCommentService && update.numberOfNote){
+
+        if(update && !update.FromCommentService && update.numberOfNote){
             delete update.numberOfNote
         }
-        if(!update.FromCommentService && update.notation){
+        if(update && !update.FromCommentService && update.notation){
             delete update.notation
         }
         if(place_id && mongoose.isValidObjectId(place_id) && update){
             update.categorie = String(update.categorie)
             update.update_at = new Date()
-            Place.findByIdAndUpdate(place_id, update, {returnDocument: 'after', runValidators: true, populate:["images"]}).then((value)=>{
+            Place.findByIdAndUpdate(place_id, update, {returnDocument: 'after', runValidators: true, populate:["images"], lean:true}).then((value)=>{
                 try{
                     if(value){
-                        callback(null, value.toObject())
+                        callback(null, value)
                     }else{
                         callback({msg: "Place non trouvée", fields_with_error: [], fields:"", type_error:"no-found"})
                     }
                 }catch(e){
+                    console.log(e)
                     callback({msg: "Erreur avec la base de données", fields_with_error: [], fields:"", type_error:"error-mongo"})
                 }
             }).catch((errors) =>{
@@ -355,7 +357,7 @@ module.exports.PlaceService =  class PlaceService{
         if (places_id && Array.isArray(places_id) && places_id.length>0  && places_id.filter((e) => { return mongoose.isValidObjectId(e) }).length == places_id.length){
             places_id = places_id.map((place) => { return new mongoose.Types.ObjectId(place) })
             let images_id = []
-            let comments_id = []
+
             for(let i=0; i<places_id.length; i++){
                 const images = await Place.aggregate([{
                     $match: {_id: new mongoose.Types.ObjectId(places_id[i])} 

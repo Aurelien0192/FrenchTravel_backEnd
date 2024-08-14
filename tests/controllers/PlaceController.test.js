@@ -286,6 +286,20 @@ describe("POST - /place", () => {
             done()
         })
     })
+    it ("create another professional user -S", (done) => {
+        chai.request(server).post('/user').send({
+            firstName : "Eric",
+            lastName : "Dupond",
+            userType:"professional",
+            username:"EricLeFake",
+            password:"coucou",
+            email:"eric.fake@gmail.com"
+        }).end((err, res) =>{
+            res.should.has.status(201)
+            users.push(res.body)
+            done()
+        })
+    })
     it("connect the professional user - S",(done) => {
         chai.request(server).post('/login').send({
             username:"EricLaDébrouille",
@@ -299,6 +313,16 @@ describe("POST - /place", () => {
     it("connect the normal user - S",(done) => {
         chai.request(server).post('/login').send({
             username:"EricLaFripouille",
+            password:"coucou"
+        }).end((err, res) => {
+            res.should.has.status(200)
+            tokens.push(res.body.token)
+            done()
+        })
+    })
+    it("connect the normal user - S",(done) => {
+        chai.request(server).post('/login').send({
+            username:"EricLeFake",
             password:"coucou"
         }).end((err, res) => {
             res.should.has.status(200)
@@ -464,6 +488,32 @@ describe('GET - /places/random', () =>{
         })
     })
 })
+describe('GET -/places/suggestions',()=>{
+    it('get many places with correct coordonates - S',(done)=>{
+        chai.request(server).get('/places/suggestions').query({latCoordinate:47.2326466,lonCoordinate:6.0314766}).end((err, res)=>{
+            res.should.has.status(200)
+            done()
+        })
+    })
+    it('get many places with correct coordonates but number in string - S',(done)=>{
+        chai.request(server).get('/places/suggestions').query({latCoordinate:"47.2326466",lonCoordinate:"6.0314766"}).end((err, res)=>{
+            res.should.has.status(200)
+            done()
+        })
+    })
+    it('get many places with correct coordonates uncorrect - E',(done)=>{
+        chai.request(server).get('/places/suggestions').query({latCoordinate:"ergjerz",lonCoordinate:"6.0314766"}).end((err, res)=>{
+            res.should.has.status(405)
+            done()
+        })
+    })
+    it('get many places with missing query - E',(done)=>{
+        chai.request(server).get('/places/suggestions').end((err, res)=>{
+            res.should.has.status(405)
+            done()
+        })
+    })
+})
 
 describe('GET - /places', () => {
     it('get places with correct query - S',(done) => {
@@ -491,7 +541,6 @@ describe('GET - /places', () => {
         })
     })
 })
-
 describe('GET - /places/suggestions', () => {
     it('get random place with correct coordinates - S',(done) => {
         chai.request(server).get('/places/suggestions').query({
@@ -518,6 +567,77 @@ describe('GET - /places/suggestions', () => {
         })
     })
     
+})
+describe("UPDATE - /place",()=>{
+    it("update a correct place with correct user and correct body - S",(done) => {
+        chai.request(server).put(`/place/${places[0]._id}`).auth(tokens[0],{type: 'bearer'}).send({
+            name:"la grange du grenier",
+            categorie:"activity"
+        }).end((err,res) => {
+            res.should.has.status(200)
+            done()
+        })
+    })
+    it("update a correct place with correct user but want change immutable fields- E",(done) => {
+        chai.request(server).put(`/place/${places[0]._id}`).auth(tokens[0],{type: 'bearer'}).send({
+            numberOfNote:1000,
+            categorie:"activity"
+        }).end((err,res) => {
+            res.should.has.status(200)
+            done()
+        })
+    })
+    it("update a correct place with correct user but want add uncorrect fields for activity- E",(done) => {
+        chai.request(server).put(`/place/${places[0]._id}`).auth(tokens[0],{type: 'bearer'}).send({
+            categorie:"hotel",
+            moreInfo : {accessibility:"ascensceur"}
+        }).end((err,res) => {
+            res.should.has.status(405)
+            done()
+        })
+    })
+    it("other professional try to change not his place - E",(done) => {
+        chai.request(server).put(`/place/${places[0]._id}`).auth(tokens[3],{type: 'bearer'}).send({
+            name:"la grange du grenier",
+            categorie:"activity"
+        }).end((err,res) => {
+            res.should.has.status(401)
+            done()
+        })
+    })
+    it(" update place without authentifiate - S",(done) => {
+        chai.request(server).put(`/place/${places[0]._id}`).send({
+            name:"la grange du grenier",
+            categorie:"activity"
+        }).end((err,res) => {
+            res.should.has.status(401)
+            done()
+        })
+    })
+    it("update a place without body - E",(done) => {
+        chai.request(server).put(`/place/${places[0]._id}`).auth(tokens[0],{type: 'bearer'}).end((err,res) => {
+            res.should.has.status(200)
+            done()
+        })
+    })
+    it("udapte a place with correct id place but not exist in database - E",(done) => {
+        chai.request(server).put(`/place/${users[0]._id}`).auth(tokens[0],{type: 'bearer'}).send({
+            name:"la grange du grenier",
+            categorie:"activity"
+        }).end((err,res) => {
+            res.should.has.status(404)
+            done()
+        })
+    })
+    it("udapte a place with uncorrect id place - E",(done) => {
+        chai.request(server).put(`/place/jersoigrj`).auth(tokens[0],{type: 'bearer'}).send({
+            name:"la grange du grenier",
+            categorie:"activity"
+        }).end((err,res) => {
+            res.should.has.status(405)
+            done()
+        })
+    })
 })
 describe("DELETE - /place",()=>{
     it("delete one place with missing id place - E", (done) => {
@@ -624,6 +744,12 @@ describe('DELETE "/places', () => {
     })
     it('purge database - S',(done)=>{
         chai.request(server).delete(`/user/${users[1]._id}`).auth(tokens[1],{type: 'bearer'}).end((err,res)=>{
+            res.should.has.status(200)
+            done()
+        })
+    })
+    it('purge database - S',(done)=>{
+        chai.request(server).delete(`/user/${users[2]._id}`).auth(tokens[2],{type: 'bearer'}).end((err,res)=>{
             res.should.has.status(200)
             done()
         })

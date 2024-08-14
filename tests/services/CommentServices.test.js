@@ -312,6 +312,14 @@ describe("addOnResponseComment",() => {
             done()
         })
     })
+    it("try to respond another time to same comment - E",(done) => {
+        CommentService.addOneResponseComment(comments[0]._id, user._id,{comment: "merci pour ce commentaire"},null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err["type_error"]).to.be.equal("unauthorized")
+            done()
+        })
+    })
     it("check id responseComment exist in comment - S",(done) => {
         CommentService.findOneCommentById(comments[0]._id, null, function (err, value){
             expect(value).to.be.a('object')
@@ -319,14 +327,6 @@ describe("addOnResponseComment",() => {
             expect(value['response']).to.be.a('object')
             expect(value['response']).to.haveOwnProperty('_id')
             expect(String(value['response']['_id'])).to.be.equal(String(comments[1]._id))
-            done()
-        })
-    })
-    it("try to respond another time to same comment - E",(done) => {
-        CommentService.addOneResponseComment(comments[0]._id, user._id,{comment: "merci pour ce commentaire"},null, function(err, value){
-            expect(err).to.be.a('object')
-            expect(err).to.haveOwnProperty('type_error')
-            expect(err["type_error"]).to.be.equal("unauthorized")
             done()
         })
     })

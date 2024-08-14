@@ -524,7 +524,6 @@ describe("addOnePlace", () => {
         })
     })
 })
-
 describe("FindOnePlace",()=>{
     it("find one place with correct id -S ",(done) => {
         PlaceService.findOnePlaceById(places[0]._id, null, function(err, value){
@@ -535,16 +534,92 @@ describe("FindOnePlace",()=>{
             done()
         })
     })
+    it("find one place with uncorrect id - E ",(done) => {
+        PlaceService.findOnePlaceById("dfqboijbfo", null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err["type_error"]).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it("find one place with missing id - E ",(done) => {
+        PlaceService.findOnePlaceById(null, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err["type_error"]).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it("find one place with missing id - E ",(done) => {
+        PlaceService.findOnePlaceById(user._id, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err["type_error"]).to.be.equal('no-found')
+            done()
+        })
+    })
     it("find one place with correct id with populate - S",(done) => {
         PlaceService.findOnePlaceById(places[0]._id, {populate:true}, function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('_id')
+            expect(value).to.haveOwnProperty("images")
+            expect(value["images"]).to.be.an('array')
+            expect(value['images']).to.lengthOf.at.least(1)
+            expect(value["images"][0]).to.haveOwnProperty('_id')
+            expect(value).to.haveOwnProperty('comments')
+            expect(value["comments"]).to.be.an('array')
+            expect(value["comments"]).to.lengthOf(1)
             places.push(value)
             done()
         })
     })
 })
-
+describe('findManyPlaceByID',() => {
+    it("find many places with correts ids - S", (done) => {
+        PlaceService.findManyPlacesById([places[0]._id, places[1]._id], null, function(err, value){
+            expect(value).to.be.an('array')
+            expect(value).to.lengthOf(2)
+            value.forEach((place, index)=>{
+                expect(place).to.be.a('object')
+                expect(place).to.haveOwnProperty("_id")
+                expect(String(place['_id'])).to.be.equal(String(places[index]._id))
+            })
+            done()
+        })
+    })
+    it("find many places with one id uncorrect - E", (done) => {
+        PlaceService.findManyPlacesById(["efoqeroj", places[1]._id], null, function(err, value){
+            expect(err).to.be.a("object")
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err["type_error"]).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it("find many places with one id missing - S", (done) => {
+        PlaceService.findManyPlacesById([null, places[1]._id], null, function(err, value){
+            expect(err).to.be.a("object")
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err["type_error"]).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it("find many places with missing ids - E", (done) => {
+        PlaceService.findManyPlacesById(null, null, function(err, value){
+            expect(err).to.be.a("object")
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err["type_error"]).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it("find many places with id not in array- E", (done) => {
+        PlaceService.findManyPlacesById(places[0]._id, null, function(err, value){
+            expect(err).to.be.a("object")
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err["type_error"]).to.be.equal('no-valid')
+            done()
+        })
+    })
+})
 describe('FindManyPlaces',() => {
     it("find many places with correct informations search:Besançon - S", (done) =>{
         PlaceService.findManyPlaces(1,5,{search:"Besançon"}, null, function(err, value){
@@ -599,6 +674,17 @@ describe('FindManyPlaces',() => {
             done()
         })
     })
+    it("find many place by owner",()=>{
+        PlaceService.findManyPlaces(1,5,{user_id:user._id},null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('results')
+            expect(value.results).to.be.an("array")
+            value.results.forEach((result)=>{
+                expect(result).to.haveOwnProperty("owner")
+                expect(String(result.owner)).to.be.equal(String(user._id))
+            })
+        })
+    })
     it("find many places with null page and limit - S", (done) =>{
         PlaceService.findManyPlaces(null, null,{search:"Besançon"}, null, function(err, value){
             expect(value).to.be.a('object')
@@ -618,11 +704,11 @@ describe('FindManyPlaces',() => {
 describe("findManyPlaceRandom",() => {
     it("find random place - S",(done)=> {
         PlaceService.findThreePlacesPerCategoryWithBestNotation(function(err, value){            
-            // expect(value).to.be.an('array')
-            // expect(value[0]).to.be.a('object')
-            // expect(value[0]).to.haveOwnProperty('images')
-            // expect(value[0].images).to.be.an('array')
-            // expect(err).to.be.null
+            expect(value).to.be.an('array')
+            expect(value[0]).to.be.a('object')
+            expect(value[0]).to.haveOwnProperty('images')
+            expect(value[0].images).to.be.an('array')
+            expect(err).to.be.null
             done()
         })
     })
@@ -653,6 +739,115 @@ describe("findNearPlaces",()=>{
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty("type_error")
             expect(err["type_error"]).to.be.equal("no-valid")
+            done()
+        })
+    })
+})
+describe("updateOnePlace",()=>{
+    it('update one place with correct information - S ',(done)=>{
+        PlaceService.updateOnePlace(places[0]._id,{
+            name:"la grange du grenier",
+            categorie:"activity"
+        },null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('name')
+            expect(value.name).to.be.equal("la grange du grenier")
+            done()
+        })
+    })
+    it('update one place with correct information - S',(done)=>{
+        PlaceService.updateOnePlace(places[0]._id,{
+            name:"la grange du grenier",
+            categorie:"activity"
+        },null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('name')
+            expect(value.name).to.be.equal("la grange du grenier")
+            done()
+        })
+    })
+    it('owner try to change numberOfNote - E',(done)=>{
+        PlaceService.updateOnePlace(places[0]._id,{
+            numberOfNote:1000,
+            categorie:"activity"
+        },null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty("numberOfNote")
+            expect(value["numberOfNote"]).to.be.equal(1)
+            done()
+        })
+    })
+    it('owner try to change notation - E',(done)=>{
+        PlaceService.updateOnePlace(places[0]._id,{
+            numberOfNote:2,
+            categorie:"activity"
+        },null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty("notation")
+            expect(value["notation"]).to.be.equal(5)
+            done()
+        })
+    })
+    it('owner try to change typeOfPlace - E',(done)=>{
+        PlaceService.updateOnePlace(places[0]._id,{
+            categorie:"hotel"
+        },null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty("categorie")
+            expect(value["categorie"]).to.be.equal("activity")
+            done()
+        })
+    })
+    it('owner try to add moreInfo not allow in activity - E',(done)=>{
+        PlaceService.updateOnePlace(places[0]._id,{
+            categorie:"hotel",
+            moreInfo : {accessibility:"ascensceur"}
+        },null, function(err, value){
+            expect(err).to.be.a("object")
+            expect(err).to.haveOwnProperty("msg")
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err.type_error).to.be.equal("validator")
+            done()
+        })
+    })
+    it('update without body - E',(done)=>{
+        PlaceService.updateOnePlace(places[0]._id,null ,null, function(err, value){
+            expect(err).to.be.a("object")
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err.type_error).to.be.equal("no-valid")
+            done()
+        })
+    })
+    it('update one place with uncorrect place id - E ',(done)=>{
+        PlaceService.updateOnePlace("sdlslvnkd",{
+            name:"la grange du grenier",
+            categorie:"activity"
+        },null, function(err, value){
+            expect(err).to.be.a("object")
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err.type_error).to.be.equal("no-valid")
+            done()
+        })
+    })
+    it('update one place with missing place id - E ',(done)=>{
+        PlaceService.updateOnePlace(null ,{
+            name:"la grange du grenier",
+            categorie:"activity"
+        },null, function(err, value){
+            expect(err).to.be.a("object")
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err.type_error).to.be.equal("no-valid")
+            done()
+        })
+    })
+    it('update one place with correct place id nut not exist in database - E ',(done)=>{
+        PlaceService.updateOnePlace(user._id ,{
+            name:"la grange du grenier",
+            categorie:"activity"
+        },null, function(err, value){
+            expect(err).to.be.a("object")
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err.type_error).to.be.equal("no-found")
             done()
         })
     })

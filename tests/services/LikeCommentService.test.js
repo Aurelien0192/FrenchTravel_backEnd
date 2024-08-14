@@ -204,6 +204,10 @@ describe("deleteOneLikeComment",() => {
 describe("delete user",() => {
     it("delete",(done)=>{
         UserService.deleteOneUser(user._id, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('_id')
+            expect(String(value['_id'])).to.be.equal(String(user._id))
+            expect(err).to.be.null
             done()
         })
     })

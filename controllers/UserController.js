@@ -45,8 +45,6 @@ module.exports.UserControllers = class UserControllers{
         })
     }
 
-
-
     static addOneUser(req, res){
         const opts = null
         req.log.info("Ajout d'un utilisateur")
@@ -55,16 +53,12 @@ module.exports.UserControllers = class UserControllers{
         })
     }
 
-
-    
     static findOneUserById(req, res){
         UserService.findOneUserById(req.params.id, null, function(err, value){
             req.log.info("recherche d'un utilisateur")
             responseOfServer(err, value, req, res, false)
         })
     }
-
-
 
     static updateOneUser(req, res){
         const opts = null
@@ -82,8 +76,6 @@ module.exports.UserControllers = class UserControllers{
             responseOfServer(err, value, req, res, false)
         })
     }
-
-
 
     static deleteOneUser(req, res, next){
         const opts = null

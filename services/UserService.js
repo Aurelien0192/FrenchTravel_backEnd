@@ -223,6 +223,7 @@ module.exports.UserService = class UserService{
                             callback(e)
                         }
                     }).catch((e) => {
+                        console.log(e)
                         callback({ msg: "Impossible de chercher l'élément.", fields_with_error: [], fields:"", type_error: "error-mongo" });
                     })
                 }

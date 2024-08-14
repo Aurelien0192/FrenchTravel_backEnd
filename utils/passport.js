@@ -24,7 +24,7 @@ passport.use(new JWTStrategy({
 }, function (req, jwt_payload, done){
     UserService.findOneUserById(jwt_payload._id, null, function (err, value){
         if(err){
-            done(err)
+            done(null, false, {msg:"not-found", message:'AUcun utilisateur trouvé pour ce token', type_error:"no-valid"})
         }else if (value && value.token === ""){
             done(null, false, {msg:"unauthorized", type_error:"no-valid"})
         }else{ 

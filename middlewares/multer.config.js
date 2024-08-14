@@ -22,8 +22,6 @@ const storage = multer.diskStorage({
     }
 })
 
-
-
 module.exports.oneImage = multer({
     storage,
     limits:{
@@ -37,7 +35,6 @@ module.exports.oneImage = multer({
         }else{
             callback(new Error("Invalid file extension"))
         }
-
     }    
 }).single('image')
 
