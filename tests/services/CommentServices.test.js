@@ -8,8 +8,8 @@ const _ = require('lodash')
 
 const comments = []
 let like = {}
-let user = {}
-let place = {}
+const users = []
+const places = []
 
 describe('create user and place for test',() => {
     const goodUser ={
@@ -20,9 +20,23 @@ describe('create user and place for test',() => {
         password:"coucou",
         email:"eric.dupond@gmail.com"
     }
+    const anothergoodUser={
+        firstName : "Eric",
+        lastName : "Dupond",
+        userType:"professional",
+        username:"EricLeFake",
+        password:"coucou",
+        email:"eric.leFake@gmail.com"
+    }
     it("user creation",(done)=>{
         UserService.addOneUser(goodUser, null, function(err, value){
-            user = {...value}
+            users.push(value)
+            done()
+        })
+    })
+    it("another user creation",(done)=>{
+        UserService.addOneUser(anothergoodUser, null, function(err, value){
+            users.push(value)
             done()
         })
     })
@@ -42,8 +56,29 @@ describe('create user and place for test',() => {
             latCoordinate: 46.907258,
             lonCoordinate:6.3537263
         }
-        PlaceService.addOnePlace(goodHotel,user._id, null, function(err, value){
-            place = {...value}
+        PlaceService.addOnePlace(goodHotel,users[0]._id, null, function(err, value){
+            places.push(value)
+            done()
+        })
+    })
+    it('another place creation',(done)=>{
+        const goodHotel = {
+            name: "Château du Doubs",
+            describe : "Super chateau dans le centre du Doubs",
+            categorie : "hotel",
+            moreInfo:{
+                services:"ascensceur"
+            },
+            street: "2 rue du Moulin Parnet",
+            city: "Pontarlier",
+            codePostal : "25300",
+            country: "France",
+            county: "Doubs",
+            latCoordinate: 46.907258,
+            lonCoordinate:6.3537263
+        }
+        PlaceService.addOnePlace(goodHotel,users[1]._id, null, function(err, value){
+            places.push(value)
             done()
         })
     })
@@ -59,7 +94,7 @@ describe("AddOneComment",() => {
             note:5,
             dateVisited: new Date()
         }
-        CommentService.addOneComment(user._id,place._id,goodComment, null, function(err, value){
+        CommentService.addOneComment(users[0]._id,places[0]._id,goodComment, null, function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty("note")
             expect(value["note"]).to.be.equal(5)
@@ -69,22 +104,22 @@ describe("AddOneComment",() => {
         })
     })
     it('check place correctly update - S',(done)=>{
-        PlaceService.findOnePlaceById(place._id, null, function(err,value){
+        PlaceService.findOnePlaceById(places[0]._id, null, function(err,value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty("_id")
             expect(value).to.haveOwnProperty("numberOfNote")
             expect(value).to.haveOwnProperty("notation")
-            expect(String(value["_id"])).to.be.equal(String(place._id))
+            expect(String(value["_id"])).to.be.equal(String(places[0]._id))
             expect(value["numberOfNote"]).to.be.equal(1)
             expect(value["notation"]).to.be.equal(5)
             done()
         })
     })
     it(("add a like with correct user_id and place_id - S"),(done)=>{
-        LikeCommentService.addOneLikeOnComment(comments[0]._id,user._id, 0, null, function(err, value){
+        LikeCommentService.addOneLikeOnComment(comments[0]._id,users[0]._id, 0, null, function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('user_id')
-            expect(String(value['user_id'])).to.be.equal(String(user._id))
+            expect(String(value['user_id'])).to.be.equal(String(users[0]._id))
             expect(value).to.haveOwnProperty('comment_id')
             expect(String(value['comment_id'])).to.be.equal(String(comments[0]._id))
             like = {...value}
@@ -100,12 +135,31 @@ describe("AddOneComment",() => {
             note:5,
             dateVisited: new Date()
         }
-        CommentService.addOneComment("66b0dca10a",place._id,goodComment, null, function(err, value){
+        CommentService.addOneComment("66b0dca10a",places[0]._id,goodComment, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err).to.haveOwnProperty('msg')
             expect(err["msg"]).to.be.equal("user_id is uncorrect")
             expect(err["type_error"]).to.be.equal("no-valid")
+            done()
+        })
+    })
+    it('Add one comment with unwanted field to another place - S',(done) => {
+        const goodComment = {
+            comment:"superbe après-midi dans ce lieu",
+            categorie:"hotel",
+            numberOfNote:0,
+            notation:0,
+            note:5,
+            categorie: "hotel",
+            dateVisited: new Date()
+        }
+        CommentService.addOneComment(users[0]._id,places[1]._id,goodComment, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty("note")
+            expect(value["note"]).to.be.equal(5)
+            expect(err).to.be.null
+            comments.push(value)
             done()
         })
     })
@@ -118,7 +172,7 @@ describe("AddOneComment",() => {
             note:5,
             dateVisited: new Date()
         }
-        CommentService.addOneComment(null,place._id,goodComment, null, function(err, value){
+        CommentService.addOneComment(null,places[0]._id,goodComment, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err).to.haveOwnProperty('msg')
@@ -136,7 +190,7 @@ describe("AddOneComment",() => {
             note:5,
             dateVisited: new Date()
         }
-        CommentService.addOneComment(user._id,"669f589f754",goodComment, null, function(err, value){
+        CommentService.addOneComment(users[0]._id,"669f589f754",goodComment, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err).to.haveOwnProperty('msg')
@@ -154,7 +208,7 @@ describe("AddOneComment",() => {
             note:5,
             dateVisited: new Date()
         }
-        CommentService.addOneComment(user._id,null,goodComment, null, function(err, value){
+        CommentService.addOneComment(users[0]._id,null,goodComment, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err).to.haveOwnProperty('msg')
@@ -172,7 +226,7 @@ describe("AddOneComment",() => {
             note:5,
             dateVisited: new Date()
         }
-        CommentService.addOneComment(user._id,place._id,goodComment, null, function(err, value){
+        CommentService.addOneComment(users[0]._id,places[0]._id,goodComment, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty("type_error")
             expect(err).to.haveOwnProperty("fields_with_error")
@@ -190,7 +244,7 @@ describe("AddOneComment",() => {
             note:10,
             dateVisited: new Date()
         }
-        CommentService.addOneComment(user._id,place._id,goodComment, null, function(err, value){
+        CommentService.addOneComment(users[0]._id,places[0]._id,goodComment, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty("type_error")
             expect(err).to.haveOwnProperty("fields_with_error")
@@ -208,7 +262,7 @@ describe("AddOneComment",() => {
             note:5,
             dateVisited: "fsijoiejzo"
         }
-        CommentService.addOneComment(user._id,place._id,goodComment, null, function(err, value){
+        CommentService.addOneComment(users[0]._id,places[0]._id,goodComment, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty("type_error")
             expect(err).to.haveOwnProperty("fields_with_error")
@@ -225,7 +279,7 @@ describe("AddOneComment",() => {
             notation:0,
             dateVisited: new Date()
         }
-        CommentService.addOneComment(user._id,place._id,goodComment, null, function(err, value){
+        CommentService.addOneComment(users[0]._id,places[0]._id,goodComment, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty("type_error")
             expect(err).to.haveOwnProperty("fields_with_error")
@@ -237,7 +291,7 @@ describe("AddOneComment",() => {
 })
 describe("addOnResponseComment",() => {
     it("add correct response to another comment but comment_id uncorrect - E",(done) => {
-        CommentService.addOneResponseComment("blablabla", user._id,{comment: "merci pour ce commentaire"},null, function(err, value){
+        CommentService.addOneResponseComment("blablabla", users[0]._id,{comment: "merci pour ce commentaire"},null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err).to.haveOwnProperty('msg')
@@ -247,7 +301,7 @@ describe("addOnResponseComment",() => {
         })
     })
     it("add correct response to another comment but comment_id missing - E",(done) => {
-        CommentService.addOneResponseComment(null, user._id,{comment: "merci pour ce commentaire"},null, function(err, value){
+        CommentService.addOneResponseComment(null, users[0]._id,{comment: "merci pour ce commentaire"},null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err).to.haveOwnProperty('msg')
@@ -257,7 +311,7 @@ describe("addOnResponseComment",() => {
         })
     })
     it("add correct response to another comment but comment_id missing in database - E",(done) => {
-        CommentService.addOneResponseComment(user._id, user._id,{comment: "merci pour ce commentaire"},null, function(err, value){
+        CommentService.addOneResponseComment(users[0]._id, users[0]._id,{comment: "merci pour ce commentaire"},null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err["type_error"]).to.be.equal("no-found")
@@ -285,7 +339,7 @@ describe("addOnResponseComment",() => {
         })
     })
     it("add response to another comment with empty comment - E",(done) => {
-        CommentService.addOneResponseComment(comments[0]._id, user._id,{comment: ""},null, function(err, value){
+        CommentService.addOneResponseComment(comments[0]._id, users[0]._id,{comment: ""},null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err["type_error"]).to.be.equal("validator")
@@ -293,7 +347,7 @@ describe("addOnResponseComment",() => {
         })
     })
     it("add response to another comment with missing comment - E",(done) => {
-        CommentService.addOneResponseComment(comments[0]._id, user._id,null,null, function(err, value){
+        CommentService.addOneResponseComment(comments[0]._id, users[0]._id,null,null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err["type_error"]).to.be.equal("no-valid")
@@ -301,19 +355,19 @@ describe("addOnResponseComment",() => {
         })
     })
     it("add correct response to comment - S",(done) => {
-        CommentService.addOneResponseComment(comments[0]._id, user._id,{comment: "merci pour ce commentaire"},null, function(err, value){
+        CommentService.addOneResponseComment(comments[0]._id, users[0]._id,{comment: "merci pour ce commentaire"},null, function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty("user_id")
             expect(value).to.haveOwnProperty("isResponse")
             expect(value["isResponse"]).to.be.equal(true)
-            expect(String(value["user_id"])).to.be.equal(String(user._id))
+            expect(String(value["user_id"])).to.be.equal(String(users[0]._id))
             expect(err).to.be.null
             comments.push(value)
             done()
         })
     })
     it("try to respond another time to same comment - E",(done) => {
-        CommentService.addOneResponseComment(comments[0]._id, user._id,{comment: "merci pour ce commentaire"},null, function(err, value){
+        CommentService.addOneResponseComment(comments[0]._id, users[0]._id,{comment: "merci pour ce commentaire"},null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err["type_error"]).to.be.equal("unauthorized")
@@ -326,7 +380,7 @@ describe("addOnResponseComment",() => {
             expect(value).to.haveOwnProperty("response")
             expect(value['response']).to.be.a('object')
             expect(value['response']).to.haveOwnProperty('_id')
-            expect(String(value['response']['_id'])).to.be.equal(String(comments[1]._id))
+            expect(String(value['response']['_id'])).to.be.equal(String(comments[2]._id))
             done()
         })
     })
@@ -359,7 +413,7 @@ describe("findCommentById",()=>{
         })
     })
     it('find comment with correct ID but not exist in database - E',(done)=>{
-        CommentService.findOneCommentById(user._id, null, function(err, value){
+        CommentService.findOneCommentById(users[0]._id, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('no-found')
@@ -371,7 +425,7 @@ describe("findCommentById",()=>{
 
 describe("findManyComments  - S",()=>{
     it("find comments with good user ID",(done) => {
-        CommentService.findManyComments(null, null, {user_id :user._id}, null, null, function(err,value){
+        CommentService.findManyComments(null, null, {user_id :users[0]._id}, null, null, function(err,value){
             expect(value).to.haveOwnProperty('results')
             expect(value['results']).to.be.an('array')
             expect(value['results']).to.have.lengthOf.at.least(1)
@@ -381,7 +435,7 @@ describe("findManyComments  - S",()=>{
                 expect(result).to.haveOwnProperty("isResponse")
                 expect(result["isResponse"]).to.be.equal(false)
             })
-            expect(String(value['results'][0]['user_id'])).to.be.equal(String(user._id))
+            expect(String(value['results'][0]['user_id'])).to.be.equal(String(users[0]._id))
             done()
         })
     })
@@ -410,7 +464,7 @@ describe("findManyComments  - S",()=>{
         })
     })
     it("find comments with correct user ID but not present in database - S",(done) => {
-        CommentService.findManyComments(null, null, {user_id:place._id}, null, null, function(err,value){
+        CommentService.findManyComments(null, null, {user_id:places[0]._id}, null, null, function(err,value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('count')
             expect(value["count"]).to.be.equal(0)
@@ -418,7 +472,7 @@ describe("findManyComments  - S",()=>{
         })
     })
     it("find comments with correct place ID - S",(done) => {
-        CommentService.findManyComments(null, null, {place_id:place._id}, null, null, function(err,value){
+        CommentService.findManyComments(null, null, {place_id:places[0]._id}, null, null, function(err,value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('results')
             expect(value["results"]).to.have.lengthOf.at.least(1)
@@ -426,7 +480,7 @@ describe("findManyComments  - S",()=>{
         })
     })
     it("find comments with correct place ID with populate in user_id - S",(done) => {
-        CommentService.findManyComments(null, null, {place_id:place._id},"populateuser_id", null, function(err,value){
+        CommentService.findManyComments(null, null, {place_id:places[0]._id},"populateuser_id", null, function(err,value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('results')
             expect(value["results"]).to.be.an('Array')
@@ -436,12 +490,82 @@ describe("findManyComments  - S",()=>{
         })
     })
     it("find comments with correct user ID with populate in place_id - S",(done) => {
-        CommentService.findManyComments(null, null, {user_id:user._id},"populateplace_id", null, function(err,value){
+        CommentService.findManyComments(null, null, {user_id:users[0]._id},"populateplace_id", null, function(err,value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('results')
             expect(value["results"]).to.be.an('Array')
             expect(value["results"]).to.have.lengthOf.at.least(1)
             expect(value["results"][0]).to.haveOwnProperty("_id")
+            done()
+        })
+    })
+})
+describe("findManyCommentsByOwnerOfPlace",()=>{
+    it('find many comments with correct places_id',(done)=>{
+        CommentService.findManyCommentsByOwnerOfPlace(null, null, [places[0]._id], null, users[0]._id, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty("count")
+            expect(value["count"]).to.be.equal(2)
+            expect(value).to.haveOwnProperty("results")
+            expect(value["results"]).to.be.an('array')
+            expect(value["results"]).to.lengthOf(2)
+            value.results.forEach((result)=>{
+                expect(result).to.be.a("object")
+                expect(result).to.haveOwnProperty("place_id")
+                expect(result["place_id"]).to.haveOwnProperty("_id")
+                expect(String(result["place_id"]["_id"])).to.be.equal(String(places[0]._id))
+            })
+            done()
+        })
+    })
+    it('find many comments with correct places_id',(done)=>{
+        CommentService.findManyCommentsByOwnerOfPlace(null, null, [places[1]._id], null, users[0]._id, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty("count")
+            expect(value["count"]).to.be.equal(1)
+            expect(value).to.haveOwnProperty("results")
+            expect(value["results"]).to.be.an('array')
+            expect(value["results"]).to.lengthOf(1)
+            value.results.forEach((result)=>{
+                expect(result).to.be.a("object")
+                expect(result).to.haveOwnProperty("place_id")
+                expect(result["place_id"]).to.haveOwnProperty("_id")
+                expect(String(result["place_id"]["_id"])).to.be.equal(String(places[1]._id))
+            })
+            done()
+        })
+    })
+    it('find many comments with uncorrect places_id - E',(done) =>{
+        CommentService.findManyCommentsByOwnerOfPlace(null, null, ["jqdiojdfoj"], null, users[0]._id, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it('find many comments with places_id not array - E',(done) =>{
+        CommentService.findManyCommentsByOwnerOfPlace(null, null, places[0]._id, null, users[0]._id, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it('find many comments with places_id missing - E',(done) =>{
+        CommentService.findManyCommentsByOwnerOfPlace(null, null, null, null, users[0]._id, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty("type_error")
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it('find many comments with ids correct but missing in database - E',(done) =>{
+        CommentService.findManyCommentsByOwnerOfPlace(null, null, [users[0]._id], null, users[0]._id, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty("count")
+            expect(value['count']).to.be.equal(0)
+            expect(value).to.haveOwnProperty("results")
+            expect(value["results"]).to.lengthOf(0)
             done()
         })
     })
@@ -505,7 +629,7 @@ describe("updateOneComment",()=>{
         })
     })
     it('update one comment with correct id but not exist in database - E',(done)=>{
-        CommentService.updateOneComment(user._id, {comment:"hello"}, null, function(err, value){
+        CommentService.updateOneComment(users[0]._id, {comment:"hello"}, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal("no-found")
@@ -531,7 +655,7 @@ describe("deleteOneCommentByID",()=>{
         })
     })
     it("delete one comment with correct ID but not exist in database - E",(done)=>{
-        CommentService.deleteOneCommentById(user._id,function(err, value){
+        CommentService.deleteOneCommentById(users[0]._id,function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('no-found')
@@ -601,15 +725,21 @@ describe("deleteManyComments",() => {
         CommentService.deleteManyComments(_.map(comments,"_id"), function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('deletedCount')
-            expect(value['deletedCount']).to.be.equal(1)
+            expect(value['deletedCount']).to.be.equal(2)
             done()
         })
     })
 })
 
-describe("delete user",() => {
+describe("delete users",() => {
     it("delete",(done)=>{
-        UserService.deleteOneUser(user._id, null, function(err, value){
+        UserService.deleteOneUser(users[0]._id, null, function(err, value){
+            expect(value).to.be.a("object")
+            done()
+        })
+    })
+    it("delete",(done)=>{
+        UserService.deleteOneUser(users[1]._id, null, function(err, value){
             expect(value).to.be.a("object")
             done()
         })

@@ -320,7 +320,7 @@ describe("POST - /place", () => {
             done()
         })
     })
-    it("connect the normal user - S",(done) => {
+    it("connect the another professinal user - S",(done) => {
         chai.request(server).post('/login').send({
             username:"EricLeFake",
             password:"coucou"

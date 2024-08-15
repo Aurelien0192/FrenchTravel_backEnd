@@ -148,8 +148,6 @@ module.exports.CommentServices = class CommentService{
     static async findManyComments(page, limit, filter, options, user_id, callback){
         const populate = ["response",{path:"likes",match:{user_id: user_id}}]
 
-        
-
         if(options && options.populate && options.populate.includes("user_id")){ 
             populate.push({
             path: "user_id",
@@ -206,6 +204,61 @@ module.exports.CommentServices = class CommentService{
         }
     
     }
+
+    static async findManyCommentsByOwnerOfPlace(page, limit, places_id, options, user_id, callback){
+        if(places_id && Array.isArray(places_id) && places_id.length>0  && places_id.filter((e) => { return mongoose.isValidObjectId(e) }).length == places_id.length){
+
+            const populate = [
+                {path:"likes",
+                    match:{user_id: user_id}
+                },{
+                    path:"user_id",
+                    populate:{
+                        path:"profilePhoto"
+                    }
+                },{
+                    path:"place_id",
+                }
+            ]               
+            page = !page ? 1 : page
+            limit = !limit ? 0 : limit
+            page = !Number.isNaN(page) ? Number(page): page
+            limit = !Number.isNaN(limit) ? Number(limit): limit
+            if(places_id){
+                if (Number.isNaN(page) || Number.isNaN(limit)){
+                    callback ({msg: `format de ${Number.isNaN(page) ? "page" : "limit"} est incorrect`, type_error:"no-valid"})
+                }else{
+                    
+                    Comment.countDocuments({place_id: places_id}, {populate:populate}).then((value) => {
+                        if (value > 0){
+                            const skip = ((page-1) * limit)
+                            try{
+                                Comment.find({place_id: places_id}, null, {skip:skip, limit:limit, populate:populate, sort:{create_at:-1}, lean:true}).then((results) => {
+                                    const finalResults = results.map((result)=>{return {...result, liked: result.likes.length > 0}})
+                                    callback(null, {
+                                        count : value,
+                                        results : finalResults
+                                    })
+                                })
+                            }catch(e){
+                                console.log(e)
+                            }
+                        }else{
+                            callback(null,{count : 0, results : []})
+                        }
+                    }).catch((e) => {
+                        callback(e)
+                    })
+                }
+            }else{
+                callback({msg: "query is missing", type_error:"no-valid"})
+            }
+        }else{
+            callback({ msg: "ObjectId non conforme.", type_error: 'no-valid' })
+        }
+    
+    }
+
 
     static async updateOneComment(comment_id, update, options, callback){
         if(comment_id && mongoose.isValidObjectId(comment_id) && update){

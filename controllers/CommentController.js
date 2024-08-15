@@ -55,6 +55,12 @@ module.exports.CommentController = class CommentController{
         })
     }
 
+    static findManyCommentsByOwnerOfPlace(req, res){
+        CommentServices.findManyCommentsByOwnerOfPlace(req.query.page, req.query.limit, res.locals.idsOfPlaces, null, req.user._id, function(err, value){
+            responseOfServer(err, value, req, res, false)
+        })
+    }
+
     static deleteOneCommentById(req, res){
         CommentServices.deleteOneCommentById(req.params.id, function(err, value){
             responseOfServer(err, value, req, res, false)

@@ -46,6 +46,7 @@ const LikeCommentController = require('./controllers/LikeCommentController').Lik
 // Import des middlewares
 const controleOwner = require('./middlewares/controleOwner')
 const controlePlaceExist = require('./middlewares/controlePlaceExist').controlePlaceExist
+const findAllPlaceOfOwner = require('./middlewares/findAllPlacesOfOwner').findAllPlacesOfOwner
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -97,6 +98,7 @@ app.post('/comment',database.controlsBDD,passport.authenticate('jwt',{session:fa
 app.post('/responseComment/:id',database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwnerOfPlaceToRespondAComment, CommentController.addOneResponseComment)
 app.get('/comment/:id',database.controlsBDD, CommentController.findOneCommentById)
 app.get('/comments',database.controlsBDD, CommentController.findManyComments)
+app.get('/commentsByOwner',database.controlsBDD,passport.authenticate('jwt',{session:false}),findAllPlaceOfOwner,CommentController.findManyCommentsByOwnerOfPlace)
 app.delete('/comment/:id',database.controlsBDD,passport.authenticate('jwt',{session:false}),controleOwner.controleOwnerOfComment,CommentController.deleteOneCommentById)
 
 //routes likeComment
