@@ -146,7 +146,15 @@ module.exports.CommentServices = class CommentService{
     }
 
     static async findManyComments(page, limit, filter, options, user_id, callback){
-        const populate = ["response",{path:"likes",match:{user_id: user_id}}]
+        const populate = [{
+                    path:"response",
+                    populate:{
+                        path:"user_id",
+                        populate:{
+                            path:"profilePhoto"
+                        }
+                    }
+                },,{path:"likes",match:{user_id: user_id}}]
 
         if(options && options.populate && options.populate.includes("user_id")){ 
             populate.push({
@@ -209,6 +217,15 @@ module.exports.CommentServices = class CommentService{
         if(places_id && Array.isArray(places_id) && places_id.length>0  && places_id.filter((e) => { return mongoose.isValidObjectId(e) }).length == places_id.length){
 
             const populate = [
+                {
+                    path:"response",
+                    populate:{
+                        path:"user_id",
+                        populate:{
+                            path:"profilePhoto"
+                        }
+                    }
+                },
                 {path:"likes",
                     match:{user_id: user_id}
                 },{
