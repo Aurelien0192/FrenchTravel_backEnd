@@ -213,9 +213,66 @@ module.exports.CommentServices = class CommentService{
     
     }
 
-    static async findManyCommentsByOwnerOfPlace(page, limit, places_id, options, user_id, callback){
+    static async findManyCommentsByOwnerOfPlace(page, limit, places_id,search, options, user_id, callback){
         if(places_id && Array.isArray(places_id) && places_id.length>0  && places_id.filter((e) => { return mongoose.isValidObjectId(e) }).length == places_id.length){
-
+            
+            const queryMongo = {$and:[{place_id: places_id}]}
+            console.log(search)
+            
+            if(search.search){
+                let placesIdCorrespondingSearch = await Comment.aggregate([
+                    {
+                        $lookup:{
+                            from: 'places',
+                            localField: 'place_id',
+                            foreignField: '_id',
+                            as: 'places'
+                        }
+                    },{
+                        $unwind: "$places"
+                    },{
+                        $match:{
+                            'places.name':{
+                                $regex: new RegExp(search.search, 'i')
+                            }
+                        }   
+                    },{
+                        $project:{
+                            place_id:1,
+                            _id:0
+                        }
+                    }
+                ])
+                let usersIdCorrespondingSearch = await Comment.aggregate([
+                    {
+                        $lookup:{
+                            from: 'users',
+                            localField: 'user_id',
+                            foreignField: '_id',
+                            as: 'users'
+                        }
+                    },{
+                        $unwind: "$users"
+                    },{
+                        $match:{
+                            'users.username':{
+                                $regex: new RegExp(search.search, 'i')
+                            }
+                        }   
+                    },{
+                        $project:{
+                            user_id:1,
+                            _id:0
+                        }
+                    }
+                ])
+                placesIdCorrespondingSearch = _.uniq(placesIdCorrespondingSearch.map((e)=>{return String(e.place_id)}))
+                placesIdCorrespondingSearch = placesIdCorrespondingSearch.map((e)=>{return new mongoose.Types.ObjectId(e)})
+                usersIdCorrespondingSearch = _.uniq(usersIdCorrespondingSearch.map((e)=>{return String(e.user_id)}))
+                usersIdCorrespondingSearch = usersIdCorrespondingSearch.map((e)=>{return new mongoose.Types.ObjectId(e)})
+                queryMongo.$and.push({$or:[{user_id:usersIdCorrespondingSearch},{place_id:placesIdCorrespondingSearch}]})
+            }
+            
             const populate = [
                 {
                     path:"response",
@@ -246,7 +303,7 @@ module.exports.CommentServices = class CommentService{
                     callback ({msg: `format de ${Number.isNaN(page) ? "page" : "limit"} est incorrect`, type_error:"no-valid"})
                 }else{
                     
-                    Comment.countDocuments({place_id: places_id}, {populate:populate}).then((value) => {
+                    Comment.countDocuments(queryMongo, {populate:populate}).then((value) => {
                         if (value > 0){
                             const skip = ((page-1) * limit)
                             try{
