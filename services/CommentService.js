@@ -307,7 +307,7 @@ module.exports.CommentServices = class CommentService{
                         if (value > 0){
                             const skip = ((page-1) * limit)
                             try{
-                                Comment.find({place_id: places_id}, null, {skip:skip, limit:limit, populate:populate, sort:{create_at:-1}, lean:true}).then((results) => {
+                                Comment.find(queryMongo, null, {skip:skip, limit:limit, populate:populate, sort:{create_at:-1}, lean:true}).then((results) => {
                                     const finalResults = results.map((result)=>{return {...result, liked: result.likes.length > 0}})
                                     callback(null, {
                                         count : value,
