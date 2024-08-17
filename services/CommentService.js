@@ -154,7 +154,7 @@ module.exports.CommentServices = class CommentService{
                             path:"profilePhoto"
                         }
                     }
-                },,{path:"likes",match:{user_id: user_id}}]
+                },{path:"likes",match:{user_id: user_id}}]
 
         if(options && options.populate && options.populate.includes("user_id")){ 
             populate.push({
@@ -213,117 +213,212 @@ module.exports.CommentServices = class CommentService{
     
     }
 
-    static async findManyCommentsByOwnerOfPlace(page, limit, places_id,search, options, user_id, callback){
+    static async findManyCommentsByOwnerOfPlace(page, limit, places_id, search, options, user_id, callback){
         if(places_id && Array.isArray(places_id) && places_id.length>0  && places_id.filter((e) => { return mongoose.isValidObjectId(e) }).length == places_id.length){
-            
-            const queryMongo = {$and:[{place_id: places_id}]}
-            console.log(search)
-            
-            if(search.search){
-                let placesIdCorrespondingSearch = await Comment.aggregate([
-                    {
-                        $lookup:{
-                            from: 'places',
-                            localField: 'place_id',
-                            foreignField: '_id',
-                            as: 'places'
-                        }
-                    },{
-                        $unwind: "$places"
-                    },{
-                        $match:{
-                            'places.name':{
-                                $regex: new RegExp(search.search, 'i')
-                            }
-                        }   
-                    },{
-                        $project:{
-                            place_id:1,
-                            _id:0
-                        }
-                    }
-                ])
-                let usersIdCorrespondingSearch = await Comment.aggregate([
-                    {
-                        $lookup:{
-                            from: 'users',
-                            localField: 'user_id',
-                            foreignField: '_id',
-                            as: 'users'
-                        }
-                    },{
-                        $unwind: "$users"
-                    },{
-                        $match:{
-                            'users.username':{
-                                $regex: new RegExp(search.search, 'i')
-                            }
-                        }   
-                    },{
-                        $project:{
-                            user_id:1,
-                            _id:0
-                        }
-                    }
-                ])
-                placesIdCorrespondingSearch = _.uniq(placesIdCorrespondingSearch.map((e)=>{return String(e.place_id)}))
-                placesIdCorrespondingSearch = placesIdCorrespondingSearch.map((e)=>{return new mongoose.Types.ObjectId(e)})
-                usersIdCorrespondingSearch = _.uniq(usersIdCorrespondingSearch.map((e)=>{return String(e.user_id)}))
-                usersIdCorrespondingSearch = usersIdCorrespondingSearch.map((e)=>{return new mongoose.Types.ObjectId(e)})
-                queryMongo.$and.push({$or:[{user_id:usersIdCorrespondingSearch},{place_id:placesIdCorrespondingSearch}]})
-            }
-            
-            const populate = [
-                {
-                    path:"response",
-                    populate:{
-                        path:"user_id",
-                        populate:{
-                            path:"profilePhoto"
-                        }
-                    }
-                },
-                {path:"likes",
-                    match:{user_id: user_id}
-                },{
-                    path:"user_id",
-                    populate:{
-                        path:"profilePhoto"
-                    }
-                },{
-                    path:"place_id",
-                }
-            ]               
             page = !page ? 1 : page
-            limit = !limit ? 0 : limit
+            limit = !limit ? 10 : limit
             page = !Number.isNaN(page) ? Number(page): page
             limit = !Number.isNaN(limit) ? Number(limit): limit
             if(places_id){
                 if (Number.isNaN(page) || Number.isNaN(limit)){
                     callback ({msg: `format de ${Number.isNaN(page) ? "page" : "limit"} est incorrect`, type_error:"no-valid"})
                 }else{
-                    
-                    Comment.countDocuments(queryMongo, {populate:populate}).then((value) => {
-                        if (value > 0){
-                            const skip = ((page-1) * limit)
-                            try{
-                                Comment.find(queryMongo, null, {skip:skip, limit:limit, populate:populate, sort:{create_at:-1}, lean:true}).then((results) => {
-                                    const finalResults = results.map((result)=>{return {...result, liked: result.likes.length > 0}})
-                                    callback(null, {
-                                        count : value,
-                                        results : finalResults
-                                    })
-                                })
-                            }catch(e){
-                                console.log(e)
-                            }
-                        }else{
-                            callback(null,{count : 0, results : []})
-                        }
-                    }).catch((e) => {
-                        callback(e)
-                    })
+                    try{
+                        let finalResults = await Comment.aggregate([
+                            {
+    $lookup:
+      {
+        from: "places",
+        localField: "place_id",
+        foreignField: "_id",
+        as: "place_id"
+      }
+  },
+  {
+    $lookup:
+      {
+        from: "users",
+        localField: "user_id",
+        foreignField: "_id",
+        as: "user_id"
+      }
+  },
+  {
+    $lookup:
+      {
+        from: "likecomments",
+        localField: "_id",
+        foreignField: "comment_id",
+        as: "likes"
+      }
+  },
+  {
+    $lookup:
+      {
+        from: "comments",
+        localField: "response",
+        foreignField: "_id",
+        as: "response"
+      }
+  },
+  {
+    $unwind:
+      {
+        path: "$response",
+        preserveNullAndEmptyArrays: true
+      }
+  },
+  {
+    $lookup:
+      {
+        from: "users",
+        localField: "response.user_id",
+        foreignField: "_id",
+        as: "response.user_id"
+      }
+  },
+  {
+    $unwind:
+      {
+        path: "$response.user_id",
+        preserveNullAndEmptyArrays: true
+      }
+  },
+  {
+    $lookup:
+      {
+        from: "images",
+        localField:
+          "response.user_id.profilePhoto",
+        foreignField: "_id",
+        as: "response.user_id.profilePhoto"
+      }
+  },
+  {
+    $unwind:
+      {
+        path: "$response.user_id.profilePhoto",
+        preserveNullAndEmptyArrays: true
+      }
+  },
+    {
+    $addFields:
+      {
+        likes: {
+          $filter: {
+            input: "$likes",
+            as: "likes",
+            cond: {
+              $eq: [
+                "$$likes.user_id",
+                new mongoose.Types.ObjectId(user_id)
+              ]
+            }
+          }
+        }
+      }
+  },
+  {
+    $unwind:
+      {
+        path: "$user_id",
+        preserveNullAndEmptyArrays: true
+      }
+  },
+  {
+    $lookup:
+      {
+        from: "images",
+        localField: "user_id.profilePhoto",
+        foreignField: "_id",
+        as: "user_id.profilePhoto"
+      }
+  },
+  {
+    $unwind:
+      {
+        path: "$user_id.profilePhoto",
+        preserveNullAndEmptyArrays: true
+      }
+  },
+  {
+    $match:
+      {
+        $and: [
+          {
+            "place_id._id": {
+              $in: places_id
+            }
+          },
+          {
+            $or: [
+              {
+                "place_id.name": {
+                  $regex: search?search:"",
+                  $options: "i"
                 }
+              },
+              {
+                "user_id.username": {
+                  $regex: search?search:"",
+                  $options: "i"
+                }
+              }
+            ]
+          }
+        ]
+      }
+  },
+  {
+    $facet:
+      {
+        count: [
+          {
+            $count: "count"
+          }
+        ],
+        results: [
+          {
+            $sort: {
+              create_at: -1
+            }
+          },
+          {
+            $limit: 3
+          },
+          {
+            $skip: 0
+          }
+        ]
+      }
+  },
+  {
+    $project:
+      {
+        count: {
+          $arrayElemAt: ["$count.count", 0]
+        },
+        results: 1
+      }
+  }
+                            ])
+                            finalResults = finalResults[0]
+                            finalResults.results = finalResults.results.map((result)=>{return {...result, liked: result.likes.length > 0}})
+                            _.flatten(finalResults.results)
+                            finalResults.results.forEach((result) =>{
+                                    Object.keys(result.response.user_id).length===0 && delete result.response
+                                })
+                            console.log(finalResults.results[0].user_id)
+                            callback(null, { 
+                                count : finalResults.count? finalResults.count : 0,
+                                results : finalResults.results
+                            })
+                        
+                    }catch(e){
+                        console.log(e)
+                        callback(e)
+                    }
+                    }
             }else{
                 callback({msg: "query is missing", type_error:"no-valid"})
             }

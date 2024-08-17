@@ -59,11 +59,11 @@ module.exports.CommentController = class CommentController{
     }
 
     static findManyCommentsByOwnerOfPlace(req, res){
-        const q = {}
+        let search = ""
         if(req.query.search){
-            q.search = req.query.search
+            search = req.query.search
         }
-        CommentServices.findManyCommentsByOwnerOfPlace(req.query.page, req.query.limit, res.locals.idsOfPlaces,q, null, req.user._id, function(err, value){
+        CommentServices.findManyCommentsByOwnerOfPlace(req.query.page, req.query.limit, res.locals.idsOfPlaces,search, null, req.user._id, function(err, value){
             responseOfServer(err, value, req, res, false)
         })
     }

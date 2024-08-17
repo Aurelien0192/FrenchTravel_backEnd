@@ -502,7 +502,8 @@ describe("findManyComments  - S",()=>{
 })
 describe("findManyCommentsByOwnerOfPlace",()=>{
     it('find many comments with correct places_id',(done)=>{
-        CommentService.findManyCommentsByOwnerOfPlace(null, null, [places[0]._id], null, users[0]._id, function(err, value){
+        CommentService.findManyCommentsByOwnerOfPlace(null, null, [places[0]._id], null, null, users[0]._id, function(err, value){
+            console.log(value.results[0].place_id)
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty("count")
             expect(value["count"]).to.be.equal(2)
@@ -512,14 +513,14 @@ describe("findManyCommentsByOwnerOfPlace",()=>{
             value.results.forEach((result)=>{
                 expect(result).to.be.a("object")
                 expect(result).to.haveOwnProperty("place_id")
-                expect(result["place_id"]).to.haveOwnProperty("_id")
-                expect(String(result["place_id"]["_id"])).to.be.equal(String(places[0]._id))
+                expect(result["place_id"][0]).to.haveOwnProperty("_id")
+                expect(String(result["place_id"][0]["_id"])).to.be.equal(String(places[0]._id))
             })
             done()
         })
     })
     it('find many comments with correct places_id',(done)=>{
-        CommentService.findManyCommentsByOwnerOfPlace(null, null, [places[1]._id], null, users[0]._id, function(err, value){
+        CommentService.findManyCommentsByOwnerOfPlace(null, null, [places[1]._id], null, null, users[0]._id, function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty("count")
             expect(value["count"]).to.be.equal(1)
@@ -529,14 +530,14 @@ describe("findManyCommentsByOwnerOfPlace",()=>{
             value.results.forEach((result)=>{
                 expect(result).to.be.a("object")
                 expect(result).to.haveOwnProperty("place_id")
-                expect(result["place_id"]).to.haveOwnProperty("_id")
-                expect(String(result["place_id"]["_id"])).to.be.equal(String(places[1]._id))
+                expect(result["place_id"][0]).to.haveOwnProperty("_id")
+                expect(String(result["place_id"][0]["_id"])).to.be.equal(String(places[1]._id))
             })
             done()
         })
     })
     it('find many comments with uncorrect places_id - E',(done) =>{
-        CommentService.findManyCommentsByOwnerOfPlace(null, null, ["jqdiojdfoj"], null, users[0]._id, function(err, value){
+        CommentService.findManyCommentsByOwnerOfPlace(null, null, ["jqdiojdfoj"], null, null, users[0]._id, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty("type_error")
             expect(err['type_error']).to.be.equal('no-valid')
@@ -544,7 +545,7 @@ describe("findManyCommentsByOwnerOfPlace",()=>{
         })
     })
     it('find many comments with places_id not array - E',(done) =>{
-        CommentService.findManyCommentsByOwnerOfPlace(null, null, places[0]._id, null, users[0]._id, function(err, value){
+        CommentService.findManyCommentsByOwnerOfPlace(null, null, places[0]._id, null, null, users[0]._id, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty("type_error")
             expect(err['type_error']).to.be.equal('no-valid')
@@ -552,7 +553,7 @@ describe("findManyCommentsByOwnerOfPlace",()=>{
         })
     })
     it('find many comments with places_id missing - E',(done) =>{
-        CommentService.findManyCommentsByOwnerOfPlace(null, null, null, null, users[0]._id, function(err, value){
+        CommentService.findManyCommentsByOwnerOfPlace(null, null, null, null, null, users[0]._id, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty("type_error")
             expect(err['type_error']).to.be.equal('no-valid')
@@ -560,7 +561,8 @@ describe("findManyCommentsByOwnerOfPlace",()=>{
         })
     })
     it('find many comments with ids correct but missing in database - E',(done) =>{
-        CommentService.findManyCommentsByOwnerOfPlace(null, null, [users[0]._id], null, users[0]._id, function(err, value){
+        CommentService.findManyCommentsByOwnerOfPlace(null, null, [users[0]._id], null, null, users[0]._id, function(err, value){
+            console.log(err, value)
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty("count")
             expect(value['count']).to.be.equal(0)
