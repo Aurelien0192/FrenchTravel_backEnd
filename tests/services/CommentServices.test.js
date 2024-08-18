@@ -63,7 +63,7 @@ describe('create user and place for test',() => {
     })
     it('another place creation',(done)=>{
         const goodHotel = {
-            name: "Château du Doubs",
+            name: "le palace",
             describe : "Super chateau dans le centre du Doubs",
             categorie : "hotel",
             moreInfo:{
@@ -424,7 +424,7 @@ describe("findCommentById",()=>{
 
 
 describe("findManyComments  - S",()=>{
-    it("find comments with good user ID",(done) => {
+    it("find comments with good user ID - S",(done) => {
         CommentService.findManyComments(null, null, {user_id :users[0]._id}, null, null, function(err,value){
             expect(value).to.haveOwnProperty('results')
             expect(value['results']).to.be.an('array')
@@ -503,7 +503,6 @@ describe("findManyComments  - S",()=>{
 describe("findManyCommentsByOwnerOfPlace",()=>{
     it('find many comments with correct places_id',(done)=>{
         CommentService.findManyCommentsByOwnerOfPlace(null, null, [places[0]._id], null, null, users[0]._id, function(err, value){
-            console.log(value.results[0].place_id)
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty("count")
             expect(value["count"]).to.be.equal(2)
@@ -562,12 +561,53 @@ describe("findManyCommentsByOwnerOfPlace",()=>{
     })
     it('find many comments with ids correct but missing in database - E',(done) =>{
         CommentService.findManyCommentsByOwnerOfPlace(null, null, [users[0]._id], null, null, users[0]._id, function(err, value){
-            console.log(err, value)
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty("count")
             expect(value['count']).to.be.equal(0)
             expect(value).to.haveOwnProperty("results")
             expect(value["results"]).to.lengthOf(0)
+            done()
+        })
+    })
+    it('find many comments by user who posts comment - S',(done)=>{
+        CommentService.findManyCommentsByOwnerOfPlace(null, null, [places[0]._id,places[1]._id], "EricLaDébrouille", null, users[0]._id, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty("count")
+            expect(value["count"]).to.be.equal(3)
+            expect(value).to.haveOwnProperty("results")
+            expect(value["results"]).to.be.an('array')
+            expect(value["results"]).to.lengthOf(3)
+            value.results.forEach((result)=>{
+                expect(result).to.be.a("object")
+                expect(result).to.haveOwnProperty("user_id")
+                expect(result['user_id']).to.haveOwnProperty("_id")
+                expect(String(result['user_id']['_id'])).to.be.equal(String(users[0]._id))
+            })
+            done()
+        })
+    })
+    it('find many comments by user never post comment - S',(done)=>{
+        CommentService.findManyCommentsByOwnerOfPlace(null, null, [places[0]._id,places[1]._id], "EricLeFake", null, users[0]._id, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty("count")
+            expect(value["count"]).to.be.equal(0)
+            expect(value).to.haveOwnProperty("results")
+            expect(value["results"]).to.be.an('array')
+            expect(value["results"]).to.lengthOf(0)
+            done()
+        })
+    })
+    it('find many comments by place - S',(done)=>{
+        CommentService.findManyCommentsByOwnerOfPlace(null, null, [places[0]._id,places[1]._id], "le palace", null, users[0]._id, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty("count")
+            expect(value["count"]).to.be.equal(1)
+            expect(value).to.haveOwnProperty("results")
+            expect(value["results"]).to.be.an('array')
+            expect(value["results"]).to.lengthOf(1)
+            expect(value['results'][0]).to.haveOwnProperty('place_id')
+            expect(value["results"][0]["place_id"][0]).to.haveOwnProperty('_id')
+            expect(String(value['results'][0]['place_id'][0]['_id'])).to.be.equal(String(places[1]._id))
             done()
         })
     })

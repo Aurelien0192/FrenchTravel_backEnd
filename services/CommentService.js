@@ -226,181 +226,156 @@ module.exports.CommentServices = class CommentService{
                     try{
                         let finalResults = await Comment.aggregate([
                             {
-    $lookup:
-      {
-        from: "places",
-        localField: "place_id",
-        foreignField: "_id",
-        as: "place_id"
-      }
-  },
-  {
-    $lookup:
-      {
-        from: "users",
-        localField: "user_id",
-        foreignField: "_id",
-        as: "user_id"
-      }
-  },
-  {
-    $lookup:
-      {
-        from: "likecomments",
-        localField: "_id",
-        foreignField: "comment_id",
-        as: "likes"
-      }
-  },
-  {
-    $lookup:
-      {
-        from: "comments",
-        localField: "response",
-        foreignField: "_id",
-        as: "response"
-      }
-  },
-  {
-    $unwind:
-      {
-        path: "$response",
-        preserveNullAndEmptyArrays: true
-      }
-  },
-  {
-    $lookup:
-      {
-        from: "users",
-        localField: "response.user_id",
-        foreignField: "_id",
-        as: "response.user_id"
-      }
-  },
-  {
-    $unwind:
-      {
-        path: "$response.user_id",
-        preserveNullAndEmptyArrays: true
-      }
-  },
-  {
-    $lookup:
-      {
-        from: "images",
-        localField:
-          "response.user_id.profilePhoto",
-        foreignField: "_id",
-        as: "response.user_id.profilePhoto"
-      }
-  },
-  {
-    $unwind:
-      {
-        path: "$response.user_id.profilePhoto",
-        preserveNullAndEmptyArrays: true
-      }
-  },
-    {
-    $addFields:
-      {
-        likes: {
-          $filter: {
-            input: "$likes",
-            as: "likes",
-            cond: {
-              $eq: [
-                "$$likes.user_id",
-                new mongoose.Types.ObjectId(user_id)
-              ]
-            }
-          }
-        }
-      }
-  },
-  {
-    $unwind:
-      {
-        path: "$user_id",
-        preserveNullAndEmptyArrays: true
-      }
-  },
-  {
-    $lookup:
-      {
-        from: "images",
-        localField: "user_id.profilePhoto",
-        foreignField: "_id",
-        as: "user_id.profilePhoto"
-      }
-  },
-  {
-    $unwind:
-      {
-        path: "$user_id.profilePhoto",
-        preserveNullAndEmptyArrays: true
-      }
-  },
-  {
-    $match:
-      {
-        $and: [
-          {
-            "place_id._id": {
-              $in: places_id
-            }
-          },
-          {
-            $or: [
-              {
-                "place_id.name": {
-                  $regex: search?search:"",
-                  $options: "i"
-                }
-              },
-              {
-                "user_id.username": {
-                  $regex: search?search:"",
-                  $options: "i"
-                }
-              }
-            ]
-          }
-        ]
-      }
-  },
-  {
-    $facet:
-      {
-        count: [
-          {
-            $count: "count"
-          }
-        ],
-        results: [
-          {
-            $sort: {
-              create_at: -1
-            }
-          },
-          {
-            $limit: 3
-          },
-          {
-            $skip: 0
-          }
-        ]
-      }
-  },
-  {
-    $project:
-      {
-        count: {
-          $arrayElemAt: ["$count.count", 0]
-        },
-        results: 1
-      }
-  }
+                                $lookup:
+                                    {
+                                        from: "places",
+                                        localField: "place_id",
+                                        foreignField: "_id",
+                                        as: "place_id"
+                                    }
+                                },{
+                                    $lookup:
+                                    {
+                                            from: "users",
+                                            localField: "user_id",
+                                            foreignField: "_id",
+                                            as: "user_id"
+                                    }
+                                },{
+                                    $lookup:
+                                    {
+                                        from: "likecomments",
+                                        localField: "_id",
+                                        foreignField: "comment_id",
+                                        as: "likes"
+                                    }
+                                },{
+                                    $lookup:
+                                    {
+                                        from: "comments",
+                                        localField: "response",
+                                        foreignField: "_id",
+                                        as: "response"
+                                    }
+                                },{
+                                    $unwind:
+                                    {
+                                        path: "$response",
+                                        preserveNullAndEmptyArrays: true
+                                    }
+                                },{
+                                    $lookup:
+                                    {
+                                        from: "users",
+                                        localField: "response.user_id",
+                                        foreignField: "_id",
+                                        as: "response.user_id"
+                                    }
+                                },{
+                                    $unwind:
+                                    {
+                                        path: "$response.user_id",
+                                        preserveNullAndEmptyArrays: true
+                                    }
+                                },{
+                                    $lookup:
+                                    {
+                                        from: "images",
+                                        localField:"response.user_id.profilePhoto",
+                                        foreignField: "_id",
+                                        as: "response.user_id.profilePhoto"
+                                    }
+                                },{
+                                    $unwind:
+                                    {
+                                        path: "$response.user_id.profilePhoto",
+                                        preserveNullAndEmptyArrays: true
+                                    }
+                                },{
+                                  $addFields:
+                                    {
+                                      likes: {
+                                        $filter: {
+                                          input: "$likes",
+                                          as: "likes",
+                                          cond: {
+                                            $eq: [
+                                              "$$likes.user_id",
+                                              new mongoose.Types.ObjectId(user_id)
+                                            ]
+                                          }
+                                        }
+                                      }
+                                    }
+                                },{
+                                    $unwind:
+                                    {
+                                        path: "$user_id",
+                                        preserveNullAndEmptyArrays: true
+                                    }
+                                },{
+                                    $lookup:
+                                    {
+                                        from: "images",
+                                        localField: "user_id.profilePhoto",
+                                        foreignField: "_id",
+                                        as: "user_id.profilePhoto"
+                                    }
+                                },{
+                                    $unwind:
+                                    {
+                                        path: "$user_id.profilePhoto",
+                                        preserveNullAndEmptyArrays: true
+                                    }
+                                },{
+                                  $match:
+                                    {
+                                        $and: [{
+                                            "place_id._id": 
+                                            {
+                                                $in: places_id
+                                            }
+                                        },{
+                                            $or: [{
+                                                "place_id.name": {
+                                                    $regex: search?search:"",
+                                                    $options: "i"
+                                                }
+                                            },{
+                                                "user_id.username": {
+                                                    $regex: search?search:"",
+                                                    $options: "i"
+                                                }
+                                            }]
+                                        }]
+                                    }
+                                },{
+                                    $facet:
+                                    {
+                                        count: [
+                                            {
+                                                $count: "count"
+                                            }
+                                        ],
+                                        results: [{
+                                            $sort: {
+                                                create_at: -1
+                                            }
+                                        },{
+                                            $limit: 3
+                                        },{
+                                            $skip: 0
+                                        }]
+                                    }
+                                },{
+                                    $project:
+                                    {
+                                        count: {
+                                            $arrayElemAt: ["$count.count", 0]
+                                        },
+                                        results: 1
+                                    }
+                                }
                             ])
                             finalResults = finalResults[0]
                             finalResults.results = finalResults.results.map((result)=>{return {...result, liked: result.likes.length > 0}})
@@ -408,7 +383,6 @@ module.exports.CommentServices = class CommentService{
                             finalResults.results.forEach((result) =>{
                                     Object.keys(result.response.user_id).length===0 && delete result.response
                                 })
-                            console.log(finalResults.results[0].user_id)
                             callback(null, { 
                                 count : finalResults.count? finalResults.count : 0,
                                 results : finalResults.results

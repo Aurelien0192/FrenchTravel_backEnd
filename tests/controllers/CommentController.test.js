@@ -342,7 +342,7 @@ describe("GET - /commentsByOwner",() =>{
             expect(res.body).to.be.a('object')
             expect(res.body.results).to.be.an('array')
             res.body.results.forEach((result)=>{
-                expect(String(result.place_id._id)).to.contain.oneOf(_.map(places, (e)=>{return String(e._id)}))
+                expect(String(result.place_id[0]._id)).to.contain.oneOf(_.map(places, (e)=>{return String(e._id)}))
             })
             res.should.has.status(200)
             done()
