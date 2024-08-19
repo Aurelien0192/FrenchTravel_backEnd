@@ -4,6 +4,7 @@ const PlaceService = require("../../services/PlaceService").PlaceService
 const ImageService = require("../../services/ImageService").ImageService
 const CommentService = require("../../services/CommentService").CommentServices
 const LikeCommentService = require("../../services/LikeCommentService").LikeCommentService
+const FavoriteService = require("../../services/FavoriteService").FavoriteService
 let expect = chai.expect
 
 const users =[]
@@ -11,6 +12,7 @@ let place = {}
 let image = {}
 let comment = {}
 let like = {}
+let favorite = {}
 
 describe("AddOneUser",()=> {
     
@@ -99,6 +101,18 @@ describe("AddOneUser",()=> {
             expect(String(value['comment_id'])).to.be.equal(String(comment._id))
             like = {...value}
             done()
+        })
+    })
+    it("add in favorite the place - S",(done)=>{
+        FavoriteService.addOneFavorite(users[0]._id, place._id, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty("user")
+            expect(value).to.haveOwnProperty("place")
+            expect(String(value["user"])).to.be.equal(String(users[0]._id))
+            expect(String(value['place'])).to.be.equal(String(place._id))
+            favorite = {...value} 
+            done()
+        
         })
     })
     it("Add user with supplementary property - S",(done)=>{
@@ -386,6 +400,16 @@ describe("DeleteOneUser",()=>{
             expect(value).to.haveOwnProperty('firstName')
             expect(value['firstName']).to.be.equal("Gaston")
             expect(err).to.be.null
+            done()
+        })
+    })
+    it('verify favorite correctly delete - S',(done) =>{
+        FavoriteService.findManyFavorites(null, null, null, users[0]._id, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('count')
+            expect(value["count"]).to.be.equal(0)
+            expect(value).to.haveOwnProperty("results")
+            expect(value['results']).to.lengthOf(0)
             users.splice(0,1)
             done()
         })

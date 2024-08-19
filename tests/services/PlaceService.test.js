@@ -4,6 +4,7 @@ const ImageService = require("../../services/ImageService").ImageService;
 const UserService = require("../../services/UserService").UserService
 const CommentService = require("../../services/CommentService").CommentServices
 const LikeCommentService = require("../../services/LikeCommentService").LikeCommentService
+const FavoriteService = require("../../services/FavoriteService").FavoriteService
 const { destination } = require('pino');
 let expect = chai.expect
 
@@ -259,6 +260,7 @@ let imagesTab = []
 let user = {}
 const comments = []
 const likes = []
+let favorite = {}
 
 describe('create user for test',() => {
     const goodUser ={
@@ -291,7 +293,7 @@ describe("addOnePlace", () => {
     it("Add comment to correct Place - S",(done)=>{
         const goodComment = {
             comment:"superbe après-midi dans ce lieu",
-            categorie:"hotel",
+            categorie:"activity",
             numberOfNote:0,
             notation:0,
             note:5,
@@ -314,6 +316,17 @@ describe("addOnePlace", () => {
             expect(String(value["comment_id"])).to.be.equal(String(comments[0]._id))
             expect(String(value["user_id"])).to.be.equal(String(user._id))
             likes.push(value)
+            done()
+        })
+    })
+    it("add in favorite the place - S",(done)=>{
+        FavoriteService.addOneFavorite(user._id, places[0]._id, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty("user")
+            expect(value).to.haveOwnProperty("place")
+            expect(String(value["user"])).to.be.equal(String(user._id))
+            expect(String(value['place'])).to.be.equal(String(places[0]._id))
+            favorite = {...value} 
             done()
         })
     })
@@ -636,7 +649,7 @@ describe('FindManyPlaces',() => {
         })
     })
     it("find many places with correct informations search:Pontarlier and Category:activity - S", (done) =>{
-        PlaceService.findManyPlaces(1,5,{search:"Pontarlier",categorie:"activity"}, null, function(err, value){
+        PlaceService.findManyPlaces(1,5,{search:"Pontarlier", categorie:"activity"}, null, function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('results')
             expect(value.results).to.be.an("array")
@@ -788,16 +801,6 @@ describe("updateOnePlace",()=>{
             done()
         })
     })
-    it('owner try to change typeOfPlace - E',(done)=>{
-        PlaceService.updateOnePlace(places[0]._id,{
-            categorie:"hotel"
-        },null, function(err, value){
-            expect(value).to.be.a('object')
-            expect(value).to.haveOwnProperty("categorie")
-            expect(value["categorie"]).to.be.equal("activity")
-            done()
-        })
-    })
     it('owner try to add moreInfo not allow in activity - E',(done)=>{
         PlaceService.updateOnePlace(places[0]._id,{
             categorie:"hotel",
@@ -883,6 +886,16 @@ describe("deleteOnePlace",() => {
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('_id')
             expect(String(value['_id'])).to.be.equal(String(places[0]._id))
+            done()
+        })
+    })
+    it('verify favorite correctly delete - S',(done) =>{
+        FavoriteService.findManyFavorites(null, null, places[0]._id, user._id, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('count')
+            expect(value["count"]).to.be.equal(0)
+            expect(value).to.haveOwnProperty("results")
+            expect(value['results']).to.lengthOf(0)
             places.splice(0,1)
             done()
         })

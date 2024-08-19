@@ -126,20 +126,23 @@ module.exports.FavoriteService = class FavoriteService{
     }
 
     static deleteManyFavorites = async function(placeOrUser_id, options, callback){
-        if(placeOrUser_id && mongoose.isValidObjectId(placeOrUser_id)){
-                Favorite.deleteMany({$or:[{place:placeOrUser_id}, {user:placeOrUser_id}]}).then((value)=>{
-                    if(value && value.deletedCount !== 0){
-                        callback(null, value)
-                    }else{
-                        callback({msg:"Aucun favoris trouvé", type_error:"no-found"})
-                    }
-                }).catch((error)=>{
-                    callback({msg: "error in server", e, type_error:"error-mongo"})
-                })
+        if(!Array.isArray(placeOrUser_id)){
+            placeOrUser_id = [placeOrUser_id]
+        }
+        if(placeOrUser_id.filter((e) => { return mongoose.isValidObjectId(e) }).length == placeOrUser_id.length){
+
+            Favorite.deleteMany({$or:[{place:placeOrUser_id},{user:placeOrUser_id}]}).then((value)=>{
+                if(value && value.deletedCount !== 0){
+                    callback(null, value)
+                }else{
+                    callback({msg:"Aucun favoris trouvé", type_error:"no-found"})
+                }
+            }).catch((error)=>{
+                callback({msg: "error in server", e, type_error:"error-mongo"})
+            })
 
         }else{
-            const err = ErrorGenerator.controlIntegrityofID({placeOrUser_id})
-            callback({msg : err, type_error:"no-valid"})
+            callback({msg: "les ids renseigner ne sont pas valid",type_error:"no-valid"})
         }
     }
 }
