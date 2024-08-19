@@ -16,7 +16,6 @@ const PlaceSchema = mongoose.Schema({
         enum : ["hotel","restaurant","activity"],
         default:"activity",
         required: true,
-        immutable:true
     },
     notation :{
         type: Number,
@@ -84,8 +83,9 @@ const PlaceSchema = mongoose.Schema({
         equipment :{
             type : String,
             validate : [function validator(){
+                console.log(this._update)
                 return this.categorie === "hotel" || this._update.$set.categorie === "hotel"
-            },{message : `services is not allowed in categorie activity or restaurant`}]
+            },{message : `equipment is not allowed in categorie activity or restaurant`}]
         },
         hotelCategorie:{
             type:Number,
@@ -93,14 +93,14 @@ const PlaceSchema = mongoose.Schema({
             max:5,
             validate : [function validator(){
                 return this.categorie==="hotel" || this._update.$set.categorie === "hotel"
-            },{message : `duration is not allowed in categorie activity or restaurant`}]
+            },{message : `hotelCategorie is not allowed in categorie activity or restaurant`}]
         },
         accessibility :{
             type : [String],
             default:undefined,
             validate : [function validator(){
                 return this.categorie === "hotel" || this._update.$set.categorie === "hotel"
-            },{message : `services is not allowed in categorie activity or restaurant`}]
+            },{message : `accessibility is not allowed in categorie activity or restaurant`}]
         },
     },
     street:{
