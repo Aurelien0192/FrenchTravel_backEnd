@@ -34,6 +34,49 @@ module.exports.FavoriteService = class FavoriteService{
         }
     }
 
+    static findManyFavorites = async function(page, limit, placeOrOrFolder_id, user_id, option, callback){
+        page = !page ? 1 : page
+        limit = !limit ? 7 : limit
+        page = !Number.isNaN(page) ? Number(page): page
+        limit = !Number.isNaN(limit) ? Number(limit): limit
+
+        if(user_id && mongoose.isValidObjectId(user_id)){
+            if((placeOrOrFolder_id && mongoose.isValidObjectId(placeOrOrFolder_id)) || !placeOrOrFolder_id){
+                const queryMongo = 
+                {$and:[
+                    {user: user_id},
+                    {$or : _.map(["place","folder"], (e) => {return{[e]:`${new mongoose.Types.ObjectId(placeOrOrFolder_id)}`,$options: 'i'}})}
+                ]}
+                if (Number.isNaN(page) || Number.isNaN(limit)){
+                    callback ({msg: `format de ${Number.isNaN(page) ? "page" : "limit"} est incorrect`, type_error:"no-valid"})
+                }else{
+                    Favorite.countDocuments(queryMongo).then((value) => {
+                        if (value > 0){
+                            const skip = ((page-1) * limit)
+                            Favorite.find(queryMongo, null, {skip:skip, limit:limit, populate:'places',lean:true}).then((results) => {
+                                callback(null, {
+                                    count : value,
+                                    results : results
+                                })
+                            })
+                        }else{
+                            callback(null,{count : 0, results : []})
+                        }
+                    }).catch((e) => {
+                        callback(e)
+                    })
+                }
+            }else{
+                const err = ErrorGenerator.controlIntegrityofID(placeOrOrFolder_id)
+                callback({msg: err, type_error:"no-valid"})
+            }
+
+        }else{
+            const err = ErrorGenerator.controlIntegrityofID(user_id)
+            callback({msg: err, type_error:"no-valid"})
+        }
+    }
+
     static updateOneFavorite = async function(favorite_id,update,options, callback){
         try{
             if(favorite_id && mongoose.isValidObjectId(favorite_id)){
