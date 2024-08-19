@@ -42,7 +42,6 @@ module.exports.controleOwnerOfPlace = (req, res, next) => {
             res.send({msg:"vous n'êtes pas autorisé à modifier ce lieu", type_error:"authorization"})
         }else{
             req.body.categorie = value.categorie
-            console.log(req.body)
             next()
         }
     })

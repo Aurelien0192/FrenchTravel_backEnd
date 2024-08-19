@@ -83,7 +83,6 @@ const PlaceSchema = mongoose.Schema({
         equipment :{
             type : String,
             validate : [function validator(){
-                console.log(this._update)
                 return this.categorie === "hotel" || this._update.$set.categorie === "hotel"
             },{message : `equipment is not allowed in categorie activity or restaurant`}]
         },
