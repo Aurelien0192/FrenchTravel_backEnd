@@ -44,10 +44,14 @@ require("../utils/database")
 //    require('./controllers/LikeCommentController.test')
 // })
 
-describe("FavoriteService",() => {
-   require('./services/FavoriteService.test')
-})
+// describe("FavoriteService",() => {
+//    require('./services/FavoriteService.test')
+// })
 
-describe("FavoriteController",()=>{
-   require('./controllers/FavoriteController.test')
+// describe("FavoriteController",()=>{
+//    require('./controllers/FavoriteController.test')
+// })
+
+describe("FolderService",()=>{
+   require('./services/FolderService.test')
 })

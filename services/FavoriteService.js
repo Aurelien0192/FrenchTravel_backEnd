@@ -68,12 +68,12 @@ module.exports.FavoriteService = class FavoriteService{
                 }
             }else{
                 const err = ErrorGenerator.controlIntegrityofID(placeOrFolder_id)
-                callback({msg: err, type_error:"no-valid"})
+                callback(err)
             }
 
         }else{
             const err = ErrorGenerator.controlIntegrityofID({user_id})
-            callback({msg: err, type_error:"no-valid"})
+            callback(err)
         }
     }
 
@@ -100,7 +100,7 @@ module.exports.FavoriteService = class FavoriteService{
                 }
             }else{
                 const err = ErrorGenerator.controlIntegrityofID({favorite_id})
-                callback({msg : err, type_error:"no-valid"})
+                callback(err)
             }
         }catch(e){
             callback({msg: "error in server", e, type_error:"error-mongo"})
@@ -121,7 +121,7 @@ module.exports.FavoriteService = class FavoriteService{
 
         }else{
             const err = ErrorGenerator.controlIntegrityofID({user_id, place_id})
-            callback({msg : err, type_error:"no-valid"})
+            callback(err)
         }
     }
 

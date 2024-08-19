@@ -10,14 +10,12 @@ const Folder = mongoose.model('Folder',FolderSchema)
 
 module.exports.FolderService = class FolderService{
 
-    static async addOneFolder(user_id, name, options, callback){
+    static async addOneFolder(user_id, body, options, callback){
         if(user_id && mongoose.isValidObjectId(user_id)){
-            if(name){
+            if(body){
                 user_id = new mongoose.Types.ObjectId(user_id)
-                const new_folder = new Folder({
-                    user: user_id,
-                    name: name
-                })
+                const new_folder = new Folder(body)
+                new_folder.user = user_id
                 const errors = new_folder.validateSync()
                 if(errors){
                     let err = ErrorGenerator.generateErrorSchemaValidator(errors)
@@ -35,7 +33,7 @@ module.exports.FolderService = class FolderService{
             }
         }else{
             const err = ErrorGenerator.controlIntegrityofID({user_id})
-            callback({msg:err, type_error:"no-valid"})
+            callback(err)
         }
     }
     static findOneFolderById(folder_id, options, callback){
@@ -52,7 +50,7 @@ module.exports.FolderService = class FolderService{
             })
         }else{
             const err = ErrorGenerator.controlIntegrityofID({folder_id})
-            callback({msg:err, type_error:"no-valid"})
+            callback(err)
         }
     }
 
@@ -85,7 +83,7 @@ module.exports.FolderService = class FolderService{
             }
         }else{
             const err = ErrorGenerator.controlIntegrityofID({user_id})
-            callback({msg:err, type_error:"no-valid"})
+            callback(err)
         }
     }
 
@@ -103,7 +101,7 @@ module.exports.FolderService = class FolderService{
             })
         }else{
             const err = ErrorGenerator.controlIntegrityofID({folder_id})
-            callback({msg:err, type_error:"no-valid"}) 
+            callback(err) 
         }
     }
 
@@ -121,7 +119,7 @@ module.exports.FolderService = class FolderService{
             })
         }else{
             const err = ErrorGenerator.controlIntegrityofID({user_id})
-            callback({msg:err, type_error:"no-valid"}) 
+            callback(err) 
         }
     }
 }
