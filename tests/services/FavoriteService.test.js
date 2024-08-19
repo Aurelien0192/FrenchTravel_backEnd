@@ -158,6 +158,73 @@ describe("add one favorite",()=>{
         })
     })
 })
+describe('findManyFavorite',()=>{
+    it("find many favorites with correct information - S",(done)=>{
+        FavoriteService.findManyFavorites(null, null, places[0]._id, users[0]._id, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('count')
+            expect(value['count']).to.be.equal(1)
+            expect(value).to.haveOwnProperty('results')
+            expect(value['results']).to.be.an('array')
+            expect(value['results']).to.lengthOf(1)
+            expect(value['results'][0]).to.haveOwnProperty('user')
+            expect(value['results'][0]).to.haveOwnProperty('place')
+            expect(String(value['results'][0]['user'])).to.be.equal(String(users[0]._id))
+            expect(value['results'][0]['place']).to.haveOwnProperty('_id')
+            expect(String(value['results'][0]['place']['_id'])).to.be.equal(String(places[0]._id))
+            done()
+        })
+    })
+    it("find many favorites without place id - S",(done)=>{
+        FavoriteService.findManyFavorites(null, null, null, users[0]._id, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('count')
+            expect(value['count']).to.be.equal(2)
+            expect(value).to.haveOwnProperty('results')
+            expect(value['results']).to.be.an('array')
+            expect(value['results']).to.lengthOf(2)
+            value.results.forEach((result)=>{
+                expect(result).to.haveOwnProperty('user')
+                expect(String(result['user'])).to.be.equal(String(users[0]._id))
+            })
+            done()
+        })
+    })
+    it("find many favorite with uncorrect place id - E",(done) => {
+        FavoriteService.findManyFavorites(null, null, "qsejojgoq", users[0]._id, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it("find many favorite with correct place id but not exist in database - S",(done) => {
+        FavoriteService.findManyFavorites(null, null, users[1]._id, users[0]._id, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('count')
+            expect(value["count"]).to.be.equal(0)
+            expect(value).to.haveOwnProperty("results")
+            expect(value['results']).to.lengthOf(0)
+            done()
+        })
+    })
+    it("find many favorite with correct place id but uncorrect user - E",(done) => {
+        FavoriteService.findManyFavorites(null, null, places[0]._id, "kdfopjgop", null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it("find many favorite with correct place id but missing user - E",(done) => {
+        FavoriteService.findManyFavorites(null, null, places[0]._id, null, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+})
 describe('updateOneFavorite',()=>{
     it("update one favorite with correct information - S",(done) =>{
         FavoriteService.updateOneFavorite(favorites[0]._id, {visited:true}, null, function(err, value){

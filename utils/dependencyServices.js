@@ -53,7 +53,7 @@ module.exports.dependencyService = class DependencyService{
         const LikeCommentService = require("../services/LikeCommentService").LikeCommentService
         const FavoriteService = require('../services/FavoriteService').FavoriteService
         let error = ""
-        FavoriteService.deleteManyFavorites(user_id, null, function(err, value){
+        FavoriteService.deleteManyFavorites(places_ids, null, function(err, value){
             if(err && err.type_error !== "no-found"){
                 error = error, "une erreur c'est produite lors de la suppression de vos favoris"
             }

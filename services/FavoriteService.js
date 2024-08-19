@@ -34,18 +34,18 @@ module.exports.FavoriteService = class FavoriteService{
         }
     }
 
-    static findManyFavorites = async function(page, limit, placeOrOrFolder_id, user_id, option, callback){
+    static findManyFavorites = async function(page, limit, placeOrFolder_id, user_id, option, callback){
         page = !page ? 1 : page
         limit = !limit ? 7 : limit
         page = !Number.isNaN(page) ? Number(page): page
         limit = !Number.isNaN(limit) ? Number(limit): limit
 
         if(user_id && mongoose.isValidObjectId(user_id)){
-            if((placeOrOrFolder_id && mongoose.isValidObjectId(placeOrOrFolder_id)) || !placeOrOrFolder_id){
+            if((placeOrFolder_id && mongoose.isValidObjectId(placeOrFolder_id)) || !placeOrFolder_id){
                 const queryMongo = 
                 {$and:[
                     {user: user_id},
-                    {$or : _.map(["place","folder"], (e) => {return{[e]:`${new mongoose.Types.ObjectId(placeOrOrFolder_id)}`,$options: 'i'}})}
+                    placeOrFolder_id? {$or : _.map(["place","folder"], (e) => {return{[e]:new mongoose.Types.ObjectId(placeOrFolder_id)}})} : {}
                 ]}
                 if (Number.isNaN(page) || Number.isNaN(limit)){
                     callback ({msg: `format de ${Number.isNaN(page) ? "page" : "limit"} est incorrect`, type_error:"no-valid"})
@@ -53,7 +53,7 @@ module.exports.FavoriteService = class FavoriteService{
                     Favorite.countDocuments(queryMongo).then((value) => {
                         if (value > 0){
                             const skip = ((page-1) * limit)
-                            Favorite.find(queryMongo, null, {skip:skip, limit:limit, populate:'places',lean:true}).then((results) => {
+                            Favorite.find(queryMongo, null, {skip:skip, limit:limit, populate:'place',lean:true}).then((results) => {
                                 callback(null, {
                                     count : value,
                                     results : results
@@ -67,12 +67,12 @@ module.exports.FavoriteService = class FavoriteService{
                     })
                 }
             }else{
-                const err = ErrorGenerator.controlIntegrityofID(placeOrOrFolder_id)
+                const err = ErrorGenerator.controlIntegrityofID(placeOrFolder_id)
                 callback({msg: err, type_error:"no-valid"})
             }
 
         }else{
-            const err = ErrorGenerator.controlIntegrityofID(user_id)
+            const err = ErrorGenerator.controlIntegrityofID({user_id})
             callback({msg: err, type_error:"no-valid"})
         }
     }
