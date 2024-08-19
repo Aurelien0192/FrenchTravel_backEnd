@@ -47,6 +47,7 @@ const FavoriteController = require('./controllers/FavoriteController').FavoriteC
 // Import des middlewares
 const controleOwner = require('./middlewares/controleOwner')
 const controlePlaceExist = require('./middlewares/controlePlaceExist').controlePlaceExist
+const controlePlaceExistForFavorite = require('./middlewares/controlePlaceExist').controlePlaceExistForFavorite
 const findAllPlaceOfOwner = require('./middlewares/findAllPlacesOfOwner').findAllPlacesOfOwner
 
 app.use((req, res, next) => {
@@ -109,10 +110,10 @@ app.delete('/like/:id',database.controlsBDD,passport.authenticate('jwt',{session
 
 //route Favorite
 
-app.post('/favorite',database.controlsBDD,passport.authenticate('jwt',{session:false}),controlePlaceExist,FavoriteController.addOneFavorite)
+app.post('/favorite/:id',database.controlsBDD,passport.authenticate('jwt',{session:false}),controlePlaceExistForFavorite,FavoriteController.addOneFavorite)
 app.get('/favorites',database.controlsBDD,passport.authenticate('jwt',{session:false}),FavoriteController.findManyFavorites)
 app.put('/favorite/:id',database.controlsBDD,passport.authenticate('jwt',{session:false}),FavoriteController.updateOneFavorite)
-app.delete('favorite/:id',database.controlsBDD,passport.authenticate('jwt',{session:false}),FavoriteController.deleteOneFavorite)
+app.delete('/favorite/:id',database.controlsBDD,passport.authenticate('jwt',{session:false}),FavoriteController.deleteOneFavorite)
 
 
 app.listen(Config.port, () => {

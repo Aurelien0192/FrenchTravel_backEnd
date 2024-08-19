@@ -5,7 +5,7 @@ module.exports.FavoriteController = class FavoriteController{
 
     static addOneFavorite(req, res){
         FavoriteService.addOneFavorite(req.user._id, req.params.id, null, function(err, value){
-           responseOfServer(err, value, req, res, false)
+           responseOfServer(err, value, req, res, true)
         })
     }
 
@@ -22,7 +22,7 @@ module.exports.FavoriteController = class FavoriteController{
     }
 
     static deleteOneFavorite(req, res){
-        FavoriteService.deleteOneFavorite(req.params.id, req.query.user, null, function(err, value){
+        FavoriteService.deleteOneFavorite(req.params.id, req.user._id, null, function(err, value){
             responseOfServer(err, value, req, res, false)
         })
     }

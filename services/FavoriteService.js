@@ -80,7 +80,7 @@ module.exports.FavoriteService = class FavoriteService{
     static updateOneFavorite = async function(favorite_id,update,options, callback){
         try{
             if(favorite_id && mongoose.isValidObjectId(favorite_id)){
-                if(update){
+                if(update && Object.keys(update).length>0){
                     Favorite.findByIdAndUpdate(favorite_id,update,{returnDocument: 'after', runValidators: true}).then((value)=>{
                         try{
                             if(value){

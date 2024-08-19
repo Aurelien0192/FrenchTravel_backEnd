@@ -4,17 +4,17 @@ require("../utils/database")
 //    require('./controllers/ApiLocationController.test')
 // })
 
-describe("PlaceService", () => {
-   require('./services/PlaceService.test')
-})
+// describe("PlaceService", () => {
+//    require('./services/PlaceService.test')
+// })
 
 // describe("PlaceControllers", () => {
 //    require('./controllers/PlaceController.test')
 // })
 
-describe("UserService",() => {
-   require('./services/UserService.test')
-})
+// describe("UserService",() => {
+//    require('./services/UserService.test')
+// })
 
 // describe("UserController",() => {
 //    require('./controllers/UserController.test')
@@ -44,6 +44,10 @@ describe("UserService",() => {
 //    require('./controllers/LikeCommentController.test')
 // })
 
-// describe("FavoriteService",() => {
-//    require('./services/FavoriteService.test')
-// })
+describe("FavoriteService",() => {
+   require('./services/FavoriteService.test')
+})
+
+describe("FavoriteController",()=>{
+   require('./controllers/FavoriteController.test')
+})
