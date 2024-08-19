@@ -42,6 +42,7 @@ const ApiLocationControllers = require("./controllers/ApiLocationController").Ap
 const ImageController = require('./controllers/ImageController').ImageController
 const CommentController = require('./controllers/CommentController').CommentController
 const LikeCommentController = require('./controllers/LikeCommentController').LikeCommentController
+const FavoriteController = require('./controllers/FavoriteController').FavoriteController
 
 // Import des middlewares
 const controleOwner = require('./middlewares/controleOwner')
@@ -105,6 +106,14 @@ app.delete('/comment/:id',database.controlsBDD,passport.authenticate('jwt',{sess
 
 app.post('/like',database.controlsBDD,passport.authenticate('jwt',{session:false}),LikeCommentController.addOneLikeOnComment)
 app.delete('/like/:id',database.controlsBDD,passport.authenticate('jwt',{session:false}),LikeCommentController.deleteOneLikeOnComment)
+
+//route Favorite
+
+app.post('/favorite',database.controlsBDD,passport.authenticate('jwt',{session:false}),controlePlaceExist,FavoriteController.addOneFavorite)
+app.get('/favorites',database.controlsBDD,passport.authenticate('jwt',{session:false}),FavoriteController.findManyFavorites)
+app.put('/favorite/:id',database.controlsBDD,passport.authenticate('jwt',{session:false}),FavoriteController.updateOneFavorite)
+app.delete('favorite/:id',database.controlsBDD,passport.authenticate('jwt',{session:false}),FavoriteController.deleteOneFavorite)
+
 
 app.listen(Config.port, () => {
     Logger.info(`Serveur démarré sur le port ${Config.port}.`)

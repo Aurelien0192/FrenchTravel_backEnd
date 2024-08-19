@@ -36,7 +36,7 @@ module.exports.FavoriteService = class FavoriteService{
 
     static findManyFavorites = async function(page, limit, placeOrFolder_id, user_id, option, callback){
         page = !page ? 1 : page
-        limit = !limit ? 7 : limit
+        limit = !limit ? 0 : limit
         page = !Number.isNaN(page) ? Number(page): page
         limit = !Number.isNaN(limit) ? Number(limit): limit
 
