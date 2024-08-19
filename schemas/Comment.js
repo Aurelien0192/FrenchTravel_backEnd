@@ -5,12 +5,14 @@ const CommentSchema = mongoose.Schema({
     user_id:{
         type: mongoose.Types.ObjectId,
         ref:"User",
-        required: true
+        required: true,
+        immutable: true
     },
     place_id:{
         type:mongoose.Types.ObjectId,
         ref:"Place",
-        required: true
+        required: true,
+        immutable: true,
     },
     isResponse:{
         type:Boolean,

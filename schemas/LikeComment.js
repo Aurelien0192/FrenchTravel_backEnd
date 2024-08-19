@@ -5,13 +5,15 @@ const LikeCommentSchemas = mongoose.Schema({
         type: mongoose.Types.ObjectId,
         required: true,
         index: true,
-        ref:"User"
+        ref:"User",
+        immutable: true
     },
     comment_id:{
         type: mongoose.Types.ObjectId,
         required: true,
         index: true,
-        ref:"Comment"
+        ref:"Comment",
+        immutable: true,
     },
     create_at:{
         type:Date,

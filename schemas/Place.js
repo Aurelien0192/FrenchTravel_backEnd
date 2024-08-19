@@ -9,7 +9,8 @@ const PlaceSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         immutable: true,
-        required : true
+        required : true,
+        immutable: true
     },
     categorie : {
         type: String,

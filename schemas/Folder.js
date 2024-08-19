@@ -7,10 +7,16 @@ const FolderSchema = mongoose.Schema({
     },
     user :{
         type: mongoose.Types.ObjectId,
-        required: true
+        required: true,
+        immutable: true,
+        ref: "User"
     },
-    place:{
-        type: mongoose.Types.ObjectId,
-        required:true
-    }
 })
+
+FolderSchema.virtual('favorites',{
+    ref:'Favorite',
+    localField : '_id',
+    foreignField:'folder'
+})
+
+module.exports.FolderSchema = FolderSchema
