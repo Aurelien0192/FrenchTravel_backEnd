@@ -611,6 +611,17 @@ describe("findManyCommentsByOwnerOfPlace",()=>{
             done()
         })
     })
+    it('find many comments by search not exist - S',(done)=>{
+        CommentService.findManyCommentsByOwnerOfPlace(null, null, [places[0]._id,places[1]._id], "qsfezezffez", null, users[0]._id, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty("count")
+            expect(value["count"]).to.be.equal(0)
+            expect(value).to.haveOwnProperty("results")
+            expect(value["results"]).to.be.an('array')
+            expect(value["results"]).to.lengthOf(0)
+            done()
+        })
+    })
 })
 
 describe("updateOneComment",()=>{

@@ -360,6 +360,35 @@ describe("GET - /commentsByOwner",() =>{
             done()
         })
     })
+    it("find comments with place search - S",(done)=>{
+        chai.request(server).get('/commentsByOwner').query({search:"Château du Doubs"}).auth(tokens[0],{type: 'bearer'}).end((err, res)=>{
+            expect(res.body).to.be.a('object')
+            expect(res.body.results).to.be.an('array')
+            res.body.results.forEach((result)=>{
+                expect(String(result.place_id[0]._id)).to.contain.oneOf(_.map(places, (e)=>{return String(e._id)}))
+            })
+            res.should.has.status(200)
+            done()
+        })
+    })
+    it("find comments with username search - S",(done)=>{
+        chai.request(server).get('/commentsByOwner').query({search:"EricLaDébrouille"}).auth(tokens[0],{type: 'bearer'}).end((err, res)=>{
+            expect(res.body).to.be.a('object')
+            expect(res.body.results).to.be.an('array')
+            res.body.results.forEach((result)=>{
+                expect(String(result.place_id[0]._id)).to.contain.oneOf(_.map(places, (e)=>{return String(e._id)}))
+            })
+            res.should.has.status(200)
+            done()
+        })
+    })
+    it("find comments with not exist find search - S",(done)=>{
+        chai.request(server).get('/commentsByOwner').query({search:"rgregger"}).auth(tokens[0],{type: 'bearer'}).end((err, res)=>{
+            expect(res.body).to.be.a('object')
+            res.should.has.status(200)
+            done()
+        })
+    })
 })
 describe("DELETE - /comment/:id",() => {
     it("delete one comment not authentifiate - E",(done)=>{
