@@ -83,6 +83,56 @@
  */
 
 /**
+ * @swagger
+ * /images:
+ *  get:
+ *      summary: find many images by user ID
+ *      description: Find many images by user id
+ *      tags:
+ *          - Image
+ *      security:
+ *          - bearerAuth: []
+ *      consumes:
+ *          - multipart/form-data
+ *      parameters:
+ *          - in: query
+ *            name: page
+ *            type: number
+ *          - in: query
+ *            name: limit
+ *            type: number
+ *          - in: query
+ *            name: user_id
+ *            type: string
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                          type: object
+ *                          properties:
+ *                              count:
+ *                                  type: number
+ *                              results:
+ *                                  type: array
+ *                                  items:
+ *                                      $ref : '#/components/schemas/Image'
+ *      responses:
+ *          201:
+ *              description: Image successfully upload.
+ *              content: 
+ *                  application/json:
+ *                      schema:
+ *                          $ref : '#/components/schemas/Image'
+ *          404:
+ *              $ref: '#/components/responses/NotFound'
+ *          405:
+ *              $ref: '#/components/responses/ValidationError'
+ *          500:
+ *              description : Internal server error
+ */
+
+/**
 * 
  * @swagger
  * /image/{id}:

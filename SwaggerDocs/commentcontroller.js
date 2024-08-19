@@ -116,6 +116,12 @@
  *          - Comment
  *      parameters:
  *          - in: query
+ *            name: page
+ *            type: number
+ *          - in: query
+ *            name: limit
+ *            type: number
+ *          - in: query
  *            name: user_id
  *            type: string
  *            description: id of user who post comments
@@ -124,11 +130,57 @@
  *            type: string
  *            description: id of place where comments are
  *          - in: query
+ *            name: visitor_id
+ *            type: string
+ *            description: id of user connected and visited the website
+ *          - in: query
  *            name: options
  *            description: if who want populate by user or place
  *            schema:
  *              type: string
  *              enum: [populateuser_id, populateplace_id]
+ *      responses:
+ *          200:
+ *              description: Comments successfully finds.
+ *              content: 
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              count:
+ *                                  type: number
+ *                              results:
+ *                                  type: array
+ *                                  items:
+ *                                      $ref : '#/components/schemas/Comment'
+ *          404:
+ *              $ref: '#/components/responses/NotFound'
+ *          405:
+ *              $ref: '#/components/responses/ValidationError'
+ *          500:
+ *              description : Internal server error
+ */
+
+/**
+ * @swagger
+ * /commentsByOwner:
+ *  get:
+ *      summary: find comments by owner
+ *      description: find all comments post in places belonging of one owner
+ *      tags:
+ *          - Comment
+ *      security:
+ *          - bearerAuth: []
+ *      parameters:
+ *          - in: query
+ *            name: page
+ *            type: number
+ *          - in: query
+ *            name: limit
+ *            type: number
+ *          - in: query
+ *            name: search
+ *            description: finds comment by name of place or username of poster
  *      responses:
  *          200:
  *              description: Comments successfully finds.
