@@ -22,3 +22,7 @@ const FavoriteSchema = mongoose.Schema({
         default: false
     }
 })
+
+FavoriteSchema.index({user: 1, place: 1},{unique: true})
+
+module.exports.FavoriteSchema = FavoriteSchema
