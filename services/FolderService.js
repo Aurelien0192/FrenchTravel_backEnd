@@ -87,6 +87,29 @@ module.exports.FolderService = class FolderService{
         }
     }
 
+    static updateFolderById(folder_id, body, options, callback){
+        if(folder_id && mongoose.isValidObjectId(folder_id)){
+            if(Object.keys(body).length===1 && Object.keys(body)==="name"){
+                Folder.findByIdAndUpdate(folder_id, body,{returnDocument: 'after', runValidators: true}).then((value)=>{
+                    if(value){
+                        callback(null, value.toObject())
+                    }else{
+                        callback({msg:"le dossier n'a pas été trouvé", type_error:"no-found"})
+                    }
+                }).catch((errors)=>{
+                    const err = ErrorGenerator.generateErrorSchemaValidator(errors)
+                    callback(err)
+                })
+            }else{
+                callback({msg:"body is not valid",type_error:"no-valid"})
+            }
+        }else{
+            const err = ErrorGenerator({folder_id})
+            callback(err)
+        }
+
+    }
+
     static deleteOneFolderById(folder_id, options, callback){
         if(folder_id && mongoose.isValidObjectId(folder_id)){
             folder_id = new mongoose.Types.ObjectId(folder_id)
