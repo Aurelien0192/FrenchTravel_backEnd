@@ -288,7 +288,6 @@ module.exports.PlaceService =  class PlaceService{
                     callback(err);
                 }else{
                     const err = ErrorGenerator.generateErrorSchemaValidator(errors)
-
                     callback(err)
                 }
             })
