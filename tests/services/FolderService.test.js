@@ -220,6 +220,64 @@ describe("findManyFolders",()=>{
         })
     })
 })
+describe('updateOneFolderById',()=>{
+    it('update one folder with correct id and correct information - S',(done)=>{
+        FolderService.updateFolderById(folders[0]._id,{name:"provence"}, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('name')
+            expect(value['name']).to.be.equal('provence')
+            done()
+        })
+    })
+    it('update one folder with correct id but empty name - E',(done)=>{
+        FolderService.updateFolderById(folders[0]._id,{name:""}, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('validator')
+            done()
+        })
+    })
+    it('update one folder with correct id but body missing - E',(done)=>{
+        FolderService.updateFolderById(folders[0]._id,null, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it('update one folder with correct id but wrong field in body - E',(done)=>{
+        FolderService.updateFolderById(folders[0]._id,{coucou: "c'est moi"}, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it('update one folder with correct id but supplementary field in body - E',(done)=>{
+        FolderService.updateFolderById(folders[0]._id,{name:"vacances", coucou: "c'est moi"}, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it('update one folder with correct body but uncorrect id - E',(done)=>{
+        FolderService.updateFolderById("odfbhre",{name:"vacances"}, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it('update one folder with correct body but missing id - E',(done)=>{
+        FolderService.updateFolderById(null,{name:"vacances"}, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+})
 describe('deleteOneFolderById',()=>{
     it('delete one folder with uncorrect id - E',(done)=>{
         FolderService.deleteOneFolderById("dvvjerovjrev", null, function(err, value){

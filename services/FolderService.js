@@ -89,7 +89,7 @@ module.exports.FolderService = class FolderService{
 
     static updateFolderById(folder_id, body, options, callback){
         if(folder_id && mongoose.isValidObjectId(folder_id)){
-            if(Object.keys(body).length===1 && Object.keys(body)==="name"){
+            if(body && Object.keys(body).length===1 && Object.keys(body)[0]==="name"){
                 Folder.findByIdAndUpdate(folder_id, body,{returnDocument: 'after', runValidators: true}).then((value)=>{
                     if(value){
                         callback(null, value.toObject())
@@ -104,7 +104,7 @@ module.exports.FolderService = class FolderService{
                 callback({msg:"body is not valid",type_error:"no-valid"})
             }
         }else{
-            const err = ErrorGenerator({folder_id})
+            const err = ErrorGenerator.controlIntegrityofID({folder_id})
             callback(err)
         }
 
