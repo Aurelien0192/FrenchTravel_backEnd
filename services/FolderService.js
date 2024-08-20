@@ -1,7 +1,9 @@
 const FolderSchema = require('../schemas/Folder').FolderSchema
 const _ = require('lodash')
 const ErrorGenerator = require('../utils/errorGenerator').errorGenerator
+const DependencyService = require("../utils/dependencyServices").dependencyService
 const mongoose = require('mongoose')
+const { dependencyService } = require('../utils/dependencyServices')
 
 FolderSchema.set('toJSON',{virtuals:true})
 FolderSchema.set('toObject',{virtuals:true})
@@ -113,14 +115,20 @@ module.exports.FolderService = class FolderService{
     static deleteOneFolderById(folder_id, options, callback){
         if(folder_id && mongoose.isValidObjectId(folder_id)){
             folder_id = new mongoose.Types.ObjectId(folder_id)
-            Folder.findByIdAndDelete(folder_id).then((value)=>{
-                if(value){
-                    callback(null, value.toObject())
+            DependencyService.deleteAttachedDocumentsOfFolder(folder_id, function(err,value){
+                if(err){
+                    return callback({msg:err, type_error:"aborded"})
                 }else{
-                    callback({msg:"aucun dossier trouvé", type_error:"no-found"})
+                    Folder.findByIdAndDelete(folder_id).then((value)=>{
+                        if(value){
+                            callback(null, value.toObject())
+                        }else{
+                            callback({msg:"aucun dossier trouvé", type_error:"no-found"})
+                        }
+                    }).catch((e)=>{
+                        callback(e)
+                    })
                 }
-            }).catch((e)=>{
-                callback(e)
             })
         }else{
             const err = ErrorGenerator.controlIntegrityofID({folder_id})
@@ -131,14 +139,27 @@ module.exports.FolderService = class FolderService{
     static deleteManyFolder(user_id, options, callback){
         if(user_id && mongoose.isValidObjectId(user_id)){
             user_id = new mongoose.Types.ObjectId(user_id)
-            Folder.deleteMany({user:user_id}).then((value) =>{
-                if (value && value.deletedCount !== 0){
-                    callback(null, value)
+            FolderService.findManyFolders(null, 0, user_id, null, function(err, value){
+                if(value.count > 0){
+                    const folders_id = _.map(value.results,'_id')
+                    dependencyService.deleteAttachedDocumentsOfFolder(folders_id,function(err, value){
+                        if(err){
+                            return callback({msg:err, type_error:"aborded"})
+                        }else{
+                            Folder.deleteMany({user:user_id}).then((value) =>{
+                                if (value && value.deletedCount !== 0){
+                                    callback(null, value)
+                                }else{
+                                    callback({msg: "Aucun dossier trouvé", type_error: "no-found"})
+                                }
+                            }).catch((e)=>{
+                                callback(e)
+                            })
+                        }
+                    })
                 }else{
                     callback({msg: "Aucun dossier trouvé", type_error: "no-found"})
                 }
-            }).catch((e)=>{
-                callback(e)
             })
         }else{
             const err = ErrorGenerator.controlIntegrityofID({user_id})

@@ -7,6 +7,7 @@ module.exports.dependencyService = class DependencyService{
         const CommentServices = require("../services/CommentService").CommentServices
         const PlaceService = require("../services/PlaceService").PlaceService
         const LikeCommentService = require("../services/LikeCommentService").LikeCommentService
+        const FolderService = require('../services/FolderService').FolderService
         const FavoriteService = require('../services/FavoriteService').FavoriteService
         let error = ""
         PlaceService.findManyPlaces(null, null, {user_id:user_id},null,function(err, value){
@@ -17,31 +18,36 @@ module.exports.dependencyService = class DependencyService{
                 if(err && err.type_error != "no-found"){
                     error = error, "une erreur c'est produite lors de la suppression de vos établissements"
                 }
-                FavoriteService.deleteManyFavorites(user_id, null, function(err, value){
-                    if(err && err.type_error !== "no-found"){
-                        error = error, "une erreur c'est produite lors de la suppression de vos favoris"
+                FolderService.deleteManyFolder(user_id, null, function(err, value){
+                    if(err && err.type_error != "no-found"){
+                        error = error, "une erreur c'est produite lors de la suppression de vos dossiers"
                     }
-                    CommentServices.findManyComments(null, null, {user_id:user_id},null, null, function(err, value){
+                    FavoriteService.deleteManyFavorites(user_id, null, function(err, value){
                         if(err && err.type_error !== "no-found"){
-                            error = error,"une erreur c'est produite lors de la recherche des commentaires que vous avez postez"
-                        } 
-                        if(value && value.count>0){
-                            const comments_id = _.map(value.results,"_id")
-                            CommentServices.deleteManyComments(comments_id,function(err, value){
-                                if(err && err.type_error !== "no-found"){
-                                    error = error, "une erreur c'est produite lors la suppression de vos commentaires"   
-                                }
-                                LikeCommentService.deleteManyLikesComments(comments_id,function(err, value){
-                                    if(err && err.type_error !=="no-found"){
-                                        error = error, "une erreur c'est produite lors la suppression des likes liés à vos commentaires"   
-                                    }
-                                    callback(error)
-                                })
-                            })
-                        }else{
-                            callback()
+                            error = error, "une erreur c'est produite lors de la suppression de vos favoris"
                         }
-                    })   
+                        CommentServices.findManyComments(null, null, {user_id:user_id},null, null, function(err, value){
+                            if(err && err.type_error !== "no-found"){
+                                error = error,"une erreur c'est produite lors de la recherche des commentaires que vous avez postez"
+                            } 
+                            if(value && value.count>0){
+                                const comments_id = _.map(value.results,"_id")
+                                CommentServices.deleteManyComments(comments_id,function(err, value){
+                                    if(err && err.type_error !== "no-found"){
+                                        error = error, "une erreur c'est produite lors la suppression de vos commentaires"   
+                                    }
+                                    LikeCommentService.deleteManyLikesComments(comments_id,function(err, value){
+                                        if(err && err.type_error !=="no-found"){
+                                            error = error, "une erreur c'est produite lors la suppression des likes liés à vos commentaires"   
+                                        }
+                                        callback(error)
+                                    })
+                                })
+                            }else{
+                                callback()
+                            }
+                        })   
+                    })
                 })
             })
         })
@@ -87,6 +93,17 @@ module.exports.dependencyService = class DependencyService{
         LikeCommentService.deleteManyLikesComments([comment_id], function(err, value){
             if(err && err.type_error !== "no_found"){
                 error = error, "une erreur c'est produite lors de la suppression des likes associées"
+            }
+            callback(error)
+        })
+    }
+
+    static async deleteAttachedDocumentsOfFolder(folder_id,callback){
+        const FavoriteService = require("../services/FavoriteService").FavoriteService
+        let error=""
+        FavoriteService.deleteManyFavorites(folder_id, function(err, value){
+            if(err && err.type_error !== "no_found"){
+                error = error, "une erreur c'est produite lors de la suppression des favoris présent dans votre/vos dossier(s)"
             }
             callback(error)
         })

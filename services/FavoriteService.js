@@ -125,13 +125,13 @@ module.exports.FavoriteService = class FavoriteService{
         }
     }
 
-    static deleteManyFavorites = async function(placeOrUser_id, options, callback){
+    static deleteManyFavorites = async function(placeOrUserOrFolder_id, options, callback){
         if(!Array.isArray(placeOrUser_id)){
             placeOrUser_id = [placeOrUser_id]
         }
         if(placeOrUser_id.filter((e) => { return mongoose.isValidObjectId(e) }).length == placeOrUser_id.length){
 
-            Favorite.deleteMany({$or:[{place:placeOrUser_id},{user:placeOrUser_id}]}).then((value)=>{
+            Favorite.deleteMany({$or:[{place:placeOrUserOrFolder_id},{user:placeOrUserOrFolder_id},{folder:placeOrUserOrFolder_id}]}).then((value)=>{
                 if(value && value.deletedCount !== 0){
                     callback(null, value)
                 }else{
