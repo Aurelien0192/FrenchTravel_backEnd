@@ -43,6 +43,7 @@ const ImageController = require('./controllers/ImageController').ImageController
 const CommentController = require('./controllers/CommentController').CommentController
 const LikeCommentController = require('./controllers/LikeCommentController').LikeCommentController
 const FavoriteController = require('./controllers/FavoriteController').FavoriteController
+const FolderController = require('./controllers/FolderController').FolderController
 
 // Import des middlewares
 const controleOwner = require('./middlewares/controleOwner')
@@ -115,6 +116,13 @@ app.get('/favorites',database.controlsBDD,passport.authenticate('jwt',{session:f
 app.put('/favorite/:id',database.controlsBDD,passport.authenticate('jwt',{session:false}),FavoriteController.updateOneFavorite)
 app.delete('/favorite/:id',database.controlsBDD,passport.authenticate('jwt',{session:false}),FavoriteController.deleteOneFavorite)
 
+//route Folder
+
+app.post('/folder',database.controlsBDD,passport.authenticate('jwt',{session:false}),FolderController.addOneFolder)
+app.get('/folder/:id',database.controlsBDD,passport.authenticate('jwt',{session:false}),FolderController.findOneFolderById)
+app.get('/folders',database.controlsBDD,passport.authenticate('jwt',{session:false}),FolderController.findManyFolders)
+app.put('/folder/:id',database.controlsBDD,passport.authenticate('jwt',{session:false}),FolderController.updateFolderById)
+app.delete('/folder/:id',database.controlsBDD,passport.authenticate('jwt',{session:false}),FolderController.deleteOneFolderById)
 
 app.listen(Config.port, () => {
     Logger.info(`Serveur démarré sur le port ${Config.port}.`)
