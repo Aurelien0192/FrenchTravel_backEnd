@@ -5,6 +5,7 @@ const ImageService = require("../../services/ImageService").ImageService
 const CommentService = require("../../services/CommentService").CommentServices
 const LikeCommentService = require("../../services/LikeCommentService").LikeCommentService
 const FavoriteService = require("../../services/FavoriteService").FavoriteService
+const FolderService = require("../../services/FolderService").FolderService
 let expect = chai.expect
 
 const users =[]
@@ -12,7 +13,7 @@ let place = {}
 let image = {}
 let comment = {}
 let like = {}
-let favorite = {}
+let folder = {}
 
 describe("AddOneUser",()=> {
     
@@ -110,9 +111,19 @@ describe("AddOneUser",()=> {
             expect(value).to.haveOwnProperty("place")
             expect(String(value["user"])).to.be.equal(String(users[0]._id))
             expect(String(value['place'])).to.be.equal(String(place._id))
-            favorite = {...value} 
             done()
         
+        })
+    })
+    it('add a folder to first user - S',(done)=>{
+        FolderService.addOneFolder(users[0]._id, {name: "vacances"}, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('user')
+            expect(value).to.haveOwnProperty('name')
+            expect(String(value['user'])).to.be.equal(String(users[0]._id))
+            expect(value["name"]).to.be.equal("vacances")
+            folder = {...value}
+            done()
         })
     })
     it("Add user with supplementary property - S",(done)=>{
@@ -400,6 +411,14 @@ describe("DeleteOneUser",()=>{
             expect(value).to.haveOwnProperty('firstName')
             expect(value['firstName']).to.be.equal("Gaston")
             expect(err).to.be.null
+            done()
+        })
+    })
+    it ('check folder correctly delete - S',(done) => {
+        FolderService.findOneFolderById(folder._id, null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-found')
             done()
         })
     })
