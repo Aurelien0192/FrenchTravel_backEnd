@@ -279,7 +279,6 @@ module.exports.PlaceService =  class PlaceService{
                         callback({msg: "Place non trouvée", fields_with_error: [], fields:"", type_error:"no-found"})
                     }
                 }catch(e){
-                    console.log(e)
                     callback({msg: "Erreur avec la base de données", fields_with_error: [], fields:"", type_error:"error-mongo"})
                 }
             }).catch((errors) =>{

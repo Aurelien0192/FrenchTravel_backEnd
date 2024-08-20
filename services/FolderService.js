@@ -3,7 +3,6 @@ const _ = require('lodash')
 const ErrorGenerator = require('../utils/errorGenerator').errorGenerator
 const DependencyService = require("../utils/dependencyServices").dependencyService
 const mongoose = require('mongoose')
-const { dependencyService } = require('../utils/dependencyServices')
 
 FolderSchema.set('toJSON',{virtuals:true})
 FolderSchema.set('toObject',{virtuals:true})
@@ -142,7 +141,7 @@ module.exports.FolderService = class FolderService{
             FolderService.findManyFolders(null, 0, user_id, null, function(err, value){
                 if(value.count > 0){
                     const folders_id = _.map(value.results,'_id')
-                    dependencyService.deleteAttachedDocumentsOfFolder(folders_id,function(err, value){
+                    DependencyService.deleteAttachedDocumentsOfFolder(folders_id,function(err, value){
                         if(err){
                             return callback({msg:err, type_error:"aborded"})
                         }else{

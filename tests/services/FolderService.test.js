@@ -296,7 +296,7 @@ describe('deleteOneFolderById',()=>{
         })
     })
     it('delete one folder with correct id but not exist in database - E',(done)=>{
-        FolderService.deleteOneFolderById(user._id, null, function(err, value){
+        FolderService.deleteOneFolderById("66c478abc41f2aa9977ad3ea", null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('no-found')
@@ -330,7 +330,7 @@ describe('deleteManyFolder',()=>{
         })
     })
     it('delete many folders with correct user_id not exist in database - E',(done)=>{
-        FolderService.deleteManyFolder(place._id, null, function(err, value){
+        FolderService.deleteManyFolder("66c478abc41f2aa9977ad3ea", null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('no-found')

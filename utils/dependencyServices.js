@@ -19,7 +19,7 @@ module.exports.dependencyService = class DependencyService{
                     error = error, "une erreur c'est produite lors de la suppression de vos établissements"
                 }
                 FolderService.deleteManyFolder(user_id, null, function(err, value){
-                    if(err && err.type_error != "no-found"){
+                    if(err && err.type_error !== "no-found"){
                         error = error, "une erreur c'est produite lors de la suppression de vos dossiers"
                     }
                     FavoriteService.deleteManyFavorites(user_id, null, function(err, value){
@@ -101,7 +101,7 @@ module.exports.dependencyService = class DependencyService{
     static async deleteAttachedDocumentsOfFolder(folder_id,callback){
         const FavoriteService = require("../services/FavoriteService").FavoriteService
         let error=""
-        FavoriteService.deleteManyFavorites(folder_id, function(err, value){
+        FavoriteService.deleteManyFavorites(folder_id,null, function(err, value){
             if(err && err.type_error !== "no_found"){
                 error = error, "une erreur c'est produite lors de la suppression des favoris présent dans votre/vos dossier(s)"
             }

@@ -126,10 +126,10 @@ module.exports.FavoriteService = class FavoriteService{
     }
 
     static deleteManyFavorites = async function(placeOrUserOrFolder_id, options, callback){
-        if(!Array.isArray(placeOrUser_id)){
-            placeOrUser_id = [placeOrUser_id]
+        if(!Array.isArray(placeOrUserOrFolder_id)){
+            placeOrUserOrFolder_id = [placeOrUserOrFolder_id]
         }
-        if(placeOrUser_id.filter((e) => { return mongoose.isValidObjectId(e) }).length == placeOrUser_id.length){
+        if(placeOrUserOrFolder_id.filter((e) => { return mongoose.isValidObjectId(e) }).length == placeOrUserOrFolder_id.length){
 
             Favorite.deleteMany({$or:[{place:placeOrUserOrFolder_id},{user:placeOrUserOrFolder_id},{folder:placeOrUserOrFolder_id}]}).then((value)=>{
                 if(value && value.deletedCount !== 0){
@@ -138,6 +138,7 @@ module.exports.FavoriteService = class FavoriteService{
                     callback({msg:"Aucun favoris trouvé", type_error:"no-found"})
                 }
             }).catch((error)=>{
+                console.log(error)
                 callback({msg: "error in server", e, type_error:"error-mongo"})
             })
 
