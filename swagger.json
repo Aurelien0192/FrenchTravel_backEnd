@@ -341,6 +341,49 @@
                             "exemple":"66a75cbd8b18880971f52fe8"
                         }
                     }
+                },
+                "Favorite":{
+                    "type":"object",
+                    "required":["user","place"],
+                    "properties":{
+                        "user":{
+                            "type":"string",
+                            "description":"id of user take place in favorite",
+                            "exemple":"66a75cbd8b18880971f52fe8"
+                        },
+                        "place":{
+                            "type":"string",
+                            "description":"id of place in favorite",
+                            "exemple":"66a75cbd8b18880971f52fe8"
+                        },
+                        "folder":{
+                            "type":"string",
+                            "description":"id of folder where favorite is in",
+                            "exemple": "66a75cbd8b18880971f52fe8"
+                        },
+                        "visited":{
+                            "type":"boolean",
+                            "description":"set true if user visiter gone in this place",
+                            "default":false,
+                            "exemple":false
+                        }
+                    }
+                },
+                "Folder":{
+                    "type":"object",
+                    "required":["name","user"],
+                    "properties":{
+                        "name":{
+                            "type":"string",
+                            "description":"name of the folder",
+                            "exemple":"holiday"
+                        },
+                        "user":{
+                            "type":"string",
+                            "description":"id of user who have create the folder",
+                            "exemple": "66a75cbd8b18880971f52fe8"
+                        }
+                    }
                 }
             },"responses":{
                 "NotFound":{
