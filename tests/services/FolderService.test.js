@@ -313,7 +313,7 @@ describe('deleteOneFolderById',()=>{
     })
     it('check favorite inside folder correctly delete - S',(done)=>{
         FavoriteService.findManyFavorites(null, null, folders[0]._id, user._id, null, function(err, value){
-            expect(value).to.be.a.object()
+            expect(value).to.be.a("object")
             expect(value).to.haveOwnProperty("count")
             expect(value["count"]).to.be.equal(0)
             done()
