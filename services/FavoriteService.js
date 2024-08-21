@@ -53,7 +53,7 @@ module.exports.FavoriteService = class FavoriteService{
                     Favorite.countDocuments(queryMongo).then((value) => {
                         if (value > 0){
                             const skip = ((page-1) * limit)
-                            Favorite.find(queryMongo, null, {skip:skip, limit:limit, populate:'place',lean:true}).then((results) => {
+                            Favorite.find(queryMongo, null, {skip:skip, limit:limit, populate:{path:'place',populate:{path:'images',perDocumentLimit:1}},lean:true}).then((results) => {
                                 callback(null, {
                                     count : value,
                                     results : results
@@ -96,7 +96,20 @@ module.exports.FavoriteService = class FavoriteService{
                             callback(err)
                     })
                 }else{
-                    callback({msg: "update is missing", type_error:"no-valid"})
+                    Favorite.findByIdAndUpdate(favorite_id,{$unset:{folder: 1}},{returnDocument: 'after', runValidators: true}).then((value)=>{
+                        try{
+                            if(value){
+                                callback(null, value.toObject())
+                            }else{
+                                callback({msg: "Favoris non trouvée", fields_with_error: [], fields:"", type_error:"no-found"})
+                            }
+                        }catch(e){
+                            callback({msg: "Erreur avec la base de données", fields_with_error: [], fields:"", type_error:"error-mongo"})
+                        }
+                    }).catch((errors) => {
+                        const err = ErrorGenerator.generateErrorSchemaValidator(errors)
+                            callback(err)
+                    })
                 }
             }else{
                 const err = ErrorGenerator.controlIntegrityofID({favorite_id})
@@ -107,9 +120,9 @@ module.exports.FavoriteService = class FavoriteService{
         }
     }
 
-    static deleteOneFavorite = async function(place_id, user_id, options, callback){
-        if(user_id && mongoose.isValidObjectId(user_id) && place_id && mongoose.isValidObjectId(place_id)){
-                Favorite.findOneAndDelete({place:place_id, user:user_id}).then((value)=>{
+    static deleteOneFavorite = async function(placOrFavorite_id, user_id, options, callback){
+        if(user_id && mongoose.isValidObjectId(user_id) && placOrFavorite_id && mongoose.isValidObjectId(placOrFavorite_id)){
+                Favorite.findOneAndDelete({$and:[{user:user_id},{$or:[{place:placOrFavorite_id},{_id:placOrFavorite_id}]}], }).then((value)=>{
                     if(value){
                         callback(null, value.toObject())
                     }else{
