@@ -45,7 +45,8 @@ module.exports.FavoriteService = class FavoriteService{
                 const queryMongo = 
                 {$and:[
                     {user: user_id},
-                    placeOrFolder_id? {$or : _.map(["place","folder"], (e) => {return{[e]:new mongoose.Types.ObjectId(placeOrFolder_id)}})} : {}
+                    placeOrFolder_id? {$or : _.map(["place","folder"], (e) => {return{[e]:new mongoose.Types.ObjectId(placeOrFolder_id)}})} :
+                    option ? {folder:{$exists:false}} : {}
                 ]}
                 if (Number.isNaN(page) || Number.isNaN(limit)){
                     callback ({msg: `format de ${Number.isNaN(page) ? "page" : "limit"} est incorrect`, type_error:"no-valid"})
