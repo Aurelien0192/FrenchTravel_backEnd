@@ -368,9 +368,9 @@ module.exports.CommentServices = class CommentService{
                                                 create_at: -1
                                             }
                                         },{
-                                            $limit: 3
+                                            $limit: limit
                                         },{
-                                            $skip: 0
+                                            $skip: page-1*limit
                                         }]
                                     }
                                 },{

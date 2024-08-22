@@ -34,44 +34,87 @@ module.exports.FavoriteService = class FavoriteService{
         }
     }
 
-    static findManyFavorites = async function(page, limit, placeOrFolder_id, user_id, option, callback){
+    static findManyFavorites = async function(page, limit, placeOrFolder_id, search, user_id, option, callback){
         page = !page ? 1 : page
-        limit = !limit ? 0 : limit
+        limit = !limit ? 10 : limit
         page = !Number.isNaN(page) ? Number(page): page
         limit = !Number.isNaN(limit) ? Number(limit): limit
 
         if(user_id && mongoose.isValidObjectId(user_id)){
-            if((placeOrFolder_id && mongoose.isValidObjectId(placeOrFolder_id)) || !placeOrFolder_id){
-                const queryMongo = 
-                {$and:[
-                    {user: user_id},
-                    placeOrFolder_id? {$or : _.map(["place","folder"], (e) => {return{[e]:new mongoose.Types.ObjectId(placeOrFolder_id)}})} :
-                    option ? {folder:{$exists:false}} : {}
-                ]}
+            if((placeOrFolder_id && mongoose.isValidObjectId(placeOrFolder_id)) || !placeOrFolder_id){ 
                 if (Number.isNaN(page) || Number.isNaN(limit)){
                     callback ({msg: `format de ${Number.isNaN(page) ? "page" : "limit"} est incorrect`, type_error:"no-valid"})
                 }else{
-                    Favorite.countDocuments(queryMongo).then((value) => {
-                        if (value > 0){
-                            const skip = ((page-1) * limit)
-                            Favorite.find(queryMongo, null, {skip:skip, limit:limit, populate:{path:'place',populate:{path:'images',perDocumentLimit:1}},lean:true}).then((results) => {
-                                callback(null, {
-                                    count : value,
-                                    results : results
-                                })
-                            })
-                        }else{
-                            callback(null,{count : 0, results : []})
+                    let favoritesFind = await Favorite.aggregate([
+                        {
+                            $lookup:{
+                                from: "places",
+                                localField: "place",
+                                foreignField: "_id",
+                                as: "place"
+                            }
+                        },{
+                            $unwind:{
+                                path: "$place",
+                                preserveNullAndEmptyArrays: true
+                            }
+                        },{
+                            $lookup:{
+                                from: "images",
+                                localField: "place._id",
+                                foreignField: "place",
+                                pipeline: [{
+                                    $limit: 1
+                                }],
+                                as: "place.images"
+                            }
+                        },{
+                            $match:{
+                                $and: [{
+                                    user: user_id
+                                },{
+                                    $or: [{
+                                        folder: placeOrFolder_id
+                                    },{
+                                        "place._id": placeOrFolder_id
+                                    }]
+                                },{
+                                    "place.name": {
+                                        $regex: search? search:"",
+                                        $options: "i"
+                                    }
+                                }]
+                            }
+                        },{
+                            $facet:{
+                                count: [{
+                                    $count: "count"
+                                }],
+                                results: [{
+                                    $limit: limit
+                                },{
+                                    $skip: (page-1)*limit
+                                }]
+                            }
+                        },{
+                            $project:{
+                                count: {
+                                    $arrayElemAt: ["$count.count", 0]
+                                },
+                                results: 1  
+                            }
                         }
-                    }).catch((e) => {
-                        callback(e)
+                    ])
+                    favoritesFind = favoritesFind[0]
+                    callback(null, {
+                        count : favoritesFind.count? favoritesFind.count : 0,
+                        results : favoritesFind.results
                     })
                 }
             }else{
                 const err = ErrorGenerator.controlIntegrityofID(placeOrFolder_id)
                 callback(err)
             }
-
         }else{
             const err = ErrorGenerator.controlIntegrityofID({user_id})
             callback(err)
@@ -121,9 +164,9 @@ module.exports.FavoriteService = class FavoriteService{
         }
     }
 
-    static deleteOneFavorite = async function(placOrFavorite_id, user_id, options, callback){
-        if(user_id && mongoose.isValidObjectId(user_id) && placOrFavorite_id && mongoose.isValidObjectId(placOrFavorite_id)){
-                Favorite.findOneAndDelete({$and:[{user:user_id},{$or:[{place:placOrFavorite_id},{_id:placOrFavorite_id}]}], }).then((value)=>{
+    static deleteOneFavorite = async function(placeOrFavorite_id, user_id, options, callback){
+        if(user_id && mongoose.isValidObjectId(user_id) && placeOrFavorite_id && mongoose.isValidObjectId(placeOrFavorite_id)){
+                Favorite.findOneAndDelete({$and:[{user:user_id},{$or:[{place:placeOrFavorite_id},{_id:placeOrFavorite_id}]}], }).then((value)=>{
                     if(value){
                         callback(null, value.toObject())
                     }else{
@@ -134,7 +177,7 @@ module.exports.FavoriteService = class FavoriteService{
                 })
 
         }else{
-            const err = ErrorGenerator.controlIntegrityofID({user_id, place_id})
+            const err = ErrorGenerator.controlIntegrityofID({user_id, placeOrFavorite_id})
             callback(err)
         }
     }

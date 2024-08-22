@@ -159,8 +159,8 @@ describe("add one favorite",()=>{
     })
 })
 describe('findManyFavorite',()=>{
-    it("find many favorites with correct information - S",(done)=>{
-        FavoriteService.findManyFavorites(null, null, places[0]._id, users[0]._id, null, function(err, value){
+    it("find many favorites by place id - S",(done)=>{
+        FavoriteService.findManyFavorites(null, null, places[0]._id, null, users[0]._id, null, function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('count')
             expect(value['count']).to.be.equal(1)
@@ -175,8 +175,24 @@ describe('findManyFavorite',()=>{
             done()
         })
     })
+    it("find many favorites by search - S",(done)=>{
+        FavoriteService.findManyFavorites(null, null, null, "le palace", users[0]._id, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('count')
+            expect(value['count']).to.be.equal(1)
+            expect(value).to.haveOwnProperty('results')
+            expect(value['results']).to.be.an('array')
+            expect(value['results']).to.lengthOf(1)
+            expect(value['results'][0]).to.haveOwnProperty('user')
+            expect(value['results'][0]).to.haveOwnProperty('place')
+            expect(String(value['results'][0]['user'])).to.be.equal(String(users[0]._id))
+            expect(value['results'][0]['place']).to.haveOwnProperty('name')
+            expect(String(value['results'][0]['place']['name'])).to.be.equal("le palace")
+            done()
+        })
+    })
     it("find many favorites without place id - S",(done)=>{
-        FavoriteService.findManyFavorites(null, null, null, users[0]._id, null, function(err, value){
+        FavoriteService.findManyFavorites(null, null, null, null, users[0]._id, null, function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('count')
             expect(value['count']).to.be.equal(2)
@@ -191,7 +207,7 @@ describe('findManyFavorite',()=>{
         })
     })
     it("find many favorite with uncorrect place id - E",(done) => {
-        FavoriteService.findManyFavorites(null, null, "qsejojgoq", users[0]._id, null, function(err, value){
+        FavoriteService.findManyFavorites(null, null, "qsejojgoq", null, users[0]._id, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('no-valid')
@@ -199,7 +215,7 @@ describe('findManyFavorite',()=>{
         })
     })
     it("find many favorite with correct place id but not exist in database - S",(done) => {
-        FavoriteService.findManyFavorites(null, null, users[1]._id, users[0]._id, null, function(err, value){
+        FavoriteService.findManyFavorites(null, null, users[1]._id, null, users[0]._id, null, function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('count')
             expect(value["count"]).to.be.equal(0)
@@ -209,7 +225,7 @@ describe('findManyFavorite',()=>{
         })
     })
     it("find many favorite with correct place id but uncorrect user - E",(done) => {
-        FavoriteService.findManyFavorites(null, null, places[0]._id, "kdfopjgop", null, function(err, value){
+        FavoriteService.findManyFavorites(null, null, places[0]._id, null, "kdfopjgop", null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('no-valid')
@@ -217,7 +233,7 @@ describe('findManyFavorite',()=>{
         })
     })
     it("find many favorite with correct place id but missing user - E",(done) => {
-        FavoriteService.findManyFavorites(null, null, places[0]._id, null, null, function(err, value){
+        FavoriteService.findManyFavorites(null, null, places[0]._id, null, null, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
             expect(err['type_error']).to.be.equal('no-valid')
@@ -227,10 +243,10 @@ describe('findManyFavorite',()=>{
 })
 describe('updateOneFavorite',()=>{
     it("update one favorite with correct information - S",(done) =>{
-        FavoriteService.updateOneFavorite(favorites[0]._id, {visited:true}, null, function(err, value){
+        FavoriteService.updateOneFavorite(favorites[0]._id, {folder:users[0]._id}, null, function(err, value){
             expect(value).to.be.a('object')
-            expect(value).to.haveOwnProperty('visited')
-            expect(value['visited']).to.be.equal(true)
+            expect(value).to.haveOwnProperty('folder')
+            expect(String(value['folder'])).to.be.equal(String(users[0]._id))
             done()
         })
     })
@@ -243,11 +259,11 @@ describe('updateOneFavorite',()=>{
             done()
         })
     })
-    it("update one favorite with missing information - E",(done) =>{
+    it("update one favorite to delete folder - S",(done) =>{
         FavoriteService.updateOneFavorite(favorites[0]._id, null, null, function(err, value){
-            expect(err).to.be.a('object')
-            expect(err).to.haveOwnProperty('type_error')
-            expect(err['type_error']).to.be.equal('no-valid')
+            console.log(err, value)
+            expect(value).to.be.a('object')
+            expect(value).to.not.haveOwnProperty('folder')
             done()
         })
     })
@@ -294,7 +310,7 @@ describe('updateOneFavorite',()=>{
 })
 
 describe("deleteOneFavorite",()=>{
-    it ("delete one comment but user_id is uncorrect - E",(done)=>{
+    it ("delete one favorite but user_id is uncorrect - E",(done)=>{
         FavoriteService.deleteOneFavorite(places[0]._id, "sdviohjiq", null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
@@ -302,7 +318,7 @@ describe("deleteOneFavorite",()=>{
             done()
         })
     })
-    it ("delete one comment but user_id is missing - E",(done)=>{
+    it ("delete one favorite but user_id is missing - E",(done)=>{
         FavoriteService.deleteOneFavorite(places[0]._id, null, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
@@ -310,7 +326,7 @@ describe("deleteOneFavorite",()=>{
             done()
         })
     })
-    it ("delete one comment but place_id is uncorrect - E",(done)=>{
+    it ("delete one favorite but place_id is uncorrect - E",(done)=>{
         FavoriteService.deleteOneFavorite("ijodvjdso", users[0]._id, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
@@ -318,7 +334,7 @@ describe("deleteOneFavorite",()=>{
             done()
         })
     })
-    it ("delete one comment but place_id is missing - E",(done)=>{
+    it ("delete one favorite but place_id is missing - E",(done)=>{
         FavoriteService.deleteOneFavorite(null, users[0]._id, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
@@ -326,7 +342,7 @@ describe("deleteOneFavorite",()=>{
             done()
         })
     })
-    it ("delete one unexisting Comment - E",(done)=>{
+    it ("delete one unexisting favorite - E",(done)=>{
         FavoriteService.deleteOneFavorite(places[0]._id, users[1]._id, null, function(err, value){
             expect(err).to.be.a('object')
             expect(err).to.haveOwnProperty('type_error')
@@ -334,7 +350,7 @@ describe("deleteOneFavorite",()=>{
             done()
         })
     })
-    it("delete one comment with correct information - S",(done) => {
+    it("delete one favorite with correct information - S",(done) => {
         FavoriteService.deleteOneFavorite(places[0]._id, users[0]._id, null, function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty("user")
