@@ -234,6 +234,12 @@ module.exports.CommentServices = class CommentService{
                                         as: "place_id"
                                     }
                                 },{
+                                    $unwind:
+                                    {
+                                        path: "$place_id",
+                                        preserveNullAndEmptyArrays: true
+                                    }
+                                },{
                                     $lookup:
                                     {
                                             from: "users",
