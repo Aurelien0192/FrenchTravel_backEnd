@@ -41,11 +41,7 @@ module.exports.FavoriteService = class FavoriteService{
         limit = !Number.isNaN(limit) ? Number(limit): limit
 
         if(user_id && mongoose.isValidObjectId(user_id)){
-            if((placeOrFolder_id && mongoose.isValidObjectId(placeOrFolder_id)) || !placeOrFolder_id){ 
-                if (Number.isNaN(page) || Number.isNaN(limit)){
-                    callback ({msg: `format de ${Number.isNaN(page) ? "page" : "limit"} est incorrect`, type_error:"no-valid"})
-                }else{
-                    let favoritesFind = await Favorite.aggregate([
+            const aggregateOptions = [
                         {
                             $lookup:{
                                 from: "places",
@@ -73,12 +69,6 @@ module.exports.FavoriteService = class FavoriteService{
                                 $and: [{
                                     user: user_id
                                 },{
-                                    $or: [{
-                                        folder: placeOrFolder_id
-                                    },{
-                                        "place._id": placeOrFolder_id
-                                    }]
-                                },{
                                     "place.name": {
                                         $regex: search? search:"",
                                         $options: "i"
@@ -104,8 +94,24 @@ module.exports.FavoriteService = class FavoriteService{
                                 results: 1  
                             }
                         }
-                    ])
+                    ]
+            if((placeOrFolder_id && mongoose.isValidObjectId(placeOrFolder_id)) || !placeOrFolder_id){ 
+                if (placeOrFolder_id){
+                    placeOrFolder_id = new mongoose.Types.ObjectId(placeOrFolder_id)
+                    aggregateOptions[3].$match.$and.push({
+                        $or: [{
+                            folder: placeOrFolder_id
+                        },{
+                            "place._id": placeOrFolder_id
+                        }]
+                    })
+                }
+                if (Number.isNaN(page) || Number.isNaN(limit)){
+                    callback ({msg: `format de ${Number.isNaN(page) ? "page" : "limit"} est incorrect`, type_error:"no-valid"})
+                }else{
+                    let favoritesFind = await Favorite.aggregate(aggregateOptions)
                     favoritesFind = favoritesFind[0]
+                    console.log(favoritesFind)
                     callback(null, {
                         count : favoritesFind.count? favoritesFind.count : 0,
                         results : favoritesFind.results
