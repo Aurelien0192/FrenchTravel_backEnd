@@ -10,7 +10,11 @@ module.exports.FavoriteController = class FavoriteController{
     }
 
     static findManyFavorites(req, res){
-        FavoriteService.findManyFavorites(req.query.page, req.query.limit, req.query.ids, req.query.q, req.user._id, req.query.option, function(err, value){
+        const q ={
+            search : req.query.search,
+            categorie: req.query.categorie
+        }
+        FavoriteService.findManyFavorites(req.query.page, req.query.limit, req.query.ids, q, req.user._id, req.query.option, function(err, value){
             responseOfServer(err, value, req, res, false)
         })
     }

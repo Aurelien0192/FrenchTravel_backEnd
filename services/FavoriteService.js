@@ -34,7 +34,7 @@ module.exports.FavoriteService = class FavoriteService{
         }
     }
 
-    static findManyFavorites = async function(page, limit, placeOrFolder_id, search, user_id, option, callback){
+    static findManyFavorites = async function(page, limit, placeOrFolder_id, q, user_id, option, callback){
         page = !page ? 1 : page
         limit = !limit ? 10 : limit
         page = !Number.isNaN(page) ? Number(page): page
@@ -70,7 +70,7 @@ module.exports.FavoriteService = class FavoriteService{
                                     user: user_id
                                 },{
                                     "place.name": {
-                                        $regex: search? search:"",
+                                        $regex: q.search? q.search:"",
                                         $options: "i"
                                     }
                                 }]
@@ -104,6 +104,16 @@ module.exports.FavoriteService = class FavoriteService{
                         },{
                             "place._id": placeOrFolder_id
                         }]
+                    })
+                }
+                if(q.categorie){
+                    aggregateOptions[3].$match.$and.push({
+                        "place.categorie": q.categorie
+                    })
+                }
+                if(option){
+                    aggregateOptions[3].$match.$and.push({
+                        folder:{$exists:false}
                     })
                 }
                 if (Number.isNaN(page) || Number.isNaN(limit)){
