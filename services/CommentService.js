@@ -370,7 +370,7 @@ module.exports.CommentServices = class CommentService{
                                         },{
                                             $limit: limit
                                         },{
-                                            $skip: page-1*limit
+                                            $skip: (page-1)*limit
                                         }]
                                     }
                                 },{
