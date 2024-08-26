@@ -175,8 +175,8 @@ describe('findManyFavorite',()=>{
             done()
         })
     })
-    it("find many favorites by search - S",(done)=>{
-        FavoriteService.findManyFavorites(null, null, null, "le palace", users[0]._id, null, function(err, value){
+    it("find many favorites by search existing favorite - S",(done)=>{
+        FavoriteService.findManyFavorites(null, null, null, {search:"le palace"}, users[0]._id, null, function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('count')
             expect(value['count']).to.be.equal(1)
@@ -188,6 +188,60 @@ describe('findManyFavorite',()=>{
             expect(String(value['results'][0]['user'])).to.be.equal(String(users[0]._id))
             expect(value['results'][0]['place']).to.haveOwnProperty('name')
             expect(String(value['results'][0]['place']['name'])).to.be.equal("le palace")
+            done()
+        })
+    })
+    it("find many favorites by categorie - S",(done)=>{
+        FavoriteService.findManyFavorites(null, null, null, {categorie:"hotel"}, users[0]._id, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('count')
+            expect(value['count']).to.be.equal(2)
+            expect(value).to.haveOwnProperty('results')
+            expect(value['results']).to.be.an('array')
+            expect(value['results']).to.lengthOf(2)
+            value.results.forEach((result)=>{
+                expect(result).to.be.a('object')
+                expect(result).to.haveOwnProperty('place')
+                expect(result['place']).to.be.a('object')
+                expect(result['place']).to.haveOwnProperty('categorie')
+                expect(result['place']['categorie']).to.be.equal('hotel')
+            })
+            done()
+        })
+    })
+    it("find many favorites by search existing favorite and categorie - S",(done)=>{
+        FavoriteService.findManyFavorites(null, null, null, {categorie:"hotel",search:"le palace"}, users[0]._id, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('count')
+            expect(value['count']).to.be.equal(1)
+            expect(value).to.haveOwnProperty('results')
+            expect(value['results']).to.be.an('array')
+            expect(value['results']).to.lengthOf(1)
+            expect(value['results'][0]).to.haveOwnProperty('user')
+            expect(value['results'][0]).to.haveOwnProperty('place')
+            expect(String(value['results'][0]['user'])).to.be.equal(String(users[0]._id))
+            expect(value['results'][0]['place']).to.haveOwnProperty('name')
+            expect(String(value['results'][0]['place']['name'])).to.be.equal("le palace")
+            done()
+        })
+    })
+    it("find many favorites by search not exist in database - S",(done)=>{
+        FavoriteService.findManyFavorites(null, null, null, {search:"le placard"}, users[0]._id, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty("count")
+            expect(value['count']).to.be.equal(0)
+            expect(value).to.haveOwnProperty('results')
+            expect(value['results']).to.lengthOf(0)
+            done()
+        })
+    })
+    it("find many favorites by unexpected field in search - S",(done)=>{
+        FavoriteService.findManyFavorites(null, null, null, {coucou:"le placard"}, users[0]._id, null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty("count")
+            expect(value['count']).to.be.equal(2)
+            expect(value).to.haveOwnProperty('results')
+            expect(value['results']).to.lengthOf(2)
             done()
         })
     })
@@ -261,7 +315,6 @@ describe('updateOneFavorite',()=>{
     })
     it("update one favorite to delete folder - S",(done) =>{
         FavoriteService.updateOneFavorite(favorites[0]._id, null, null, function(err, value){
-            console.log(err, value)
             expect(value).to.be.a('object')
             expect(value).to.not.haveOwnProperty('folder')
             done()

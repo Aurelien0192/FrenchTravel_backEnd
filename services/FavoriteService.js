@@ -41,60 +41,62 @@ module.exports.FavoriteService = class FavoriteService{
         limit = !Number.isNaN(limit) ? Number(limit): limit
 
         if(user_id && mongoose.isValidObjectId(user_id)){
-            const aggregateOptions = [
-                        {
-                            $lookup:{
-                                from: "places",
-                                localField: "place",
-                                foreignField: "_id",
-                                as: "place"
-                            }
-                        },{
-                            $unwind:{
-                                path: "$place",
-                                preserveNullAndEmptyArrays: true
-                            }
-                        },{
-                            $lookup:{
-                                from: "images",
-                                localField: "place._id",
-                                foreignField: "place",
-                                pipeline: [{
-                                    $limit: 1
-                                }],
-                                as: "place.images"
-                            }
-                        },{
-                            $match:{
-                                $and: [{
-                                    user: user_id
-                                },{
-                                    "place.name": {
-                                        $regex: q.search? q.search:"",
-                                        $options: "i"
-                                    }
-                                }]
-                            }
-                        },{
-                            $facet:{
-                                count: [{
-                                    $count: "count"
-                                }],
-                                results: [{
-                                    $limit: limit
-                                },{
-                                    $skip: (page-1)*limit
-                                }]
-                            }
-                        },{
-                            $project:{
-                                count: {
-                                    $arrayElemAt: ["$count.count", 0]
-                                },
-                                results: 1  
-                            }
+            try{
+                
+                const aggregateOptions = [
+                    {
+                        $lookup:{
+                            from: "places",
+                            localField: "place",
+                            foreignField: "_id",
+                            as: "place"
                         }
-                    ]
+                    },{
+                        $unwind:{
+                            path: "$place",
+                            preserveNullAndEmptyArrays: true
+                        }
+                    },{
+                        $lookup:{
+                            from: "images",
+                            localField: "place._id",
+                            foreignField: "place",
+                            pipeline: [{
+                                $limit: 1
+                            }],
+                            as: "place.images"
+                        }
+                    },{
+                        $match:{
+                            $and: [{
+                                user: user_id
+                            },{
+                                "place.name": {
+                                    $regex: (q && q.search)? q.search:"",
+                                    $options: "i"
+                                }
+                            }]
+                        }
+                    },{
+                        $facet:{
+                            count: [{
+                                $count: "count"
+                            }],
+                            results: [{
+                                $limit: limit
+                            },{
+                                $skip: (page-1)*limit
+                            }]
+                        }
+                    },{
+                        $project:{
+                            count: {
+                                $arrayElemAt: ["$count.count", 0]
+                            },
+                            results: 1  
+                        }
+                    }
+                ]
             if((placeOrFolder_id && mongoose.isValidObjectId(placeOrFolder_id)) || !placeOrFolder_id){ 
                 if (placeOrFolder_id){
                     placeOrFolder_id = new mongoose.Types.ObjectId(placeOrFolder_id)
@@ -106,7 +108,7 @@ module.exports.FavoriteService = class FavoriteService{
                         }]
                     })
                 }
-                if(q.categorie){
+                if(q && q.categorie){
                     aggregateOptions[3].$match.$and.push({
                         "place.categorie": q.categorie
                     })
@@ -121,7 +123,6 @@ module.exports.FavoriteService = class FavoriteService{
                 }else{
                     let favoritesFind = await Favorite.aggregate(aggregateOptions)
                     favoritesFind = favoritesFind[0]
-                    console.log(favoritesFind)
                     callback(null, {
                         count : favoritesFind.count? favoritesFind.count : 0,
                         results : favoritesFind.results
@@ -131,12 +132,15 @@ module.exports.FavoriteService = class FavoriteService{
                 const err = ErrorGenerator.controlIntegrityofID(placeOrFolder_id)
                 callback(err)
             }
+        }catch(e){
+            console.log(e)
+        }
         }else{
             const err = ErrorGenerator.controlIntegrityofID({user_id})
             callback(err)
         }
     }
-
+    
     static updateOneFavorite = async function(favorite_id,update,options, callback){
         try{
             if(favorite_id && mongoose.isValidObjectId(favorite_id)){
