@@ -49,6 +49,16 @@
  *            name: ids
  *            type: string
  *            description: id of place or folder
+ *          - in: query
+ *            name: search
+ *            type: string
+ *            description: find favorite by place's name
+ *          - in : query
+ *            name: categorie
+ *            description: find favorite by place's categorie
+ *            schema:
+ *              type: string
+ *              enum: [hotel,restaurant,activity]
  *      responses:
  *          200:
  *              description: favorites successfully finds.

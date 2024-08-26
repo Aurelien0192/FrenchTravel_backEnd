@@ -122,9 +122,13 @@
  *            name: limit
  *            type: number
  *          - in: query
- *            name: user_id
- *            type: string
- *            description: id of user who post comments
+ *            name: note
+ *            oneOf:
+ *              - type: string
+ *              - type: Array
+ *                items:
+ *                  - type: string 
+ *            description: filtrer to apply by place's note in comment
  *          - in: query
  *            name: place_id
  *            type: string
