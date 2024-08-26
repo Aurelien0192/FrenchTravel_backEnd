@@ -423,7 +423,7 @@ describe("DeleteOneUser",()=>{
         })
     })
     it('verify favorite correctly delete - S',(done) =>{
-        FavoriteService.findManyFavorites(null, null, null, users[0]._id, null, function(err, value){
+        FavoriteService.findManyFavorites(null, null, null, null, users[0]._id, null, function(err, value){
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty('count')
             expect(value["count"]).to.be.equal(0)

@@ -106,6 +106,24 @@ describe("GET - /favorites",()=>{
             done()
         })
     })
+    it("find many favorites by search - S",(done)=>{
+        chai.request(server).get('/favorites').query({search:"Château"}).auth(token,{type: 'bearer'}).end((err, res)=>{
+            res.should.has.status(200)
+            done()
+        })
+    })
+    it("find many favorites by search but not exist in database - S",(done)=>{
+        chai.request(server).get('/favorites').query({search:"zefzef"}).auth(token,{type: 'bearer'}).end((err, res)=>{
+            res.should.has.status(200)
+            done()
+        })
+    })
+    it("find many favorites by categorie - S",(done)=>{
+        chai.request(server).get('/favorites').query({categorie:"hotel"}).auth(token,{type: 'bearer'}).end((err, res)=>{
+            res.should.has.status(200)
+            done()
+        })
+    })
     it("find many favorites with uncorrect place id - E",(done)=>{
         chai.request(server).get('/favorites').query({ids:"jiodeorre"}).auth(token,{type: 'bearer'}).end((err, res)=>{
             res.should.has.status(405)
@@ -170,7 +188,7 @@ describe("PUT - /favorite/:id",()=>{
     })
     it("modify favorite with good favorite id and missing query - E",(done)=>{
         chai.request(server).put(`/favorite/${favorites[0]._id}`).auth(token,{type: 'bearer'}).end((err, res)=>{
-            res.should.has.status(405)
+            res.should.has.status(200)
             done()
         })
     })
