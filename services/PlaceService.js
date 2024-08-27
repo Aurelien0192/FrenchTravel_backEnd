@@ -67,7 +67,7 @@ module.exports.PlaceService =  class PlaceService{
                         },
                         populate:{
                             path: "user_id",
-                            select: "-password -token",
+                            select: "-password -token -email",
                             populate:{
                                 path:"profilePhoto"
                             }
@@ -188,7 +188,7 @@ module.exports.PlaceService =  class PlaceService{
                         },
                         populate:{
                             path: "user_id",
-                            select: "-password -token",
+                            select: "-password -token -email",
                             populate:{
                                 path:"profilePhoto"
                             }

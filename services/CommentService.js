@@ -160,7 +160,7 @@ module.exports.CommentServices = class CommentService{
         if(options && options.populate && options.populate.includes("user_id")){ 
             populate.push({
             path: "user_id",
-            select: "-password -token",
+            select: "-password -token -email",
             populate:{
                 path:"profilePhoto"
             }
@@ -252,7 +252,8 @@ module.exports.CommentServices = class CommentService{
                                 },{
                                     $project:{    
                                         "user_id.password":0,
-                                        "user_id.token": 0
+                                        "user_id.token": 0,
+                                        "user_id.email":0
                                     }
                                 },{
                                     $lookup:
@@ -283,6 +284,12 @@ module.exports.CommentServices = class CommentService{
                                         localField: "response.user_id",
                                         foreignField: "_id",
                                         as: "response.user_id"
+                                    }
+                                },{
+                                    $project:{    
+                                        "response.user_id.password":0,
+                                        "response.user_id.token": 0,
+                                        "response.user_id.email":0
                                     }
                                 },{
                                     $unwind:

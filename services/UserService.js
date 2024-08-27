@@ -44,6 +44,8 @@ module.exports.UserService = class UserService{
                 callback(err)
             }else{
                 await newUser.save()
+                delete newUser.password
+                delete newUser.email
                 callback(null, newUser.toObject())
             }
         } catch (error) {
@@ -58,7 +60,7 @@ module.exports.UserService = class UserService{
 
     static async findOneUserById(user_id, options, callback) {
         if(user_id && mongoose.isValidObjectId(user_id)){
-            User.findById(user_id, '-password -token', {populate:["profilePhoto"], lean:true}).then((value) => {
+            User.findById(user_id, '-password -token -email', {populate:["profilePhoto"], lean:true}).then((value) => {
                 try{
                     if (value){
                         callback(null, value)
@@ -86,7 +88,7 @@ module.exports.UserService = class UserService{
                 obj_find.push({ [e]: value})
             })
 
-            User.findOne({ $or: obj_find},null, {populate:["profilePhoto"], lean:true}).then((value) => {
+            User.findOne({ $or: obj_find},'-password -token -email', {populate:["profilePhoto"], lean:true}).then((value) => {
                 if (value){
                     callback(null, value)
                 }else{
@@ -125,7 +127,7 @@ module.exports.UserService = class UserService{
                     const salt = await bcrypt.genSalt(SALT_WORK_FACTOR)
                     update.password = await bcrypt.hash(update.password, salt)
                     
-                    User.findOneAndUpdate({email:update.email},{password:update.password},{returnDocument: 'after', runValidators: true, select: "-password -token"}).then((value)=>{
+                    User.findOneAndUpdate({email:update.email},{password:update.password},{returnDocument: 'after', runValidators: true, select: "-password -token -email"}).then((value)=>{
                         if(value){
                             callback(null,value.toObject())
                         }else{
@@ -167,7 +169,7 @@ module.exports.UserService = class UserService{
                 }
             }
             update.update_at = new Date()
-            User.findByIdAndUpdate(new ObjectId(user_id), update, {returnDocument: 'after', select: "-password -token", runValidators: true, populate:["profilePhoto"]}).then((value)=>{
+            User.findByIdAndUpdate(new ObjectId(user_id), update, {returnDocument: 'after', select: "-password -token -email", runValidators: true, populate:["profilePhoto"]}).then((value)=>{
                 try{
                     if(value){
                         callback(null, value.toObject())
@@ -193,7 +195,7 @@ module.exports.UserService = class UserService{
 
     static async updateUserProfilePhoto(user_id, update, options, callback){
         update.update_at = new Date()
-        User.findByIdAndUpdate(new ObjectId(user_id), update, {returnDocument: 'after', select: "-password -token", runValidators: true,populate:["profilePhoto"]}).then((value)=>{
+        User.findByIdAndUpdate(new ObjectId(user_id), update, {returnDocument: 'after', select: "-password -token -email", runValidators: true,populate:["profilePhoto"]}).then((value)=>{
             try{
                 if(value){
                     callback(null, value.toObject())
@@ -242,7 +244,7 @@ module.exports.UserService = class UserService{
                 if(err){
                     return callback({msg:err, type_error:"aborded"})
                 }else{
-                    User.findByIdAndDelete(user_id, {select: "-password -token"}).then((value) => {
+                    User.findByIdAndDelete(user_id, {select: "-password -token -email"}).then((value) => {
                         try {
                             if (value){
                                     callback(null, value.toObject())

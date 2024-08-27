@@ -503,7 +503,6 @@ describe("findManyComments  - S",()=>{
 describe("findManyCommentsByOwnerOfPlace",()=>{
     it('find many comments with correct places_id - S',(done)=>{
         CommentService.findManyCommentsByOwnerOfPlace(null, null, [places[0]._id], null, null, users[0]._id, function(err, value){
-            console.log(value.results[0])
             expect(value).to.be.a('object')
             expect(value).to.haveOwnProperty("count")
             expect(value["count"]).to.be.equal(2)
