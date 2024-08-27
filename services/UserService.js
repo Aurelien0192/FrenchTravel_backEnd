@@ -58,7 +58,7 @@ module.exports.UserService = class UserService{
 
     static async findOneUserById(user_id, options, callback) {
         if(user_id && mongoose.isValidObjectId(user_id)){
-            User.findById(user_id, null, {populate:["profilePhoto"], lean:true}).then((value) => {
+            User.findById(user_id, '-password -token', {populate:["profilePhoto"], lean:true}).then((value) => {
                 try{
                     if (value){
                         callback(null, value)
@@ -136,7 +136,7 @@ module.exports.UserService = class UserService{
                 }
             }
             update.update_at = new Date()
-            User.findByIdAndUpdate(new ObjectId(user_id), update, {returnDocument: 'after', runValidators: true, populate:["profilePhoto"]}).then((value)=>{
+            User.findByIdAndUpdate(new ObjectId(user_id), update, {returnDocument: 'after', select: "-password -token", runValidators: true, populate:["profilePhoto"]}).then((value)=>{
                 try{
                     if(value){
                         callback(null, value.toObject())
@@ -162,7 +162,7 @@ module.exports.UserService = class UserService{
 
     static async updateUserProfilePhoto(user_id, update, options, callback){
         update.update_at = new Date()
-        User.findByIdAndUpdate(new ObjectId(user_id), update, {returnDocument: 'after', runValidators: true,populate:["profilePhoto"]}).then((value)=>{
+        User.findByIdAndUpdate(new ObjectId(user_id), update, {returnDocument: 'after', select: "-password -token", runValidators: true,populate:["profilePhoto"]}).then((value)=>{
             try{
                 if(value){
                     callback(null, value.toObject())
@@ -211,7 +211,7 @@ module.exports.UserService = class UserService{
                 if(err){
                     return callback({msg:err, type_error:"aborded"})
                 }else{
-                    User.findByIdAndDelete(user_id).then((value) => {
+                    User.findByIdAndDelete(user_id, {select: "-password -token"}).then((value) => {
                         try {
                             if (value){
                                     callback(null, value.toObject())
