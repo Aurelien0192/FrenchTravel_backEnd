@@ -122,7 +122,47 @@
  *          500:
  *              description : Internal server error
  */
-
+/**
+ * @swagger
+ * /resPassword:
+ *  put:
+ *      summary: reset user's password with email
+ *      description : reset user's password with email
+ *      parameters:
+ *          - in: query
+ *            name: email
+ *            schema:
+ *              type: string
+ *            required: true
+ *            description: email of user who reset password
+ *          - in: query
+ *            name: password
+ *            schema:
+ *              type: string
+ *            required: true
+ *            description: new password
+ *      tags:
+ *          - User
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/User'
+ *      responses:
+ *          200:
+ *              description: User's password updated successfully.
+ *              content: 
+ *                  application/json:
+ *                      schema:
+ *                          $ref : '#/components/schemas/User'
+ *          404:
+ *              $ref: '#/components/responses/NotFound'
+ *          405:
+ *              $ref: '#/components/responses/ValidationError'
+ *          500:
+ *              description : Internal server error
+ */
 /**
  * @swagger
  * /user:
