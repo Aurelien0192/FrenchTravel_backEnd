@@ -12,9 +12,9 @@ require("../utils/database")
 //    require('./controllers/PlaceController.test')
 // })
 
-// describe("UserService",() => {
-//    require('./services/UserService.test')
-// })
+describe("UserService",() => {
+   require('./services/UserService.test')
+})
 
 // describe("UserController",() => {
 //    require('./controllers/UserController.test')
@@ -28,9 +28,9 @@ require("../utils/database")
 //    require("./services/ImageService.test")
 // })
 
-describe("CommentServices",() => {
-   require("./services/CommentServices.test")
-})
+// describe("CommentServices",() => {
+//    require("./services/CommentServices.test")
+// })
 
 // describe("CommentController",() => {
 //    require("./controllers/CommentController.test")

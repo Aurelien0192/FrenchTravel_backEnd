@@ -17,19 +17,19 @@ User.createIndexes()
 
 module.exports.UserService = class UserService{
     static loginUser = async function(username, password, options, callback){
-        UserService.findOneUser(['username','email'], username, null, async (err, value) => {
-        if(err){
-            callback(err)
-        }else{
-            if(bcrypt.compareSync(password, value.password)){ //comparaison hash password et password fourni lors de la co
-                let token = TokenUtils.createToken({_id : value._id}, null) //création du token via jsonwebtoken en fournissant l'id utilisateur
-                callback(null, {...value, token:token}) //return l'utilisateur avec le token
+        UserService.findOneUser(['username'], username, null, async (err, value) => {
+            if(err){
+                callback(err)
             }else{
-                callback({msg: "La comparaison des mots de passe sont fausse",type_error:"no-comparaison"})
+                if(bcrypt.compareSync(password, value.password)){ //comparaison hash password et password fourni lors de la co
+                    let token = TokenUtils.createToken({_id : value._id}, null) //création du token via jsonwebtoken en fournissant l'id utilisateur
+                    callback(null, {...value, token:token}) //return l'utilisateur avec le token
+                }else{
+                    callback({msg: "La comparaison des mots de passe sont fausse",type_error:"no-comparaison"})
+                }
             }
-        }
-    })
-}
+        })
+    }
 
     static async addOneUser(user, options, callback){
         try{
@@ -113,6 +113,37 @@ module.exports.UserService = class UserService{
                 callback({msg : msg, type_error: "no-valid", field_not_authorized : field_not_authorized})
             }else{
                 callback({msg: msg, type_error:"no-valid"})
+            }
+        }
+    }
+
+    static async resetPassword(update, options, callback){
+        if(update && _.difference(Object.keys(update),["email", "password"]).length === 0){
+            if(update.password && update.password.length>0){
+
+                try{
+                    const salt = await bcrypt.genSalt(SALT_WORK_FACTOR)
+                    update.password = await bcrypt.hash(update.password, salt)
+                    
+                    User.findOneAndUpdate({email:update.email},{password:update.password},{returnDocument: 'after', runValidators: true, select: "-password -token"}).then((value)=>{
+                        if(value){
+                            callback(null,value.toObject())
+                        }else{
+                            callback({msg: "Utilisateur non trouvé", type_error:"no-found"})
+                        }
+                    })
+                }catch(e){
+                    callback({msg:e, type_error:"error_mongo"})
+                }
+            }else{
+                callback({msg:"Le mot de passe ne peut être vide", fields_with_error:['password'],type_error:"no-valid"})
+            }
+        }else{
+            if(!update){
+                callback({msg:"update is missing", type_error:"no-valid"})
+            }else{
+                const unwantedFields = _.difference(Object.keys(update),["email", "password"])
+                callback({msg:`fields ${unwantedFields.join(' ')} is/are not allowed`, type_error:"no-valid"})
             }
         }
     }

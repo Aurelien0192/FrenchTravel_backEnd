@@ -299,6 +299,73 @@ describe("findOneUserById", () => {
         })
     })
 })
+describe("resetPassword",()=>{
+    it("resetPassword with correct information - S",(done)=>{
+        UserService.resetPassword({email:"peter.pan@gmail.com",password:"hello"},null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('email')
+            expect(value['email']).to.be.equal('peter.pan@gmail.com')
+            done()
+        })
+    })
+    it("login user with new password to check if password correctly change - S",(done)=>{
+        UserService.loginUser("LaFéeDuLogie","hello",null, function(err, value){
+            expect(value).to.be.a('object')
+            expect(value).to.haveOwnProperty('token')
+            done()
+        })
+    })
+    it("resetPassword with empty password - E",(done)=>{
+        UserService.resetPassword({email:"peter.pan@gmail.com",password:""},null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('msg')
+            expect(err['msg']).to.be.equal('Le mot de passe ne peut être vide')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it("resetPassword with missing password - E",(done)=>{
+        UserService.resetPassword({email:"peter.pan@gmail.com"},null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('msg')
+            expect(err['msg']).to.be.equal('Le mot de passe ne peut être vide')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-valid')
+            done()
+        })
+    })
+    it("resetPassword with unexist email - E",(done)=>{
+        UserService.resetPassword({email:"peter.pan5@gmail.com",password:"tititi"},null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('msg')
+            expect(err['msg']).to.be.equal('Utilisateur non trouvé')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-found')
+            done()
+        })
+    })
+    it("resetPassword with empty email - E",(done)=>{
+        UserService.resetPassword({email:"",password:"tititi"},null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('msg')
+            expect(err['msg']).to.be.equal('Utilisateur non trouvé')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-found')
+            done()
+        })
+    })
+    it("resetPassword with missing email - E",(done)=>{
+        UserService.resetPassword({password:"tititi"},null, function(err, value){
+            expect(err).to.be.a('object')
+            expect(err).to.haveOwnProperty('msg')
+            expect(err['msg']).to.be.equal('Utilisateur non trouvé')
+            expect(err).to.haveOwnProperty('type_error')
+            expect(err['type_error']).to.be.equal('no-found')
+            done()
+        })
+    })
+})
 
 describe("UpdateOneUser",() => {
     it("modify user with correct information - S",(done)=> {
