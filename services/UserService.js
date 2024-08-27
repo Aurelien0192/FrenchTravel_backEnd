@@ -17,7 +17,7 @@ User.createIndexes()
 
 module.exports.UserService = class UserService{
     static loginUser = async function(username, password, options, callback){
-        UserService.findOneUser(['username'], username, null, async (err, value) => {
+        UserService.findOneUser(['username','email'], username, null, async (err, value) => {
             if(err){
                 callback(err)
             }else{
@@ -88,7 +88,7 @@ module.exports.UserService = class UserService{
                 obj_find.push({ [e]: value})
             })
 
-            User.findOne({ $or: obj_find},'-password -token -email', {populate:["profilePhoto"], lean:true}).then((value) => {
+            User.findOne({ $or: obj_find},null, {populate:["profilePhoto"], lean:true}).then((value) => {
                 if (value){
                     callback(null, value)
                 }else{

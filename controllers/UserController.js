@@ -60,6 +60,13 @@ module.exports.UserControllers = class UserControllers{
         })
     }
 
+    static resetPassword(req, res){
+        UserService.resetPassword(req.body, null, function(err, value){
+            req.log.info("Réinitialisation du mot de passe d'un utilisateur")
+            responseOfServer(err, value, req, res, false)
+        })
+    }
+
     static updateOneUser(req, res){
         const opts = null
         UserService.updateOneUser(req.params.id, req.body, null, function(err, value){

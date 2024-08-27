@@ -16,9 +16,9 @@ require("../utils/database")
 //    require('./services/UserService.test')
 // })
 
-// describe("UserController",() => {
-//    require('./controllers/UserController.test')
-// })
+describe("UserController",() => {
+   require('./controllers/UserController.test')
+})
 
 // // describe("ApiLocationService", () => {
 // //    require('./services/ApiLocationService.test')
@@ -28,9 +28,9 @@ require("../utils/database")
 //    require("./services/ImageService.test")
 // })
 
-describe("CommentServices",() => {
-   require("./services/CommentServices.test")
-})
+// describe("CommentServices",() => {
+//    require("./services/CommentServices.test")
+// })
 
 // describe("CommentController",() => {
 //    require("./controllers/CommentController.test")

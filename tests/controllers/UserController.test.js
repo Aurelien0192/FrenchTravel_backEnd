@@ -222,7 +222,6 @@ describe("POST - /User",()=>{
         })
     })
 })
-
 describe("GET - /user/:id",()=>{
     it('find user with correct id - S',(done) => {
         chai.request(server).get(`/user/${users[0]._id}`).auth(token[0],{type: 'bearer'}).end((err,res)=>{
@@ -255,7 +254,44 @@ describe("GET - /user/:id",()=>{
         })
     })
 })
-
+describe('PUT - /resPassword',()=>{
+    it('reset password with correct information - S',(done)=>{
+        chai.request(server).put('/resPassword').send({email:"eric.dupond@gmail.com", password:"titi"}).end((err, res) =>{
+            res.should.have.status(200)
+            done()
+        })
+    })
+    it('reset password with empty password - E',(done)=>{
+        chai.request(server).put('/resPassword').send({email:"eric.dupond@gmail.com", password:""}).end((err, res) =>{
+            res.should.have.status(405)
+            done()
+        })
+    })
+    it('reset password with missing password - E',(done)=>{
+        chai.request(server).put('/resPassword').send({email:"eric.dupond@gmail.com"}).end((err, res) =>{
+            res.should.have.status(405)
+            done()
+        })
+    })
+    it('reset password with unexist email - E',(done)=>{
+        chai.request(server).put('/resPassword').send({email:"eric.dupond5@gmail.com", password:"tititi"}).end((err, res) =>{
+            res.should.have.status(404)
+            done()
+        })
+    })
+    it('reset password with empty email - E',(done)=>{
+        chai.request(server).put('/resPassword').send({email:"", password:"tititi"}).end((err, res) =>{
+            res.should.have.status(404)
+            done()
+        })
+    })
+    it('reset password with missing email - E',(done)=>{
+        chai.request(server).put('/resPassword').send({password:"tititi"}).end((err, res) =>{
+            res.should.have.status(404)
+            done()
+        })
+    })
+})
 describe("PUT - /user/:id",()=>{
     it('update correct id with correct value - S', (done)=>{
         chai.request(server).put(`/user/${users[0]._id}`).send({email:"laVieDesCornichons@orange.fr"}).auth(token[0],{type: 'bearer'}).end((err, res)=>{
