@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  api-test:
+    build: 
+      context: "./FrenchTravel_BackEnd"
+      dockerfile: Dockerfile
+      target: test
+    container_name: api-FrenchTravel-test
+    environment:
+      - PORT=3001
+      - SECRET_KEY=MY_SECRET_KEY_HASH
+      - SECRET_COOKIE=COOKIE
+      - URL_DATABASE=mongodb://mongodb:27017
+    ports:
+      - "3001:3001"
+    networks:
+      - app-network
+    depends_on:
+      - mongodb
+    restart: always

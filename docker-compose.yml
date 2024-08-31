@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  api:
+    build: 
+      context: "."
+      dockerfile: Dockerfile
+      target: development
+    container_name: api-FrenchTravel
+    environment:
+      - PORT=3001
+      - SECRET_KEY=MY_SECRET_KEY_HASH
+      - SECRET_COOKIE=COOKIE
+      - URL_DATABASE=mongodb://mongodb:27017
+    ports:
+      - "3001:3001"
+    networks:
+      - app-network
+    depends_on:
+      - mongodb-frenchtravel
+    
+    restart: always
+
+  mongodb-frenchtravel:
+    image: mongo:latest
+    container_name: mongodb-frenchtravel
+    volumes:
+    - ./mongo-data:/data/db
+    networks:
+      - app-network
+    expose:
+      - "27017"
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+    mongo-data:

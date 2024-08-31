@@ -13,8 +13,6 @@ const ObjectId = mongoose.Types.ObjectId
 
 const User = mongoose.model('User',UserSchema)
 
-User.createIndexes()
-
 module.exports.UserService = class UserService{
     static loginUser = async function(username, password, options, callback){
         UserService.findOneUser(['username','email'], username, null, async (err, value) => {
