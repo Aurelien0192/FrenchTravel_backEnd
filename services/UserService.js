@@ -23,7 +23,7 @@ module.exports.UserService = class UserService{
                     let token = TokenUtils.createToken({_id : value._id}, null) //création du token via jsonwebtoken en fournissant l'id utilisateur
                     callback(null, {...value, token:token}) //return l'utilisateur avec le token
                 }else{
-                    callback({msg: "La comparaison des mots de passe sont fausse",type_error:"no-comparaison"})
+                    callback({msg: "La comparaison des mots de passe est fausse",type_error:"no-comparaison"})
                 }
             }
         })
@@ -58,7 +58,7 @@ module.exports.UserService = class UserService{
 
     static async findOneUserById(user_id, options, callback) {
         if(user_id && mongoose.isValidObjectId(user_id)){
-            User.findById(user_id, '-password -token -email', {populate:["profilePhoto"], lean:true}).then((value) => {
+            User.findById(user_id, '-password -token', {populate:["profilePhoto"], lean:true}).then((value) => {
                 try{
                     if (value){
                         callback(null, value)

@@ -67,7 +67,7 @@ module.exports.PlaceService =  class PlaceService{
                         },
                         populate:{
                             path: "user_id",
-                            select: "-password -token -email",
+                            select: "-password -token -email -firstName -lastName -userType -about -create_at -update_at",
                             populate:{
                                 path:"profilePhoto"
                             }
@@ -150,7 +150,7 @@ module.exports.PlaceService =  class PlaceService{
                         },
                         populate:{
                             path: "user_id",
-                            select: "-password -token",
+                            select: "-password -token -email -firstName -lastName -userType -about -create_at -update_at",
                             populate:{
                                 path:"profilePhoto"
                             }
@@ -188,7 +188,7 @@ module.exports.PlaceService =  class PlaceService{
                         },
                         populate:{
                             path: "user_id",
-                            select: "-password -token -email",
+                            select: "-password -token -email -firstName -lastName -userType -about -create_at -update_at",
                             populate:{
                                 path:"profilePhoto"
                             }

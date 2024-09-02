@@ -150,7 +150,7 @@ module.exports.CommentServices = class CommentService{
                     path:"response",
                     populate:{
                         path:"user_id",
-                        select: "-password -token",
+                        select: "-password -token -email -firstName -lastName -userType -about -create_at -update_at",
                         populate:{
                             path:"profilePhoto"
                         }
@@ -160,7 +160,7 @@ module.exports.CommentServices = class CommentService{
         if(options && options.populate && options.populate.includes("user_id")){ 
             populate.push({
             path: "user_id",
-            select: "-password -token -email",
+            select: "-password -token -email -firstName -lastName -userType -about -create_at -update_at",
             populate:{
                 path:"profilePhoto"
             }
@@ -289,7 +289,13 @@ module.exports.CommentServices = class CommentService{
                                     $project:{    
                                         "response.user_id.password":0,
                                         "response.user_id.token": 0,
-                                        "response.user_id.email":0
+                                        "response.user_id.email":0,
+                                        "response.user_id.firstName":0,
+                                        "response.user_id.lastName":0,
+                                        "response.user_id.about":0,
+                                        "response.user_id.create_at":0,
+                                        "response.user_id.update_at":0,
+                                        "response.user_id.userType":0
                                     }
                                 },{
                                     $unwind:
