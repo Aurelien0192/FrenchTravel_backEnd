@@ -125,9 +125,9 @@ module.exports.UserService = class UserService{
                     const salt = await bcrypt.genSalt(SALT_WORK_FACTOR)
                     update.password = await bcrypt.hash(update.password, salt)
                     
-                    User.findOneAndUpdate({email:update.email},{password:update.password},{returnDocument: 'after', runValidators: true, select: "-password -token -email"}).then((value)=>{
+                    User.findOneAndUpdate({email:update.email},{password:update.password},{returnDocument: 'after', runValidators: true, select: "-password -token -email -firstName -lastName -userType -about -create_at -update_at"}).then((value)=>{
                         if(value){
-                            callback(null,value.toObject())
+                            callback(null,{msg:"le mot de passe a été correctement réinitialisé"})
                         }else{
                             callback({msg: "Utilisateur non trouvé", type_error:"no-found"})
                         }

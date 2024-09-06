@@ -303,8 +303,8 @@ describe("resetPassword",()=>{
     it("resetPassword with correct information - S",(done)=>{
         UserService.resetPassword({email:"peter.pan@gmail.com",password:"hello"},null, function(err, value){
             expect(value).to.be.a('object')
-            expect(value).to.haveOwnProperty('email')
-            expect(value['email']).to.be.equal('peter.pan@gmail.com')
+            expect(value).to.haveOwnProperty('msg')
+            expect(value['msg']).to.be.equal('le mot de passe a été correctement réinitialisé')
             done()
         })
     })
