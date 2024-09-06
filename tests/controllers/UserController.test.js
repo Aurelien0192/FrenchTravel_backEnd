@@ -3,7 +3,6 @@ const chaiHttp = require('chai-http')
 const should = chai.should()
 const expect = chai.expect
 const server = require('./../../server')
-const passport = require('passport')
 const LikeCommentService = require("../../services/LikeCommentService").LikeCommentService
 
 chai.use(chaiHttp)

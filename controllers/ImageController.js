@@ -1,38 +1,107 @@
-const { default: mongoose } = require('mongoose')
 const multer = require('../middlewares/multer.config')
+const { PlaceService } = require('../services/PlaceService')
 const ImageService = require('../services/ImageService').ImageService
 const responseOfServer = require('../utils/response').responseOfServer
+const fs = require("fs")
 
 module.exports.ImageController = class ImageController{
     static async addOneImage(req, res, next){
         req.log.info("Add one image in Database")
-        ImageService.addOneImage(req.file, req.body.place_id, req.user._id,function(err,value){
-            if(err && (err.type_error === "no-valid" || err.type_error === "validator")){
-                res.statusCode = 405
-                res.send(err)
-            }else{
-                if(req.url === "/image")
-                {
-                    res.statusCode = 201
-                    res.send(value)
+        if(req.url === '/image'){
+            PlaceService.findOnePlaceById(req.body.place_id,null, function(err, value){
+                if(err && (err.type_error === "no-valid" || err.type_error === "validator")){
+                    fs.unlink(req.file.path.split('\\').join('/'),function(err){
+                        if(err){
+                            console.log("echec de la suppression de l'image")
+                        }else{
+                            console.log("réussite de la suppression")
+                        }
+                    })
+                    res.statusCode = 405
+                    res.send(err)
+                }else if(err && (err.type_error === "no-found")){
+                    fs.unlink(req.file.path.split('\\').join('/'),function(err){
+                    if(err){
+                        console.log("echec de la suppression de l'image")
+                    }else{
+                        console.log("réussite de la suppression")
+                    }
+                })
+                    res.statusCode = 404
+                    res.send(err)
                 }else{
-                    res.locals.image = value
-                    next()
+                    ImageService.addOneImage(req.file, req.body.place_id, req.user._id, function(err,value){
+                        if(err && (err.type_error === "no-valid" || err.type_error === "validator")){
+                            res.statusCode = 405
+                            res.send(err)
+                        }else{
+                            if(req.url === "/image")
+                            {
+                                res.statusCode = 201
+                                res.send(value)
+                            }else{
+                                res.locals.image = value
+                                next()
+                            }
+                        }
+                    }) 
                 }
-            }
-        })  
+            })
+        }else{
+            ImageService.addOneImage(req.file, req.body.place_id, req.user._id, req.url, function(err,value){
+                if(err && (err.type_error === "no-valid" || err.type_error === "validator")){
+                    res.statusCode = 405
+                    res.send(err)
+                }else{
+                    if(req.url === "/image"){
+                        res.statusCode = 201
+                        res.send(value)
+                    }else{
+                        res.locals.image = value
+                        next()
+                    }
+                }
+            })  
+        }
     }
 
     static async addManyImages(req, res){
         req.log.info("Add many images in Database")
-        ImageService.addManyImages(req.files,req.body.place_id, req.user._id,function(err,value){
-
-            if(err && (err.type_error === "no-valid" || err[0].type_error === "validator")){
+        PlaceService.findOnePlaceById(req.body.place_id,null, function(err, value){
+            if(err && (err.type_error === "no-valid" || err.type_error === "validator")){
+                req.files.forEach((image) =>{
+                    fs.unlink(image.path.split('\\').join('/'),function(err){
+                        if(err){
+                            console.log("echec de la suppression de l'image")
+                        }else{
+                            console.log("réussite de la suppression")
+                        }
+                    })
+                })
                 res.statusCode = 405
                 res.send(err)
+            }else if(err && (err.type_error === "no-found")){
+                req.files.forEach((image) =>{
+                    fs.unlink(image.path.split('\\').join('/'),function(err){
+                        if(err){
+                            console.log("echec de la suppression de l'image")
+                        }else{
+                            console.log("réussite de la suppression")
+                        }
+                    })
+                })
+                res.statusCode = 404
+                res.send(err)
             }else{
-                res.statusCode = 201
-                res.send(value)
+                ImageService.addManyImages(req.files,req.body.place_id, req.user._id,function(err,value){
+                    if(err && (err.type_error === "no-valid" || err[0].type_error === "validator")){
+                        res.statusCode = 405
+                        res.send(err)
+                    }else{
+                        res.statusCode = 201
+                        res.send(value)
+                    }
+                })
             }
         })  
     }

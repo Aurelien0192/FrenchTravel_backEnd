@@ -230,9 +230,9 @@ module.exports.UserService = class UserService{
             ]);
 
             const images_id = (images.length>0 && images[0].images)? _.map(images[0].images,"_id") : []
-
+            const image_path = (images.length>0 && images[0].images)? _.map(images[0].images,"path") : []
             if(images_id.length>0){
-                await ImageService.deleteManyImages(images_id, function(err, value){
+                await ImageService.deleteManyImages(images_id, image_path, function(err, value){
                     if (err){
                         return callback({msg:"la suppression des images a rencontré un problème",type_error:"aborded", err})
                     }

@@ -34,18 +34,40 @@ module.exports.ImageService = class ImageService{
                             const data = await image.save()
                             callback(null, data.toObject()) 
                         }catch(e){
+                            fs.unlink(imageInfo.path.split('\\').join('/'),function(err){
+                                if(err){
+                                    console.log("echec de la suppression de l'image")
+                                }else{
+                                    console.log("réussite de la suppression")
+                                }
+                            })
                             callback(e)
                         }
                     }
                 }
             }catch(err){
+                fs.unlink(imageInfo.path.split('\\').join('/'),function(err){
+                    if(err){
+                        console.log("echec de la suppression de l'image")
+                    }else{
+                        console.log("réussite de la suppression")
+                    }
+                })
                 callback(err)
             }
         }else{
-            if(place_id && !mongoose.isValidObjectId(place_id)){
+            fs.unlink(imageInfo.path.split('\\').join('/'),function(err){
+                if(err){
+                    console.log("echec de la suppression de l'image")
+                }else{
+                    console.log("réussite de la suppression")
+                }
+            })
+            if(!place_id && !mongoose.isValidObjectId(place_id)){
                 callback({msg: "place_id is uncorrect",type_error:"no-valid"})
             }else{
                 callback(ErrorGenerator.controlIntegrityofID({user_id}))
+                
             }
         }
     }
@@ -55,7 +77,7 @@ module.exports.ImageService = class ImageService{
             imagesInfo = [imagesInfo]
         }
         const errors = []
-        if((!place_id || mongoose.isValidObjectId(place_id)) && user_id && mongoose.isValidObjectId(user_id)){
+        if(place_id && mongoose.isValidObjectId(place_id) && user_id && mongoose.isValidObjectId(user_id)){
             if(!imagesInfo){
                 callback({msg: "no image get for upload", type_error: "no-valid"})
                 
@@ -76,6 +98,15 @@ module.exports.ImageService = class ImageService{
                 for(let i =0; i < imagesInfo.length; i++ ){
                     let error = imageTab[i].validateSync()
                     if(error){
+                        imageTab.forEach((image)=>{
+                            fs.unlink(image.path,function(err){
+                                if(err){
+                                    console.log("echec de la suppression de l'image")
+                                }else{
+                                    console.log("réussite de la suppression")
+                                }
+                            })
+                        })
                         error = error['errors']
                         const text = Object.keys(error).map((e) => {
                             error[e].properties.message
@@ -106,6 +137,15 @@ module.exports.ImageService = class ImageService{
                 }
             }
         }else{
+            imagesInfo.forEach((image)=>{
+                fs.unlink(image.path.split('\\').join('/'),function(err){
+                    if(err){
+                        console.log("echec de la suppression de l'image")
+                    }else{
+                        console.log("réussite de la suppression")
+                    }
+                })
+            })
             if(place_id && !mongoose.isValidObjectId(place_id)){
                 callback({msg: "place_id is uncorrect",type_error:"no-valid"})
             }else{
@@ -197,11 +237,20 @@ module.exports.ImageService = class ImageService{
         }
     }
     
-    static async deleteManyImages(images_id, callback){
+    static async deleteManyImages(images_id, images_path, callback){
         if (images_id && Array.isArray(images_id) && images_id.length>0  && images_id.filter((e) => { return mongoose.isValidObjectId(e) }).length == images_id.length){
             images_id = images_id.map((image) => {return new mongoose.Types.ObjectId(image)})
             Image.deleteMany({_id: images_id}).then((value) => {
                 if (value && value.deletedCount !== 0){
+                    images_path.forEach((image_path)=>{
+                        fs.unlink(image_path,function(err){
+                            if(err){
+                                console.log("echec de la suppression de l'image")
+                            }else{
+                                console.log("réussite de la suppression")
+                            }
+                        })
+                    })
                     callback(null, value)
                 }else{
                     callback({msg: "Aucune images trouvées", type_error: "no-found"})

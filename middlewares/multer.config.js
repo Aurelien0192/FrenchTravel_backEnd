@@ -33,9 +33,21 @@ module.exports.oneImage = multer({
         if(acceptedExtentionsList.includes(extname)){
             callback(null, true)
         }else{
-            callback(new Error("Invalid file extension"))
+            callback(null, false)
         }
     }    
 }).single('image')
 
-module.exports.manyImage = multer({storage}).array('images')
+module.exports.manyImage = multer({storage,
+    limits:{
+        fileSize: 4 * 1024 * 1024,
+    },
+    fileFilter:(req, file, callback) => {
+        const acceptedExtentionsList = ['.jpg','.jpeg','.png']
+        const extname = path.extname(file.originalname).toLowerCase()
+        if(acceptedExtentionsList.includes(extname)){
+            callback(null, true)
+        }else{
+            callback(null, false)
+        }
+    }}).array('images')

@@ -320,10 +320,15 @@ module.exports.PlaceService =  class PlaceService{
                 }
             ]);
         
-            const images_id = (images.length>0 && images[0].images.length>0)? _.map(images[0].images,"_id") : []
+            const imagesToDelete = {
+                _id : [],
+                path : []
+            }
+            imagesToDelete._id = (images.length>0 && images[0].images.length>0)? _.map(images[0].images,"_id") : []
+            imagesToDelete.path = (images.length>0 && images[0].images.length>0)? _.map(images[0].images,"path") : []
 
-            if(images_id.length>0){
-                await ImageService.deleteManyImages(images_id, function(err, value){
+            if(imagesToDelete._id.length>0){
+                await ImageService.deleteManyImages(imagesToDelete._id, imagesToDelete.path, function(err, value){
                     if (err){
                         return callback({msg:"la suppression des images a rencontré un problème",type_error:"aborded", err})
                     }
@@ -357,7 +362,11 @@ module.exports.PlaceService =  class PlaceService{
     static async deleteManyPlaces(places_id, options, callback){
         if (places_id && Array.isArray(places_id) && places_id.length>0  && places_id.filter((e) => { return mongoose.isValidObjectId(e) }).length == places_id.length){
             places_id = places_id.map((place) => { return new mongoose.Types.ObjectId(place) })
-            let images_id = []
+            
+            let imagesToDelete = {
+                _id : [],
+                path : []
+            }
 
             for(let i=0; i<places_id.length; i++){
                 const images = await Place.aggregate([{
@@ -380,11 +389,12 @@ module.exports.PlaceService =  class PlaceService{
                 ])
 
                 const imagesIdForOnePlace = images.length>0 && images[0].images.length>0 ? _.map(images[0].images,"_id") : []
-                images_id = [...images_id, ...imagesIdForOnePlace]
+                const imagesPathForOnePlace = images.length>0 && images[0].images.length>0 ? _.map(images[0].images,"path") : []
+                imagesToDelete._id= [...imagesToDelete._id, ...imagesIdForOnePlace]
+                imagesToDelete.path= [...imagesToDelete.path, ...imagesPathForOnePlace]
             }
-
-            if(images_id.length>0){
-                await ImageService.deleteManyImages(images_id, function(err, value){
+            if(imagesToDelete._id.length>0){
+                await ImageService.deleteManyImages(imagesToDelete._id,imagesToDelete.path, function(err, value){
                     if (err){
                         return callback({msg:"la suppression des images a rencontré un problème",type_error:"aborded", err})
                     }

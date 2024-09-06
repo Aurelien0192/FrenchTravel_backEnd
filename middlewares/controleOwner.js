@@ -152,8 +152,10 @@ module.exports.controleOwnerOfImage = (req, res, next) => {
             ImageService.findOneImageById(req.params.id, null, function(err, image){
                 if(err && (err.type_error === "no-valid")){
                     res.statusCode = 405
+                    res.send(err)
                 }else if(err && err.type_error === "error-mongo"){
                     res.statusCode = 500
+                    res.send(err)
                 }else if(err && err.type_error === "no-found"){
                     res.statusCode = 404
                     res.send(err)
