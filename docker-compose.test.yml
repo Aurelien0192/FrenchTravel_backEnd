@@ -8,12 +8,12 @@ services:
       target: test
     container_name: api-FrenchTravel-test
     environment:
-      - PORT=3001
-      - SECRET_KEY=MY_SECRET_KEY_HASH
-      - SECRET_COOKIE=COOKIE
-      - URL_DATABASE=mongodb://mongodb:27017
+      - PORT=${PORT}
+      - SECRET_KEY=${SECRET_KEY}
+      - SECRET_COOKIE=${SECRET_COOKIE}
+      - URL_DATABASE=${URL_DATABASE}
     ports:
-      - "3001:3001"
+      - "${PORT}:${PORT}"
     networks:
       - app-network
     depends_on:

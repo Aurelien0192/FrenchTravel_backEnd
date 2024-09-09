@@ -10,18 +10,17 @@ services:
     volumes:
       - .:/app
     environment:
-      - PORT=3001
-      - SECRET_KEY=MY_SECRET_KEY_HASH
-      - SECRET_COOKIE=COOKIE
-      - URL_DATABASE=mongodb://mongodb:27017
+      - PORT=${PORT}
+      - SECRET_KEY=${SECRET_KEY}
+      - SECRET_COOKIE=${SECRET_COOKIE}
+      - URL_DATABASE=${URL_DATABASE}
       - CHOKIDAR_USEPOLLING=true
     ports:
-      - "3001:3001"
+      - "${PORT}:${PORT}"
     networks:
       - app-network
     depends_on:
       - mongodb-frenchtravel
-    
     restart: always
 
   mongodb-frenchtravel:
@@ -32,7 +31,7 @@ services:
     networks:
       - app-network
     expose:
-      - "27017"
+      - ${PORT_BDD}
 
 networks:
   app-network:
