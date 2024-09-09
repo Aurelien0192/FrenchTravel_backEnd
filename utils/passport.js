@@ -2,6 +2,7 @@ const passport = require("passport")
 const LocalStrategy = require('passport-local').Strategy
 const UserService = require('./../services/UserService').UserService
 const PassportConfig = require("../config").passportConfig
+require('dotenv').config()
 
 const passportJWT = require("passport-jwt")
 
@@ -19,7 +20,7 @@ passport.use('login', new LocalStrategy({passReqToCallback: true}, function(req,
 
 passport.use(new JWTStrategy({
     jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-    secretOrKey: PassportConfig.getSecretKey(),
+    secretOrKey: process.env.SECRET_KEY,
     passReqToCallback : true
 }, function (req, jwt_payload, done){
     UserService.findOneUserById(jwt_payload._id, null, function (err, value){

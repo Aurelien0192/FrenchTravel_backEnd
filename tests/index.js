@@ -24,9 +24,9 @@ describe("UserController",() => {
 //    require('./services/ApiLocationService.test')
 // })
 
-// describe("ImageService",() => {
-//    require("./services/ImageService.test")
-// })
+// // describe("ImageService",() => {
+// //    require("./services/ImageService.test")
+// // })
 
 describe("ImageController",()=>{
    require("./controllers/ImageController.test")

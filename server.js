@@ -1,5 +1,4 @@
 const express = require("express")
-const Config = require("./config")
 const bodyParser = require("body-parser")
 const Logger = require('./utils/logger').logger.pino
 const database = require('./middlewares/database')
@@ -8,6 +7,7 @@ const multerOneImage = require('./middlewares/multer.config').oneImage
 const multerManyImage = require('./middlewares/multer.config').manyImage
 const path = require('path')
 const session = require('express-session')
+require('dotenv').config()
 
 const swaggerJSDoc= require('swagger-jsdoc')
 const swaggerUi = require('swagger-ui-express')
@@ -23,7 +23,7 @@ const swaggerDocs = swaggerJSDoc(swaggerOptions)
 app.use('/api-docs', swaggerUi.serve,swaggerUi.setup(swaggerDocs))
 
 app.use(session({
-  secret : Config.passportConfig.getSecretCookie(),
+  secret : process.env.SECRET_COOKIE,
   resave: false,
   saveUninitialized : true,
   cookie : {secure: true}
@@ -125,8 +125,8 @@ app.get('/folders',database.controlsBDD,passport.authenticate('jwt',{session:fal
 app.put('/folder/:id',database.controlsBDD,passport.authenticate('jwt',{session:false}),FolderController.updateFolderById)
 app.delete('/folder/:id',database.controlsBDD,passport.authenticate('jwt',{session:false}),FolderController.deleteOneFolderById)
 
-app.listen(Config.port, () => {
-    Logger.info(`Serveur démarré sur le port ${Config.port}.`)
+app.listen(process.env.PORT, () => {
+    Logger.info(`Serveur démarré sur le port ${process.env.PORT}.`)
 })
 
 module.exports = app

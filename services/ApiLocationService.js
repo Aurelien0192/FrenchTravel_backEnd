@@ -1,6 +1,6 @@
 const http_geocode = require('../utils/http').http_geocode
-const keyApi = require('../config').keyApi
 const _ = require('lodash')
+require('dotenv').config()
 
 module.exports.ApiLocationServices =  class ApiLocationServices {
     static async getDataGeocode(params,callback){
@@ -21,7 +21,7 @@ module.exports.ApiLocationServices =  class ApiLocationServices {
             }
             callback(error) 
         }
-        params.api_key = keyApi.getKeyGeocode()
+        params.api_key = process.env.GEOCODE_KEY
         try{
             const data = await http_geocode.get(`search?`,{params})
             setTimeout(() => {   
