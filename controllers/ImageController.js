@@ -48,7 +48,7 @@ module.exports.ImageController = class ImageController{
                 }
             })
         }else{
-            ImageService.addOneImage(req.file, req.body.place_id, req.user._id, req.url, function(err,value){
+            ImageService.addOneImage(req.file, req.body.place_id, req.user._id, function(err,value){
                 if(err && (err.type_error === "no-valid" || err.type_error === "validator")){
                     res.statusCode = 405
                     res.send(err)
