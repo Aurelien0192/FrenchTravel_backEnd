@@ -469,12 +469,12 @@ module.exports.CommentServices = class CommentService{
     static async deleteOneCommentById(comment_id, callback){
         if(comment_id && mongoose.isValidObjectId(comment_id)){
             comment_id = new mongoose.Types.ObjectId(comment_id)
+            const commentToDelete = await Comment.findById(comment_id)
             DependencyService.deleteAttachedDocumentsOfComments(comment_id,function(err){
                 if(err){
                      return callback({msg:err, type_error:"aborded"})
                 }else{
-
-                    Comment.findByIdAndDelete(comment_id).then((value) => {
+                    Comment.deleteMany({$or:[{_id: comment_id},{_id: commentToDelete.response}]}).then((value) => {
                         if(value){
                             callback(null, value.toObject())
                         }else{
@@ -497,7 +497,9 @@ module.exports.CommentServices = class CommentService{
     static async deleteManyComments(comments_id, callback){
         if (comments_id && Array.isArray(comments_id) && comments_id.length>0  && comments_id.filter((e) => { return mongoose.isValidObjectId(e) }).length == comments_id.length){
             comments_id = comments_id.map((comment) => {return new mongoose.Types.ObjectId(comment)})
-            Comment.deleteMany({_id: comments_id}).then((value) => {
+            let commentsToDelete = await Comment.find({_id:comments_id})
+            commentsToDelete = (commentsToDelete.filter((comment)=> comment.response)).map((comment)=>{return comment.response})
+            Comment.deleteMany({$or:[{_id: comments_id},{_id:commentsToDelete}]}).then((value) => {
                 callback(null, value)
             }).catch((err) => {
                 callback({msg:"Erreur avec la base de donnée", type_error: "error-mongo"})
